@@ -1,0 +1,58 @@
+{
+  "name": "@projectwallace/css-code-coverage",
+  "version": "0.1.0",
+  "description": "",
+  "author": "Bart Veneman <bart@projectwallace.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/projectwallace/css-code-coverage.git"
+  },
+  "issues": "https://github.com/projectwallace/css-code-coverage/issues",
+  "homepage": "https://github.com/projectwallace/css-code-coverage",
+  "keywords": [
+    "css",
+    "code",
+    "coverage",
+    "testing",
+    "used",
+    "unused",
+    "dead",
+    "styles"
+  ],
+  "license": "EUPL-1.2",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "dist/css-code-coverage.js",
+  "exports": {
+    "types": "./dist/index.d.ts",
+    "default": "./dist/css-code-coverage.js"
+  },
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "c8 --reporter=text playwright test",
+    "build": "vite build",
+    "check": "tsc --noEmit",
+    "lint": "oxlint --config .oxlintrc.json",
+    "lint-package": "publint"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.0",
+    "c8": "^10.1.3",
+    "linkedom": "^0.18.12",
+    "oxlint": "^1.22.0",
+    "publint": "^0.3.14",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.9",
+    "vite-plugin-dts": "^4.5.4"
+  },
+  "dependencies": {
+    "@projectwallace/format-css": "^2.1.1",
+    "css-tree": "^3.1.0",
+    "valibot": "^1.1.0"
+  }
+}
