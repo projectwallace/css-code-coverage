@@ -120,6 +120,7 @@ export function calculate_coverage(coverage: Coverage[], parse_html: Parser): Co
 			total_lines: total_file_lines,
 			covered_lines: file_lines_covered,
 			uncovered_lines: total_file_lines - file_lines_covered,
+			// TODO: { is_covered: boolean, start_offset: number, start_line: number, end_offset: number, end_line: number }[]
 		}
 	})
 

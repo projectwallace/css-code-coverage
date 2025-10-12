@@ -23,7 +23,7 @@ jobs:
       - name: Install dependencies
         run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Install Playwright Browsers
-        run: npx playwright install chromium
+        run: npx playwright install chromium --only-shell
       - run: npm test -- --forbid-only
 
   check-ts:
@@ -40,7 +40,7 @@ jobs:
       - run: npm run check
 
   lint-code:
-    name: Check types
+    name: Lint code (oxlint)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -53,7 +53,7 @@ jobs:
       - run: npm run lint
 
   lint-package:
-    name: Lint package
+    name: Lint package (publint)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
