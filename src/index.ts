@@ -24,8 +24,8 @@ export type StylesheetCoverage = CoverageData & {
 
 export type CoverageResult = CoverageData & {
 	total_files_found: number
-	coverage_per_stylesheet: StylesheetCoverage[]
 	total_stylesheets: number
+	coverage_per_stylesheet: StylesheetCoverage[]
 }
 
 /**
