@@ -19,52 +19,33 @@ npm install @projectwallace/css-code-coverage
 
 ### Prerequisites
 
-1. You have collected browser coverage data of your CSS. There are several ways to do this:
+You have collected browser coverage data of your CSS. There are several ways to do this:
 
-   1. in the browser devtools in [Edge](https://learn.microsoft.com/en-us/microsoft-edge/devtools-guide-chromium/coverage/)/[Chrome](https://developer.chrome.com/docs/devtools/coverage/)/chromium
-   1. Via the `coverage.startCSSCoverage()` API that headless browsers like [Playwright](https://playwright.dev/docs/api/class-coverage#coverage-start-css-coverage) or [Puppeteer](https://pptr.dev/api/puppeteer.coverage.startcsscoverage/) provide.
+1.  in the browser devtools in [Edge](https://learn.microsoft.com/en-us/microsoft-edge/devtools-guide-chromium/coverage/)/[Chrome](https://developer.chrome.com/docs/devtools/coverage/)/chromium
+1.  Via the `coverage.startCSSCoverage()` API that headless browsers like [Playwright](https://playwright.dev/docs/api/class-coverage#coverage-start-css-coverage) or [Puppeteer](https://pptr.dev/api/puppeteer.coverage.startcsscoverage/) provide.
 
-   Either way you end up with one or more JSON files that contain coverage data.
+Either way you end up with one or more JSON files that contain coverage data.
 
-   ```ts
-   // Read a single JSON or a folder full of JSON files with coverage data
-   // Coverage data looks like this:
-   // {
-   //   url: 'https://www.projectwallace.com/style.css',
-   //   text: 'a { color: blue; text-decoration: underline; }', etc.
-   //   ranges: [
-   //     { start: 0, end: 46 }
-   //   ]
-   // }
-   import { parse_coverage } from '@projectwallace/css-code-coverage'
+```ts
+// Read a single JSON or a folder full of JSON files with coverage data
+// Coverage data looks like this:
+// {
+//   url: 'https://www.projectwallace.com/style.css',
+//   text: 'a { color: blue; text-decoration: underline; }', etc.
+//   ranges: [
+//     { start: 0, end: 46 }
+//   ]
+// }
+import { parse_coverage } from '@projectwallace/css-code-coverage'
 
-   let files = await fs.glob('./css-coverage/**/*.json')
-   let coverage_data = []
+let files = await fs.glob('./css-coverage/**/*.json')
+let coverage_data = []
 
-   for (let file of files) {
-   	let json_content = await fs.readFile(file, 'urf-8')
-   	coverage_data.push(...parse_coverage(json_content))
-   }
-   ```
-
-1. You provide a HTML parser that we use to 'scrape' the HTML in case the browser gives us not just plain CSS contents. Depending on where you run this analysis you can use:
-
-   1. Browser:
-      ```ts
-      function parse_html(html) {
-      	return new DOMParser().parseFromString(html, 'text/html')
-      }
-      ```
-   1. Node (using [linkedom](https://github.com/WebReflection/linkedom) in this example):
-
-      ```ts
-      // $ npm install linkedom
-      import { DOMParser } from 'linkedom'
-
-      function parse_html(html: string) {
-      	return new DOMParser().parseFromString(html, 'text/html')
-      }
-      ```
+for (let file of files) {
+	let json_content = await fs.readFile(file, 'urf-8')
+	coverage_data.push(...parse_coverage(json_content))
+}
+```
 
 ### Bringing it together
 
@@ -73,3 +54,26 @@ import { calculate_coverage } from '@projectwallace/css-code-coverage'
 
 let report = calculcate_coverage(coverage_data, parse_html)
 ```
+
+See [src/index.ts](https://github.com/projectwallace/css-code-coverage/blob/main/src/index.ts) for the data that's returned.
+
+### Optional: coverage from `<style>` blocks
+
+Covergae generators also create coverage ranges for `<style>` blocks in HTML. If this applies to your code you should provide a HTML parser that we use to 'scrape' the HTML in case the browser gives us not just plain CSS contents. Depending on where you run this analysis you can use:
+
+1.  Browser:
+    ```ts
+    function parse_html(html) {
+    	return new DOMParser().parseFromString(html, 'text/html')
+    }
+    ```
+1.  Node (using [linkedom](https://github.com/WebReflection/linkedom) in this example):
+
+    ```ts
+    // $ npm install linkedom
+    import { DOMParser } from 'linkedom'
+
+    function parse_html(html: string) {
+    	return new DOMParser().parseFromString(html, 'text/html')
+    }
+    ```
