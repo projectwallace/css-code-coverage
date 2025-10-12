@@ -44,7 +44,7 @@ function ratio(fraction: number, total: number) {
  * 4. Calculate used/unused CSS bytes (fastest path, no inspection of the actual CSS needed)
  * 5. Calculate line-coverage, byte-coverage per stylesheet
  */
-export function calculate_coverage(coverage: Coverage[], parse_html: Parser): CoverageResult {
+export function calculate_coverage(coverage: Coverage[], parse_html?: Parser): CoverageResult {
 	let total_files_found = coverage.length
 
 	if (!is_valid_coverage(coverage)) {

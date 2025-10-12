@@ -56,3 +56,14 @@ test('keeps extension-less URL with CSS text (running coverage in vite dev mode)
 	]
 	expect(filter_coverage(entries, html_parser)).toEqual(entries)
 })
+
+test('skips extension-less URL with HTML text when no parser is provided', () => {
+	let entries = [
+		{
+			url: 'http://example.com',
+			text: `<html><style>a{color:red;}</style></html>`,
+			ranges: [{ start: 13, end: 26 }],
+		},
+	]
+	expect(filter_coverage(entries)).toEqual([])
+})
