@@ -24,11 +24,15 @@ let CoverageSchema = v.array(
 	}),
 )
 
-export function parse_json(input: string) {
+export function is_valid_coverage(input: unknown): boolean {
+	let result = v.safeParse(CoverageSchema, input)
+	return result.success
+}
+
+export function parse_coverage(input: string) {
 	try {
 		let parse_result = JSON.parse(input)
-		v.parse(CoverageSchema, parse_result)
-		return parse_result as Coverage[]
+		return is_valid_coverage(parse_result) ? (parse_result as Coverage[]) : ([] as Coverage[])
 	} catch {
 		return [] as Coverage[]
 	}

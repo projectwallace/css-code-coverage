@@ -196,3 +196,45 @@ test.describe('from coverage data downloaded directly from the browser as JSON',
 		)
 	})
 })
+
+test('handles empty input', () => {
+	let result = calculate_coverage([], html_parser)
+	expect(result.total_files_found).toBe(0)
+	expect(result.total_bytes).toBe(0)
+	expect(result.used_bytes).toBe(0)
+	expect(result.unused_bytes).toBe(0)
+	expect(result.total_lines).toBe(0)
+	expect(result.covered_lines).toBe(0)
+	expect(result.uncovered_lines).toBe(0)
+	expect(result.line_coverage_ratio).toBe(0)
+	expect(result.total_stylesheets).toBe(0)
+	expect(result.coverage_per_stylesheet).toEqual([])
+})
+
+test.describe('garbage input', () => {
+	test('garbage Array', () => {
+		expect(() =>
+			calculate_coverage(
+				[
+					{
+						test: 1,
+						garbage: true,
+					},
+				] as unknown as Coverage[],
+				html_parser,
+			),
+		).toThrow('No valid coverage data found')
+	})
+
+	test('garbage Object', () => {
+		expect(() =>
+			calculate_coverage(
+				{
+					test: 1,
+					garbage: true,
+				} as unknown as Coverage[],
+				html_parser,
+			),
+		).toThrow('No valid coverage data found')
+	})
+})

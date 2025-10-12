@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { parse_json } from './parse-coverage.ts'
+import { parse_coverage } from './parse-coverage.ts'
 
 test('parses valid JSON', () => {
 	let input = `
@@ -13,7 +13,7 @@ test('parses valid JSON', () => {
 		}
 	]
 	`
-	let result = parse_json(input)
+	let result = parse_coverage(input)
 	expect(result).toEqual([
 		{
 			url: 'example.com',
@@ -34,7 +34,7 @@ test('allows entries without text', () => {
 		}
 	]
 	`
-	let result = parse_json(input)
+	let result = parse_coverage(input)
 	expect(result).toEqual([
 		{
 			url: 'example.com',
@@ -45,7 +45,7 @@ test('allows entries without text', () => {
 
 test('returns empty array for invalid JSON', () => {
 	let input = `invalid json`
-	let result = parse_json(input)
+	let result = parse_coverage(input)
 	expect(result).toEqual([])
 })
 
@@ -60,6 +60,6 @@ test('returns empty array for JSON not matching schema', () => {
 		}
 	]
 	`
-	let result = parse_json(input)
+	let result = parse_coverage(input)
 	expect(result).toEqual([])
 })

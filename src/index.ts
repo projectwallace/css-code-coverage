@@ -1,4 +1,4 @@
-import type { Coverage, Range } from './parse-coverage.ts'
+import { is_valid_coverage, type Coverage, type Range } from './parse-coverage.ts'
 import { prettify } from './prettify.ts'
 import { deduplicate_entries } from './decuplicate.ts'
 import { filter_coverage } from './filter-entries.ts'
@@ -28,6 +28,11 @@ export type CoverageResult = CoverageData & {
 	coverage_per_stylesheet: StylesheetCoverage[]
 }
 
+function ratio(fraction: number, total: number) {
+	if (total === 0) return 0
+	return fraction / total
+}
+
 /**
  * @description
  * CSS Code Coverage calculation
@@ -41,6 +46,11 @@ export type CoverageResult = CoverageData & {
  */
 export function calculate_coverage(coverage: Coverage[], parse_html: Parser): CoverageResult {
 	let total_files_found = coverage.length
+
+	if (!is_valid_coverage(coverage)) {
+		throw new TypeError('No valid coverage data found')
+	}
+
 	let filtered_coverage = filter_coverage(coverage, parse_html)
 	let prettified_coverage = prettify(filtered_coverage)
 	let deduplicated = deduplicate_entries(prettified_coverage)
@@ -114,8 +124,8 @@ export function calculate_coverage(coverage: Coverage[], parse_html: Parser): Co
 			unused_bytes: file_total_bytes - file_bytes_covered,
 			used_bytes: file_bytes_covered,
 			total_bytes: file_total_bytes,
-			line_coverage_ratio: file_lines_covered / total_file_lines,
-			byte_coverage_ratio: file_bytes_covered / file_total_bytes,
+			line_coverage_ratio: ratio(file_lines_covered, total_file_lines),
+			byte_coverage_ratio: ratio(file_bytes_covered, file_total_bytes),
 			line_coverage,
 			total_lines: total_file_lines,
 			covered_lines: file_lines_covered,
@@ -154,9 +164,13 @@ export function calculate_coverage(coverage: Coverage[], parse_html: Parser): Co
 		covered_lines: total_covered_lines,
 		unused_bytes: total_unused_bytes,
 		uncovered_lines: total_uncovered_lines,
-		byte_coverage_ratio: total_used_bytes / total_bytes,
-		line_coverage_ratio: total_covered_lines / total_lines,
+		byte_coverage_ratio: ratio(total_used_bytes, total_bytes),
+		line_coverage_ratio: ratio(total_covered_lines, total_lines),
 		coverage_per_stylesheet,
 		total_stylesheets: coverage_per_stylesheet.length,
 	}
 }
+
+export type { Coverage, Range } from './parse-coverage.ts'
+export { parse_coverage } from './parse-coverage.ts'
+export type { Parser } from './types.ts'

@@ -36,11 +36,14 @@ npm install @projectwallace/css-code-coverage
    //     { start: 0, end: 46 }
    //   ]
    // }
+   import { parse_coverage } from '@projectwallace/css-code-coverage'
+
    let files = await fs.glob('./css-coverage/**/*.json')
    let coverage_data = []
+
    for (let file of files) {
    	let json_content = await fs.readFile(file, 'urf-8')
-   	coverage_data.push(JSON.parse(json_content))
+   	coverage_data.push(...parse_coverage(json_content))
    }
    ```
 
