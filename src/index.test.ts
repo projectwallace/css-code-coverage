@@ -195,6 +195,64 @@ test.describe('from coverage data downloaded directly from the browser as JSON',
 			]),
 		)
 	})
+
+	test('calculates chunks', () => {
+		let result = calculate_coverage(coverage, html_parser)
+		expect(result.coverage_per_stylesheet.at(0)?.chunks).toEqual([
+			{ start_line: 1, is_covered: true, end_line: 4, total_lines: 4 },
+			{ start_line: 4, is_covered: false, end_line: 8, total_lines: 5 },
+			{ start_line: 8, is_covered: true, end_line: 10, total_lines: 3 },
+			{ start_line: 10, is_covered: false, end_line: 11, total_lines: 2 },
+			{ start_line: 11, is_covered: true, end_line: 14, total_lines: 4 },
+		])
+	})
+
+	test('calculates chunks for fully covered file', () => {
+		let result = calculate_coverage(
+			[
+				{
+					url: 'https://example.com',
+					ranges: [
+						{
+							start: 0,
+							end: 19,
+						},
+					],
+					text: 'h1 { color: blue; }',
+				},
+			],
+			html_parser,
+		)
+		expect(result.coverage_per_stylesheet.at(0)?.chunks).toEqual([
+			{
+				start_line: 1,
+				is_covered: true,
+				end_line: 3,
+				total_lines: 3,
+			},
+		])
+	})
+
+	test('calculates chunks for fully uncovered file', () => {
+		let result = calculate_coverage(
+			[
+				{
+					url: 'https://example.com',
+					ranges: [],
+					text: 'h1 { color: blue; }',
+				},
+			],
+			html_parser,
+		)
+		expect(result.coverage_per_stylesheet.at(0)?.chunks).toEqual([
+			{
+				start_line: 1,
+				is_covered: false,
+				end_line: 3,
+				total_lines: 3,
+			},
+		])
+	})
 })
 
 test('handles empty input', () => {

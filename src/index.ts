@@ -20,6 +20,12 @@ export type StylesheetCoverage = CoverageData & {
 	text: string
 	ranges: Range[]
 	line_coverage: Uint8Array
+	chunks: {
+		is_covered: boolean
+		start_line: number
+		end_line: number
+		total_lines: number
+	}[]
 }
 
 export type CoverageResult = CoverageData & {
@@ -117,6 +123,36 @@ export function calculate_coverage(coverage: Coverage[], parse_html?: Parser): C
 			offset = next_offset
 		}
 
+		// Create "chunks" of covered/uncovered lines for easier rendering later on
+		let chunks = [
+			{
+				start_line: 1,
+				is_covered: line_coverage[0] === 1,
+				end_line: 0,
+				total_lines: 0,
+			},
+		]
+
+		for (let index = 0; index < line_coverage.length; index++) {
+			let is_covered = line_coverage[index]
+			if (index > 0 && is_covered !== line_coverage[index - 1]) {
+				let last_chunk = chunks.at(-1)!
+				last_chunk.end_line = index
+				last_chunk.total_lines = index - last_chunk.start_line + 1
+
+				chunks.push({
+					start_line: index,
+					is_covered: is_covered === 1,
+					end_line: index,
+					total_lines: 0,
+				})
+			}
+		}
+
+		let last_chunk = chunks.at(-1)!
+		last_chunk.total_lines = line_coverage.length - last_chunk.start_line + 1
+		last_chunk.end_line = line_coverage.length
+
 		return {
 			url,
 			text,
@@ -130,7 +166,7 @@ export function calculate_coverage(coverage: Coverage[], parse_html?: Parser): C
 			total_lines: total_file_lines,
 			covered_lines: file_lines_covered,
 			uncovered_lines: total_file_lines - file_lines_covered,
-			// TODO: { is_covered: boolean, start_offset: number, start_line: number, end_offset: number, end_line: number }[]
+			chunks,
 		}
 	})
 
