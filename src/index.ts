@@ -128,20 +128,20 @@ export function calculate_coverage(coverage: Coverage[], parse_html?: Parser): C
 			{
 				start_line: 1,
 				is_covered: line_coverage[0] === 1,
-				end_line: 0,
-				total_lines: 0,
+				end_line: 1,
+				total_lines: 1,
 			},
 		]
 
-		for (let index = 0; index < line_coverage.length; index++) {
+		for (let index = 1; index < line_coverage.length; index++) {
 			let is_covered = line_coverage[index]
-			if (index > 0 && is_covered !== line_coverage[index - 1]) {
+			if (is_covered !== line_coverage[index - 1]) {
 				let last_chunk = chunks.at(-1)!
 				last_chunk.end_line = index
 				last_chunk.total_lines = index - last_chunk.start_line + 1
 
 				chunks.push({
-					start_line: index,
+					start_line: index + 1,
 					is_covered: is_covered === 1,
 					end_line: index,
 					total_lines: 0,
@@ -150,7 +150,7 @@ export function calculate_coverage(coverage: Coverage[], parse_html?: Parser): C
 		}
 
 		let last_chunk = chunks.at(-1)!
-		last_chunk.total_lines = line_coverage.length - last_chunk.start_line + 1
+		last_chunk.total_lines = line_coverage.length + 1 - last_chunk.start_line
 		last_chunk.end_line = line_coverage.length
 
 		return {

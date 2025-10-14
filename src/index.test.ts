@@ -186,10 +186,12 @@ test.describe('from coverage data downloaded directly from the browser as JSON',
 				1, 1, 1, 1,
 				// comment + p {}
 				0, 0, 0, 0,
+				// newline
+				1,
 				// @media
 				1,
 				// h1 {
-				1, 0,
+				0,
 				// color: green; }
 				1, 1, 1,
 			]),
@@ -200,10 +202,10 @@ test.describe('from coverage data downloaded directly from the browser as JSON',
 		let result = calculate_coverage(coverage, html_parser)
 		expect(result.coverage_per_stylesheet.at(0)?.chunks).toEqual([
 			{ start_line: 1, is_covered: true, end_line: 4, total_lines: 4 },
-			{ start_line: 4, is_covered: false, end_line: 8, total_lines: 5 },
-			{ start_line: 8, is_covered: true, end_line: 10, total_lines: 3 },
-			{ start_line: 10, is_covered: false, end_line: 11, total_lines: 2 },
-			{ start_line: 11, is_covered: true, end_line: 14, total_lines: 4 },
+			{ start_line: 5, is_covered: false, end_line: 8, total_lines: 4 },
+			{ start_line: 9, is_covered: true, end_line: 10, total_lines: 2 },
+			{ start_line: 11, is_covered: false, end_line: 11, total_lines: 1 },
+			{ start_line: 12, is_covered: true, end_line: 14, total_lines: 3 },
 		])
 	})
 
@@ -223,6 +225,7 @@ test.describe('from coverage data downloaded directly from the browser as JSON',
 			],
 			html_parser,
 		)
+		expect(result.coverage_per_stylesheet.at(0)?.text).toEqual('h1 {\n\tcolor: blue;\n}')
 		expect(result.coverage_per_stylesheet.at(0)?.chunks).toEqual([
 			{
 				start_line: 1,
