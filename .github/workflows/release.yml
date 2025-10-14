@@ -25,6 +25,4 @@ jobs:
       - run: npx playwright install chromium --only-shell
       - run: npm test -- --forbid-only
       - run: npm run build
-      - run: npm publish --public
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+      - run: npm publish --access public
