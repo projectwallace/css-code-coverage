@@ -45,31 +45,7 @@ In Edge, Chrome or chromium you can manually collect coverage in the browser's D
 
 Additionally, DevTools Tips writes about it in their [explainer](https://devtoolstips.org/tips/en/detect-unused-code/).
 
-### Coverage API
-
-Both Puppeteer and Playwright provide an API to programmatically get the coverage data, allowing you to put that directly into this library. Here is the gist:
-
-```ts
-// Start collecting coverage
-await page.coverage.startCSSCoverage()
-// Load the page, do all sorts of interactions to increase coverage, etc.
-await page.goto('http://example.com')
-// Stop the coverage and store the result in a variable to pass along
-let coverage = await page.coverage.stopCSSCoverage()
-
-// Now we can process it
-import { calculate_coverage } from '@projectwallace/css-code-coverage'
-
-function parse_html(html) {
-	return new DOMParser().parseFromString(html, 'text/html')
-}
-
-let report = calculcate_coverage(coverage, parse_html)
-```
-
-1.  Via the `coverage.startCSSCoverage()` API that headless browsers like [Playwright](https://playwright.dev/docs/api/class-coverage#coverage-start-css-coverage) or [Puppeteer](https://pptr.dev/api/puppeteer.coverage.startcsscoverage/) provide.
-
-Either way you end up with one or more JSON files that contain coverage data.
+You end up with one or more JSON files that contain coverage data. We provide a helper `parse_coverage()` that both parses the JSON and validates it so you can pass it directly into `calculate_coverage()`.
 
 ```ts
 // Read a single JSON or a folder full of JSON files with coverage data
@@ -90,6 +66,28 @@ for (let file of files) {
 	let json_content = await fs.readFile(file, 'urf-8')
 	coverage_data.push(...parse_coverage(json_content))
 }
+```
+
+### Coverage API
+
+Both Puppeteer and Playwright provide an API to programmatically get the coverage data, allowing you to put that directly into this library. Here is the gist:
+
+```ts
+// Start collecting coverage
+await page.coverage.startCSSCoverage()
+// Load the page, do all sorts of interactions to increase coverage, etc.
+await page.goto('http://example.com')
+// Stop the coverage and store the result in a variable to pass along
+let coverage = await page.coverage.stopCSSCoverage()
+
+// Now we can process it
+import { calculate_coverage } from '@projectwallace/css-code-coverage'
+
+function parse_html(html) {
+	return new DOMParser().parseFromString(html, 'text/html')
+}
+
+let report = calculcate_coverage(coverage, parse_html)
 ```
 
 ### Optional: coverage from `<style>` blocks
