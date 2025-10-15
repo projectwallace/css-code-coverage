@@ -39,6 +39,116 @@ function ratio(fraction: number, total: number) {
 	return fraction / total
 }
 
+function calculate_stylesheet_coverage(text: string, ranges: Range[], url: string): StylesheetCoverage {
+	function is_line_covered(line: string, start_offset: number) {
+		let end = start_offset + line.length
+		let next_offset = end + 1 // account for newline character
+		let is_empty = /^\s*$/.test(line)
+		let is_closing_brace = line.endsWith('}')
+
+		if (!is_empty && !is_closing_brace) {
+			for (let range of ranges) {
+				if (range.start > end || range.end < start_offset) {
+					continue
+				}
+				if (range.start <= start_offset && range.end >= end) {
+					return true
+				} else if (line.startsWith('@') && range.start > start_offset && range.start < next_offset) {
+					return true
+				}
+			}
+		}
+		return false
+	}
+
+	let lines = text.split('\n')
+	let total_file_lines = lines.length
+	let line_coverage = new Uint8Array(total_file_lines)
+	let file_lines_covered = 0
+	let file_total_bytes = text.length
+	let file_bytes_covered = 0
+	let offset = 0
+
+	for (let index = 0; index < lines.length; index++) {
+		let line = lines[index]
+		if (line === undefined) continue
+
+		let start = offset
+		let end = offset + line.length
+		let next_offset = end + 1 // +1 for the newline character
+		let is_empty = /^\s*$/.test(line)
+		let is_closing_brace = line.endsWith('}')
+		let is_in_range = is_line_covered(line, start)
+		let is_covered = false
+
+		let prev_is_covered = index > 0 && line_coverage[index - 1] === 1
+
+		if (is_in_range && !is_closing_brace && !is_empty) {
+			is_covered = true
+		} else if ((is_empty || is_closing_brace) && prev_is_covered) {
+			is_covered = true
+		} else if (is_empty && !prev_is_covered && is_line_covered(lines[index + 1]!, next_offset)) {
+			// If the next line is covered, mark this empty line as covered
+			is_covered = true
+		}
+
+		line_coverage[index] = is_covered ? 1 : 0
+
+		if (is_covered) {
+			file_lines_covered++
+			file_bytes_covered += line.length + 1
+		}
+
+		offset = next_offset
+	}
+
+	// Create "chunks" of covered/uncovered lines for easier rendering later on
+	let chunks = [
+		{
+			start_line: 1,
+			is_covered: line_coverage[0] === 1,
+			end_line: 1,
+			total_lines: 1,
+		},
+	]
+
+	for (let index = 1; index < line_coverage.length; index++) {
+		let is_covered = line_coverage[index]
+		if (is_covered !== line_coverage[index - 1]) {
+			let last_chunk = chunks.at(-1)!
+			last_chunk.end_line = index
+			last_chunk.total_lines = index - last_chunk.start_line + 1
+
+			chunks.push({
+				start_line: index + 1,
+				is_covered: is_covered === 1,
+				end_line: index,
+				total_lines: 0,
+			})
+		}
+	}
+
+	let last_chunk = chunks.at(-1)!
+	last_chunk.total_lines = line_coverage.length + 1 - last_chunk.start_line
+	last_chunk.end_line = line_coverage.length
+
+	return {
+		url,
+		text,
+		ranges,
+		unused_bytes: file_total_bytes - file_bytes_covered,
+		used_bytes: file_bytes_covered,
+		total_bytes: file_total_bytes,
+		line_coverage_ratio: ratio(file_lines_covered, total_file_lines),
+		byte_coverage_ratio: ratio(file_bytes_covered, file_total_bytes),
+		line_coverage,
+		total_lines: total_file_lines,
+		covered_lines: file_lines_covered,
+		uncovered_lines: total_file_lines - file_lines_covered,
+		chunks,
+	}
+}
+
 /**
  * @description
  * CSS Code Coverage calculation
@@ -63,111 +173,7 @@ export function calculate_coverage(coverage: Coverage[], parse_html?: Parser): C
 
 	// Calculate coverage for each individual stylesheet we found
 	let coverage_per_stylesheet = Array.from(deduplicated).map(([text, { url, ranges }]) => {
-		function is_line_covered(line: string, start_offset: number) {
-			let end = start_offset + line.length
-			let next_offset = end + 1 // account for newline character
-			let is_empty = /^\s*$/.test(line)
-			let is_closing_brace = line.endsWith('}')
-
-			if (!is_empty && !is_closing_brace) {
-				for (let range of ranges) {
-					if (range.start > end || range.end < start_offset) {
-						continue
-					}
-					if (range.start <= start_offset && range.end >= end) {
-						return true
-					} else if (line.startsWith('@') && range.start > start_offset && range.start < next_offset) {
-						return true
-					}
-				}
-			}
-			return false
-		}
-
-		let lines = text.split('\n')
-		let total_file_lines = lines.length
-		let line_coverage = new Uint8Array(total_file_lines)
-		let file_lines_covered = 0
-		let file_total_bytes = text.length
-		let file_bytes_covered = 0
-		let offset = 0
-
-		for (let index = 0; index < lines.length; index++) {
-			let line = lines[index]!
-			let start = offset
-			let end = offset + line.length
-			let next_offset = end + 1 // +1 for the newline character
-			let is_empty = /^\s*$/.test(line)
-			let is_closing_brace = line.endsWith('}')
-			let is_in_range = is_line_covered(line, start)
-			let is_covered = false
-
-			let prev_is_covered = index > 0 && line_coverage[index - 1] === 1
-
-			if (is_in_range && !is_closing_brace && !is_empty) {
-				is_covered = true
-			} else if ((is_empty || is_closing_brace) && prev_is_covered) {
-				is_covered = true
-			} else if (is_empty && !prev_is_covered && is_line_covered(lines[index + 1]!, next_offset)) {
-				// If the next line is covered, mark this empty line as covered
-				is_covered = true
-			}
-
-			line_coverage[index] = is_covered ? 1 : 0
-
-			if (is_covered) {
-				file_lines_covered++
-				file_bytes_covered += line.length + 1
-			}
-
-			offset = next_offset
-		}
-
-		// Create "chunks" of covered/uncovered lines for easier rendering later on
-		let chunks = [
-			{
-				start_line: 1,
-				is_covered: line_coverage[0] === 1,
-				end_line: 1,
-				total_lines: 1,
-			},
-		]
-
-		for (let index = 1; index < line_coverage.length; index++) {
-			let is_covered = line_coverage[index]
-			if (is_covered !== line_coverage[index - 1]) {
-				let last_chunk = chunks.at(-1)!
-				last_chunk.end_line = index
-				last_chunk.total_lines = index - last_chunk.start_line + 1
-
-				chunks.push({
-					start_line: index + 1,
-					is_covered: is_covered === 1,
-					end_line: index,
-					total_lines: 0,
-				})
-			}
-		}
-
-		let last_chunk = chunks.at(-1)!
-		last_chunk.total_lines = line_coverage.length + 1 - last_chunk.start_line
-		last_chunk.end_line = line_coverage.length
-
-		return {
-			url,
-			text,
-			ranges,
-			unused_bytes: file_total_bytes - file_bytes_covered,
-			used_bytes: file_bytes_covered,
-			total_bytes: file_total_bytes,
-			line_coverage_ratio: ratio(file_lines_covered, total_file_lines),
-			byte_coverage_ratio: ratio(file_bytes_covered, file_total_bytes),
-			line_coverage,
-			total_lines: total_file_lines,
-			covered_lines: file_lines_covered,
-			uncovered_lines: total_file_lines - file_lines_covered,
-			chunks,
-		}
+		return calculate_stylesheet_coverage(text, ranges, url)
 	})
 
 	// Calculate total coverage for all stylesheets combined
