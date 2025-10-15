@@ -1,4 +1,5 @@
 import { chromium } from '@playwright/test'
+import type { Coverage } from '../src'
 
 export async function generate_coverage(html: string, { link_css }: { link_css?: string } = {}) {
 	let browser = await chromium.launch({ headless: true })
@@ -22,5 +23,5 @@ export async function generate_coverage(html: string, { link_css }: { link_css?:
 	await page.evaluate(() => getComputedStyle(document.body)) // force CSS evaluation
 	let coverage = await page.coverage.stopCSSCoverage()
 	await browser.close()
-	return coverage
+	return coverage.filter((e) => e.text !== undefined) as Coverage[]
 }

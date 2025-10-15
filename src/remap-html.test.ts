@@ -64,3 +64,14 @@ test('remaps multiple style blocks', () => {
 		],
 	})
 })
+
+test.skip('removes leading & trailing whitespace from style block', () => {
+	let css = `h1 { color: red; }`
+	let html = create_html(`<style>  ${css}  </style>`, `<h1>Hello world</h1>`)
+	let range = { start: html.indexOf(css) - 2, end: html.indexOf(css) + 2 + css.length }
+	let result = remap_html(html_parser, html, [range])
+	expect(result).toEqual({
+		css,
+		ranges: [{ start: 0, end: css.length }],
+	})
+})

@@ -6,11 +6,11 @@ import type { Coverage, Range } from './parse-coverage.ts'
  * - if a duplicate stylesheet enters the room, we add it's ranges to the existing stylesheet's ranges
  * - only bytes of deduplicated stylesheets are counted
  */
-export function deduplicate_entries(entries: Coverage[]): Map<NonNullable<Coverage['text']>, Pick<Coverage, 'ranges' | 'url'>> {
+export function deduplicate_entries(entries: Coverage[]): Coverage[] {
 	let checked_stylesheets = new Map<string, { url: string; ranges: Range[] }>()
 
 	for (let entry of entries) {
-		let text = entry.text || ''
+		let text = entry.text
 		if (checked_stylesheets.has(text)) {
 			let sheet = checked_stylesheets.get(text)!
 			let ranges = sheet.ranges
@@ -36,5 +36,5 @@ export function deduplicate_entries(entries: Coverage[]): Map<NonNullable<Covera
 		}
 	}
 
-	return checked_stylesheets
+	return Array.from(checked_stylesheets, ([text, { url, ranges }]) => ({ text, url, ranges }))
 }
