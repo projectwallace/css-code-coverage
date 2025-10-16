@@ -7,13 +7,13 @@ export type Range = {
 
 export type Coverage = {
 	url: string
-	text: string
+	text?: string
 	ranges: Range[]
 }
 
 let CoverageSchema = v.array(
 	v.object({
-		text: v.string(),
+		text: v.optional(v.string()),
 		url: v.string(),
 		ranges: v.array(
 			v.object({

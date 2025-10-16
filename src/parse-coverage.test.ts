@@ -23,7 +23,7 @@ test('parses valid JSON', () => {
 	])
 })
 
-test('does not allow entries without text', () => {
+test('allows entries without text', () => {
 	let input = `
 	[
 		{
@@ -35,7 +35,12 @@ test('does not allow entries without text', () => {
 	]
 	`
 	let result = parse_coverage(input)
-	expect(result).toEqual([])
+	expect(result).toEqual([
+		{
+			url: 'example.com',
+			ranges: [{ start: 0, end: 13 }],
+		},
+	])
 })
 
 test('returns empty array for invalid JSON', () => {

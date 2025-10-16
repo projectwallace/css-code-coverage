@@ -7,16 +7,16 @@ test('handles a single entry', () => {
 		ranges: [{ start: 0, end: 4 }],
 		url: 'example.com',
 	}
-	expect(deduplicate_entries([entry])).toEqual([entry])
+	expect(deduplicate_entries([entry])).toEqual(new Map([[entry.text, { url: entry.url, ranges: entry.ranges }]]))
 })
 
-test('deduplicates a simple duplicate entry', () => {
+test('deduplicats a simple duplicate entry', () => {
 	let entry = {
 		text: 'a {}',
 		ranges: [{ start: 0, end: 4 }],
 		url: 'example.com',
 	}
-	expect(deduplicate_entries([entry, entry])).toEqual([entry])
+	expect(deduplicate_entries([entry, entry])).toEqual(new Map([[entry.text, { url: entry.url, ranges: entry.ranges }]]))
 })
 
 test('merges two identical texts with different URLs and identical ranges', () => {
@@ -33,7 +33,7 @@ test('merges two identical texts with different URLs and identical ranges', () =
 		},
 	]
 	let first = entries.at(0)!
-	expect(deduplicate_entries(entries)).toEqual([{ text: first.text, url: first.url, ranges: first.ranges }])
+	expect(deduplicate_entries(entries)).toEqual(new Map([[first.text, { url: first.url, ranges: first.ranges }]]))
 })
 
 test('merges different ranges on identical CSS, different URLs', () => {
@@ -50,7 +50,9 @@ test('merges different ranges on identical CSS, different URLs', () => {
 		},
 	]
 	let first = entries.at(0)!
-	expect(deduplicate_entries(entries)).toEqual([{ text: first.text, url: first.url, ranges: [first.ranges[0], entries[1]!.ranges[0]] }])
+	expect(deduplicate_entries(entries)).toEqual(
+		new Map([[first.text, { url: first.url, ranges: [first.ranges[0], entries[1]!.ranges[0]] }]]),
+	)
 })
 
 test('merges different ranges on identical CSS, identical URLs', () => {
@@ -66,9 +68,9 @@ test('merges different ranges on identical CSS, identical URLs', () => {
 			url: 'example.com',
 		},
 	]
-	expect(deduplicate_entries(entries)).toEqual([
-		{ text: entries[0]!.text, url: entries[0]!.url, ranges: [entries[0]!.ranges[0], entries[1]!.ranges[0]] },
-	])
+	expect(deduplicate_entries(entries)).toEqual(
+		new Map([[entries[0]!.text, { url: entries[0]!.url, ranges: [entries[0]!.ranges[0], entries[1]!.ranges[0]] }]]),
+	)
 })
 
 test('does not merge different CSS with different URLs and identical ranges', () => {
@@ -84,10 +86,12 @@ test('does not merge different CSS with different URLs and identical ranges', ()
 			url: 'example.com/b',
 		},
 	]
-	expect(deduplicate_entries(entries)).toEqual([
-		{ text: entries[0]!.text, url: entries[0]!.url, ranges: entries[0]!.ranges },
-		{ text: entries[1]!.text, url: entries[1]!.url, ranges: entries[1]!.ranges },
-	])
+	expect(deduplicate_entries(entries)).toEqual(
+		new Map([
+			[entries[0]!.text, { url: entries[0]!.url, ranges: entries[0]!.ranges }],
+			[entries[1]!.text, { url: entries[1]!.url, ranges: entries[1]!.ranges }],
+		]),
+	)
 })
 
 test('does not merge different CSS with same URLs and identical ranges', () => {
@@ -103,8 +107,10 @@ test('does not merge different CSS with same URLs and identical ranges', () => {
 			url: 'example.com',
 		},
 	]
-	expect(deduplicate_entries(entries)).toEqual([
-		{ text: entries[0]!.text, url: entries[0]!.url, ranges: entries[0]!.ranges },
-		{ text: entries[1]!.text, url: entries[1]!.url, ranges: entries[1]!.ranges },
-	])
+	expect(deduplicate_entries(entries)).toEqual(
+		new Map([
+			[entries[0]!.text, { url: entries[0]!.url, ranges: entries[0]!.ranges }],
+			[entries[1]!.text, { url: entries[1]!.url, ranges: entries[1]!.ranges }],
+		]),
+	)
 })

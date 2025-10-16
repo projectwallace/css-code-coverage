@@ -1,65 +1,84 @@
-import type { Coverage } from './parse-coverage'
-import { type ChunkedCoverage } from './chunkify'
 import { format } from '@projectwallace/format-css'
+import type { Range, Coverage } from './parse-coverage.ts'
+// css-tree tokens: https://github.com/csstree/csstree/blob/be5ea1257009960c04cccdb58bb327263e27e3b3/lib/tokenizer/types.js
+import { tokenize, tokenTypes } from 'css-tree/tokenizer'
 
-export type PrettifiedChunk = ChunkedCoverage['chunks'][0] & {
-	start_line: number
-	end_line: number
-	total_lines: number
-	css: string
-}
+export function prettify(coverage: Coverage[]): Coverage[] {
+	return coverage.map(({ url, text, ranges }) => {
+		if (!text) {
+			return { url, text, ranges }
+		}
+		let formatted = format(text)
+		let irrelevant_tokens: Set<number> = new Set([
+			tokenTypes.EOF,
+			tokenTypes.BadString,
+			tokenTypes.BadUrl,
+			tokenTypes.WhiteSpace,
+			tokenTypes.Semicolon,
+			tokenTypes.Comment,
+			tokenTypes.Colon,
+		])
 
-export type PrettifiedCoverage = Omit<Coverage, 'ranges'> & {
-	chunks: PrettifiedChunk[]
-}
+		// Initialize the ranges with an empty array of token indexes
+		let ext_ranges: (Range & { tokens: number[] })[] = ranges.map(({ start, end }) => ({ start, end, tokens: [] }))
 
-export function prettify(stylesheet: ChunkedCoverage): PrettifiedCoverage {
-	let line = 1
-	let offset = 0
+		function is_in_range(start: number, end: number): number {
+			let range_index = 0
+			for (let range of ext_ranges) {
+				if (range.start > end) return -1
+				if (range.start <= start && range.end >= end) {
+					return range_index
+				}
+				range_index++
+			}
+			return -1
+		}
 
-	let pretty_chunks = stylesheet.chunks.map((offset_chunk, index) => {
-		let css = format(stylesheet.text.slice(offset_chunk.start_offset, offset_chunk.end_offset))
+		let index = 0
 
-		if (offset_chunk.is_covered) {
-			if (index === 0) {
-				// mark the line between this chunk and the next on as covered
-				css = css + '\n'
-			} else if (index === stylesheet.chunks.length - 1) {
-				// mark the newline after the previous uncovered block as covered
-				css = '\n' + css
-			} else {
-				// mark the newline after the previous uncovered block as covered
-				// and mark the line between this chunk and the next on as covered
-				css = '\n' + css + '\n'
+		tokenize(text, (type, start, end) => {
+			if (irrelevant_tokens.has(type)) return
+			index++
+
+			// format-css changes the Url token to a Function,String,RightParenthesis token sequence
+			if (type === tokenTypes.Url) {
+				index += 2
+			}
+
+			let range_index = is_in_range(start, end)
+			if (range_index !== -1) {
+				ext_ranges[range_index]!.tokens.push(index)
+			}
+		})
+
+		let new_tokens: Map<number, Range> = new Map()
+		index = 0
+
+		tokenize(formatted, (type, start, end) => {
+			if (irrelevant_tokens.has(type)) return
+			index++
+
+			// format-css changes the Url token to a Function,String,RightParenthesis token sequence
+			if (type === tokenTypes.Url) {
+				index += 2
+			}
+
+			new_tokens.set(index, { start, end })
+		})
+
+		let new_ranges: Range[] = []
+
+		for (let range of ext_ranges) {
+			let start_token = new_tokens.get(range.tokens.at(0)!)
+			let end_token = new_tokens.get(range.tokens.at(-1)!)
+			if (start_token !== undefined && end_token !== undefined) {
+				new_ranges.push({
+					start: start_token.start,
+					end: end_token.end,
+				})
 			}
 		}
 
-		let line_count = css.split('\n').length
-		let start_offset = offset
-		let end_offset = Math.max(offset + css.length - 1, 0)
-		let start_line = line
-		let end_line = line + line_count
-
-		line = end_line
-		offset = end_offset
-
-		return {
-			...offset_chunk,
-			start_offset,
-			start_line,
-			end_line: end_line - 1,
-			end_offset,
-			css,
-			total_lines: end_line - start_line,
-		}
+		return { url, text: formatted, ranges: new_ranges }
 	})
-
-	let updated_stylesheet = {
-		...stylesheet,
-		// TODO: update ranges as well?? Or remove them because we have chunks now
-		chunks: pretty_chunks,
-		text: pretty_chunks.map(({ css }) => css).join(''),
-	}
-
-	return updated_stylesheet
 }
