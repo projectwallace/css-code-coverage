@@ -2,7 +2,9 @@ import { is_valid_coverage, type Coverage, type Range } from './parse-coverage.t
 import { deduplicate_entries } from './decuplicate.ts'
 import { filter_coverage } from './filter-entries.ts'
 import type { Parser } from './types.ts'
-import { format } from '@projectwallace/format-css'
+import { chunkify_stylesheet } from './chunkify.ts'
+import { extend_ranges } from './extend-ranges.ts'
+import { prettify, type PrettifiedCoverage, type PrettifiedChunk } from './prettify.ts'
 
 export type CoverageData = {
 	uncovered_bytes: number
@@ -19,7 +21,7 @@ export type StylesheetCoverage = CoverageData & {
 	url: string
 	text: string
 	ranges: Range[]
-	chunks: CoverageChunk[]
+	chunks: PrettifiedChunk[]
 }
 
 export type CoverageResult = CoverageData & {
@@ -33,7 +35,8 @@ function ratio(fraction: number, total: number) {
 	return fraction / total
 }
 
-function calculate_stylesheet_coverage({ text, ranges, url, chunks }: LineCoverage): StylesheetCoverage {
+function calculate_stylesheet_coverage(stylesheet: PrettifiedCoverage): StylesheetCoverage {
+	let { text, ranges, url, chunks } = stylesheet
 	let uncovered_bytes = 0
 	let covered_bytes = 0
 	let total_bytes = 0
@@ -74,136 +77,6 @@ function calculate_stylesheet_coverage({ text, ranges, url, chunks }: LineCovera
 }
 
 /**
- * WARNING: mutates the ranges array
- */
-function include_atrule_name_in_ranges(coverage: Coverage[]): Coverage[] {
-	// Adjust ranges to include @-rule name (only preludes included)
-	// Note: Cannot reliably include closing } because it may not be the end of the range
-	const LONGEST_ATRULE_NAME = '@-webkit-font-feature-values'.length
-
-	for (let stylesheet of coverage) {
-		for (let range of stylesheet.ranges) {
-			// Heuristic: atrule names are no longer than LONGEST_ATRULE_NAME
-			for (let i = 1; i >= -LONGEST_ATRULE_NAME; i--) {
-				let char_position = range.start + i
-				if (stylesheet.text.charAt(char_position) === '@') {
-					range.start = char_position
-					break
-				}
-			}
-		}
-	}
-
-	return coverage
-}
-
-type OffsetChunk = {
-	start_offset: number
-	end_offset: number
-	is_covered: boolean
-}
-
-type CoverageChunk = OffsetChunk & {
-	start_line: number
-	end_line: number
-	total_lines: number
-	css: string
-}
-
-type ChunkifiedCoverage = Coverage & { chunks: OffsetChunk[] }
-type LineCoverage = Coverage & { chunks: CoverageChunk[] }
-
-// TODO: get rid of empty chunks, merge first/last with adjecent covered block
-function chunkify_stylesheet(stylesheet: Coverage): ChunkifiedCoverage {
-	let chunks = []
-	let offset = 0
-
-	for (let range of stylesheet.ranges) {
-		// Create non-covered chunk
-		if (offset !== range.start) {
-			chunks.push({
-				start_offset: offset,
-				end_offset: range.start,
-				is_covered: false,
-			})
-			offset = range.start
-		}
-
-		chunks.push({
-			start_offset: range.start,
-			end_offset: range.end,
-			is_covered: true,
-		})
-		offset = range.end
-	}
-
-	// fill up last chunk if necessary:
-	if (offset !== stylesheet.text.length) {
-		chunks.push({
-			start_offset: offset,
-			end_offset: stylesheet.text.length,
-			is_covered: false,
-		})
-	}
-
-	return {
-		...stylesheet,
-		chunks,
-	}
-}
-
-function prettify(stylesheet: ChunkifiedCoverage): LineCoverage {
-	let line = 1
-	let offset = 0
-
-	let pretty_chunks = stylesheet.chunks.map((offset_chunk, index) => {
-		let css = format(stylesheet.text.slice(offset_chunk.start_offset, offset_chunk.end_offset))
-
-		if (offset_chunk.is_covered) {
-			if (index === 0) {
-				// mark the line between this chunk and the next on as covered
-				css = css + '\n'
-			} else if (index === stylesheet.chunks.length - 1) {
-				// mark the newline after the previous uncovered block as covered
-				css = '\n' + css
-			} else {
-				// mark the newline after the previous uncovered block as covered
-				// and mark the line between this chunk and the next on as covered
-				css = '\n' + css + '\n'
-			}
-		}
-
-		let line_count = css.split('\n').length
-		let start_offset = offset
-		let end_offset = Math.max(offset + css.length - 1, 0)
-		let start_line = line
-		let end_line = line + line_count
-
-		line = end_line
-		offset = end_offset
-
-		return {
-			...offset_chunk,
-			start_offset,
-			start_line,
-			end_line: end_line - 1,
-			end_offset,
-			css,
-			total_lines: end_line - start_line,
-		}
-	})
-
-	let updated_stylesheet = {
-		...stylesheet,
-		// TODO: update ranges as well?? Or remove them because we have chunks now
-		chunks: pretty_chunks,
-		text: pretty_chunks.map(({ css }) => css).join(''),
-	}
-
-	return updated_stylesheet
-}
-
-/**
  * @description
  * CSS Code Coverage calculation
  *
@@ -223,11 +96,9 @@ export function calculate_coverage(coverage: Coverage[], parse_html?: Parser): C
 
 	let filtered_coverage = filter_coverage(coverage, parse_html)
 	let deduplicated = deduplicate_entries(filtered_coverage)
-	let range_extended = include_atrule_name_in_ranges(deduplicated)
+	let range_extended = extend_ranges(deduplicated)
 	let chunkified = range_extended.map((stylesheet) => chunkify_stylesheet(stylesheet))
 	let prettified = chunkified.map((stylesheet) => prettify(stylesheet))
-
-	// Calculate coverage for each individual stylesheet we found
 	let coverage_per_stylesheet = prettified.map((stylesheet) => calculate_stylesheet_coverage(stylesheet))
 
 	// Calculate total coverage for all stylesheets combined
