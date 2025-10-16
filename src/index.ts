@@ -20,7 +20,6 @@ export type CoverageData = {
 export type StylesheetCoverage = CoverageData & {
 	url: string
 	text: string
-	ranges: Range[]
 	chunks: PrettifiedChunk[]
 }
 
@@ -36,7 +35,7 @@ function ratio(fraction: number, total: number) {
 }
 
 function calculate_stylesheet_coverage(stylesheet: PrettifiedCoverage): StylesheetCoverage {
-	let { text, ranges, url, chunks } = stylesheet
+	let { text, url, chunks } = stylesheet
 	let uncovered_bytes = 0
 	let covered_bytes = 0
 	let total_bytes = 0
@@ -63,7 +62,6 @@ function calculate_stylesheet_coverage(stylesheet: PrettifiedCoverage): Styleshe
 	return {
 		url,
 		text,
-		ranges,
 		uncovered_bytes,
 		covered_bytes,
 		total_bytes,

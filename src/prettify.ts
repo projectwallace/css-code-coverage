@@ -9,7 +9,7 @@ export type PrettifiedChunk = ChunkedCoverage['chunks'][0] & {
 	css: string
 }
 
-export type PrettifiedCoverage = Coverage & {
+export type PrettifiedCoverage = Omit<Coverage, 'ranges'> & {
 	chunks: PrettifiedChunk[]
 }
 
