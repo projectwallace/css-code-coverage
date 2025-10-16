@@ -10,7 +10,7 @@ export default defineConfig({
 			formats: ['es'],
 		},
 		rollupOptions: {
-			external: Object.keys(pkg.dependencies).concat('css-tree/tokenizer'),
+			external: Object.keys(pkg.dependencies),
 		},
 	},
 	plugins: [
