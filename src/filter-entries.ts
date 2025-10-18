@@ -11,7 +11,6 @@ export function filter_coverage(coverage: Coverage[], parse_html?: Parser): Cove
 	let result = []
 
 	for (let entry of coverage) {
-		if (!entry.text) continue
 		let extension = ext(entry.url).toLowerCase()
 		if (extension === 'js') continue
 
