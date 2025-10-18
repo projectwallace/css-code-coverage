@@ -29,7 +29,7 @@ test.describe('from <style> tag', () => {
 					</body>
 				</html>
 			`
-		coverage = await generate_coverage(html)
+		coverage = (await generate_coverage(html)) as Coverage[]
 	})
 
 	test('counts totals', () => {
@@ -86,7 +86,7 @@ test.describe('from <link rel="stylesheet">', () => {
 					</body>
 				</html>
 			`
-		coverage = await generate_coverage(html, { link_css: css })
+		coverage = (await generate_coverage(html, { link_css: css })) as Coverage[]
 	})
 
 	test('counts totals', () => {
