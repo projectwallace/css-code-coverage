@@ -5,9 +5,6 @@ import { tokenize, tokenTypes } from 'css-tree/tokenizer'
 
 export function prettify(coverage: Coverage[]): Coverage[] {
 	return coverage.map(({ url, text, ranges }) => {
-		if (!text) {
-			return { url, text, ranges }
-		}
 		let formatted = format(text)
 		let irrelevant_tokens: Set<number> = new Set([
 			tokenTypes.EOF,
@@ -40,11 +37,6 @@ export function prettify(coverage: Coverage[]): Coverage[] {
 			if (irrelevant_tokens.has(type)) return
 			index++
 
-			// format-css changes the Url token to a Function,String,RightParenthesis token sequence
-			if (type === tokenTypes.Url) {
-				index += 2
-			}
-
 			let range_index = is_in_range(start, end)
 			if (range_index !== -1) {
 				ext_ranges[range_index]!.tokens.push(index)
@@ -57,12 +49,6 @@ export function prettify(coverage: Coverage[]): Coverage[] {
 		tokenize(formatted, (type, start, end) => {
 			if (irrelevant_tokens.has(type)) return
 			index++
-
-			// format-css changes the Url token to a Function,String,RightParenthesis token sequence
-			if (type === tokenTypes.Url) {
-				index += 2
-			}
-
 			new_tokens.set(index, { start, end })
 		})
 

@@ -54,3 +54,21 @@ test('atrule prettification', () => {
 	]
 	expect(prettify(entries)).toEqual(prettified)
 })
+
+test('prettify url()', () => {
+	let entries = [
+		{
+			url: 'example.com',
+			text: `a{ background-image: "example.com/test.gif"; background-image: url('example.com/test.jpg'); background-image: url("example.com/test.png"); }`,
+			ranges: [{ start: 0, end: 140 }],
+		},
+	]
+	let prettified = [
+		{
+			url: 'example.com',
+			text: `a {\n\tbackground-image: "example.com/test.gif";\n\tbackground-image: url("example.com/test.jpg");\n\tbackground-image: url("example.com/test.png");\n}`,
+			ranges: [{ start: 0, end: 151 - 7 }],
+		},
+	]
+	expect(prettify(entries)).toEqual(prettified)
+})

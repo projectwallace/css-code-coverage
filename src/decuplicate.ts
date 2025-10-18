@@ -10,7 +10,7 @@ export function deduplicate_entries(entries: Coverage[]): Map<NonNullable<Covera
 	let checked_stylesheets = new Map<string, { url: string; ranges: Range[] }>()
 
 	for (let entry of entries) {
-		let text = entry.text || ''
+		let text = entry.text
 		if (checked_stylesheets.has(text)) {
 			let sheet = checked_stylesheets.get(text)!
 			let ranges = sheet.ranges
