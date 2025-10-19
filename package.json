@@ -1,6 +1,6 @@
 {
   "name": "@projectwallace/css-code-coverage",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "",
   "author": "Bart Veneman <bart@projectwallace.com>",
   "repository": {
@@ -21,7 +21,7 @@
   ],
   "license": "EUPL-1.2",
   "engines": {
-    "node": ">=22.18.0"
+    "node": ">=20"
   },
   "type": "module",
   "files": [
