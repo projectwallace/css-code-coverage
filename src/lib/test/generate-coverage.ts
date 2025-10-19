@@ -14,7 +14,7 @@ export async function generate_coverage(html: string, { link_css }: { link_css?:
 		route.fulfill({
 			status: 200,
 			contentType: 'text/css',
-			body: link_css || '',
+			body: link_css,
 		})
 	})
 	await page.coverage.startCSSCoverage()

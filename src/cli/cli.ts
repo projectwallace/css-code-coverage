@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { validate_arguments, parse_arguments, InvalidArgumentsError } from './arguments.ts'
 import { program, MissingDataError } from './program.ts'
 import { read } from './file-reader.ts'

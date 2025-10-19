@@ -1,6 +1,4 @@
-import type { CliArguments } from './arguments'
-import { calculate_coverage, type Coverage, type CoverageResult } from '../index.ts'
-import { read } from './file-reader.ts'
+import { calculate_coverage, type Coverage, type CoverageResult } from '../lib/index.ts'
 import { DOMParser } from 'linkedom'
 
 function parse_html(html: string) {
@@ -9,7 +7,7 @@ function parse_html(html: string) {
 
 export class MissingDataError extends Error {
 	constructor() {
-		super('Missing data to analyze')
+		super('No data to analyze')
 	}
 }
 

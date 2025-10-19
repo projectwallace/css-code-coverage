@@ -1,6 +1,6 @@
 import { readFile, stat, readdir } from 'node:fs/promises'
 import { join } from 'node:path'
-import { parse_coverage, type Coverage } from '../parse-coverage.ts'
+import { parse_coverage, type Coverage } from '../lib/parse-coverage.ts'
 
 export async function read(coverage_dir: string): Promise<Coverage[]> {
 	let s = await stat(coverage_dir)

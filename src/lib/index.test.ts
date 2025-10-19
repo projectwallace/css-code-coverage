@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { generate_coverage } from '../test/generate-coverage.ts'
+import { generate_coverage } from './test/generate-coverage.ts'
 import { calculate_coverage } from './index.ts'
 import type { Coverage } from './parse-coverage.ts'
 import { format } from '@projectwallace/format-css'
