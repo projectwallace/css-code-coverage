@@ -22,7 +22,7 @@ let CliArgumentsSchema = v.object({
 	'coverage-dir': CoverageDirSchema,
 	'min-line-coverage': RatioPercentageSchema,
 	'min-file-line-coverage': v.optional(RatioPercentageSchema),
-	'show-uncovered': v.optional(ShowUncoveredSchema, show_uncovered_options.none),
+	'show-uncovered': v.optional(ShowUncoveredSchema, show_uncovered_options.violations),
 	reporter: v.optional(ReporterSchema, reporters.pretty),
 })
 
@@ -77,7 +77,7 @@ export function parse_arguments(args: string[]) {
 			},
 			'show-uncovered': {
 				type: 'string',
-				default: 'none',
+				default: 'violations',
 			},
 			reporter: {
 				type: 'string',

@@ -1,6 +1,12 @@
+// oxlint-disable max-depth
 import { styleText } from 'node:util'
 import type { Report } from '../program'
 import type { CliArguments } from '../arguments'
+
+// Re-indent because tabs in the terminal tend to be bigger than usual
+function indent(line?: string): string {
+	return (line || '').replace(/^\t+/, (tabs) => ' '.repeat(tabs.length * 4))
+}
 
 export function print({ report, context }: Report, params: CliArguments) {
 	if (report.min_line_coverage.ok) {
@@ -14,13 +20,15 @@ export function print({ report, context }: Report, params: CliArguments) {
 	}
 
 	if (report.min_file_line_coverage.expected !== undefined) {
-		let { expected, ok } = report.min_file_line_coverage
+		let { expected, actual, ok } = report.min_file_line_coverage
 		if (ok) {
 			console.log(`${styleText(['bold', 'green'], 'Success')}: all files pass minimum line coverage of ${expected * 100}%`)
 		} else {
 			let num_files_failed = context.coverage.coverage_per_stylesheet.filter((sheet) => sheet.line_coverage_ratio < expected!).length
 			console.error(
-				`${styleText(['bold', 'red'], 'Failed')}: ${num_files_failed} files do not meet the minimum line coverage of ${expected * 100}%`,
+				`${styleText(['bold', 'red'], 'Failed')}: ${num_files_failed} files do not meet the minimum line coverage of ${
+					expected * 100
+				}% (minimum coverage was ${(actual * 100).toFixed(2)}%)`,
 			)
 			if (params['show-uncovered'] === 'none') {
 				console.log(`  Hint: set --show-uncovered=violations to see which files didn't pass`)
@@ -48,9 +56,10 @@ export function print({ report, context }: Report, params: CliArguments) {
 				console.log(styleText('dim', '─'.repeat(terminal_width)))
 				console.log(sheet.url)
 				console.log(`Coverage: ${(sheet.line_coverage_ratio * 100).toFixed(2)}%, ${sheet.covered_lines}/${sheet.total_lines} lines covered`)
+
 				if (min_file_line_coverage && min_file_line_coverage !== 0 && sheet.line_coverage_ratio < min_file_line_coverage) {
 					let lines_to_cover = min_file_line_coverage * sheet.total_lines - sheet.covered_lines
-					console.log(`💡 Cover ${Math.ceil(lines_to_cover)} more lines to meet the file threshold of ${min_file_line_coverage * 100}%`)
+					console.log(`Tip: cover ${Math.ceil(lines_to_cover)} more lines to meet the file threshold of ${min_file_line_coverage * 100}%`)
 				}
 				console.log(styleText('dim', '─'.repeat(terminal_width)))
 
@@ -58,23 +67,29 @@ export function print({ report, context }: Report, params: CliArguments) {
 				let line_coverage = sheet.line_coverage
 
 				for (let i = 0; i < lines.length; i++) {
-					if (line_coverage[i] === 0) {
-						// Rewind cursor N lines to render N previous lines
-						for (let j = i - NUM_LEADING_LINES; j < i; j++) {
-							console.log(styleText('dim', line_number(j)), styleText('dim', lines[j] || ''))
+					if (line_coverage[i] === 1) continue
+
+					// Rewind cursor N lines to render N previous lines
+					for (let j = i - NUM_LEADING_LINES; j < i; j++) {
+						// Make sure that we don't try to start before line 0
+						if (j >= 0) {
+							console.log(styleText('dim', line_number(j)), styleText('dim', indent(lines[j])))
 						}
-						// Render uncovered lines while increasing cursor until reaching next covered block
-						while (line_coverage[i] === 0) {
-							console.log(styleText('red', line_number(i, false)), lines[i])
-							i++
-						}
-						// Forward cursor N lines to render N trailing lines
-						for (let end = i + NUM_TRAILING_LINES; i < end && i < lines.length; i++) {
-							console.log(styleText('dim', line_number(i)), styleText('dim', lines[i]!))
-						}
-						// Show empty line between blocks
-						console.log()
 					}
+
+					// Render uncovered lines while increasing cursor until reaching next covered block
+					while (line_coverage[i] === 0) {
+						console.log(styleText('red', line_number(i, false)), indent(lines[i]))
+						i++
+					}
+
+					// Forward cursor N lines to render N trailing lines
+					for (let end = i + NUM_TRAILING_LINES; i < end && i < lines.length; i++) {
+						console.log(styleText('dim', line_number(i)), styleText('dim', indent(lines[i])))
+					}
+
+					// Show empty line between blocks
+					console.log()
 				}
 			}
 		}
