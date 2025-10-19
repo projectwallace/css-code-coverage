@@ -2,28 +2,28 @@
 	"compilerOptions": {
 		// Base options:
 		"skipLibCheck": true,
-		"target": "esnext",
+		"target": "es2024",
 		"verbatimModuleSyntax": true,
 		"allowJs": false,
 		"moduleDetection": "force",
-		"allowImportingTsExtensions": true,
 		// Strictness
 		"strict": true,
 		"noUncheckedIndexedAccess": true,
 		// Type checking, not transpiling
 		"module": "ESNext",
 		"moduleResolution": "bundler",
-		"allowSyntheticDefaultImports": true,
-		"noEmit": true,
 		"lib": [
-			"esnext",
+			"es2024",
 			"DOM"
 		],
 		"declaration": true,
-		"emitDeclarationOnly": true
+		"rootDirs": ["src/lib", "src/cli"],
+		"outDir": "dist"
 	},
 	"include": [
-		"src/**/*.ts"
+		"src/lib/index.ts",
+		"src/cli/cli.ts",
+		"src/lib/*.d.ts"
 	],
 	"exclude": [
 		"node_modules",

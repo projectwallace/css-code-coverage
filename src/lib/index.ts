@@ -1,8 +1,8 @@
-import { is_valid_coverage, type Coverage, type Range } from './parse-coverage.ts'
-import { prettify } from './prettify.ts'
-import { deduplicate_entries } from './decuplicate.ts'
-import { filter_coverage } from './filter-entries.ts'
-import type { Parser } from './types.ts'
+import { is_valid_coverage, type Coverage, type Range } from './parse-coverage.js'
+import { prettify } from './prettify.js'
+import { deduplicate_entries } from './decuplicate.js'
+import { filter_coverage } from './filter-entries.js'
+import type { Parser } from './types.js'
 
 export type CoverageData = {
 	unused_bytes: number
@@ -57,12 +57,12 @@ export function calculate_coverage(coverage: Coverage[], parse_html?: Parser): C
 		throw new TypeError('No valid coverage data found')
 	}
 
-	let filtered_coverage = filter_coverage(coverage, parse_html)
-	let prettified_coverage = prettify(filtered_coverage)
-	let deduplicated = deduplicate_entries(prettified_coverage)
+	let filtered_coverage: Coverage[] = filter_coverage(coverage, parse_html)
+	let prettified_coverage: Coverage[] = prettify(filtered_coverage)
+	let deduplicated: Coverage[] = deduplicate_entries(prettified_coverage)
 
 	// Calculate coverage for each individual stylesheet we found
-	let coverage_per_stylesheet = Array.from(deduplicated).map(([text, { url, ranges }]) => {
+	let coverage_per_stylesheet = deduplicated.map(({ text, url, ranges }) => {
 		function is_line_covered(line: string, start_offset: number) {
 			let end = start_offset + line.length
 			let next_offset = end + 1 // account for newline character
@@ -134,8 +134,8 @@ export function calculate_coverage(coverage: Coverage[], parse_html?: Parser): C
 		]
 
 		for (let index = 1; index < line_coverage.length; index++) {
-			let is_covered = line_coverage[index]
-			if (is_covered !== line_coverage[index - 1]) {
+			let is_covered = line_coverage.at(index)
+			if (is_covered !== line_coverage.at(index - 1)) {
 				let last_chunk = chunks.at(-1)!
 				last_chunk.end_line = index
 				last_chunk.total_lines = index - last_chunk.start_line + 1
@@ -207,6 +207,6 @@ export function calculate_coverage(coverage: Coverage[], parse_html?: Parser): C
 	}
 }
 
-export type { Coverage, Range } from './parse-coverage.ts'
-export { parse_coverage } from './parse-coverage.ts'
-export type { Parser } from './types.ts'
+export type { Coverage, Range } from './parse-coverage.js'
+export { parse_coverage } from './parse-coverage.js'
+export type { Parser } from './types.js'

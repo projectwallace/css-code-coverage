@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { parse_coverage } from './parse-coverage.ts'
+import { parse_coverage } from './parse-coverage.js'
 
 test('parses valid JSON', () => {
 	let input = `

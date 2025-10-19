@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { ext } from './ext.ts'
+import { ext } from './ext.js'
 
 let valid = [
 	'https://example.com/style.css',

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { filter_coverage } from './filter-entries.ts'
+import { filter_coverage } from './filter-entries.js'
 import { DOMParser } from 'linkedom'
 
 function html_parser(html: string) {

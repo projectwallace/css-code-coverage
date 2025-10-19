@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { calculate_coverage } from '.'
+import { calculate_coverage } from './index.js'
 import { DOMParser } from 'linkedom'
 
 function parse_html(html: string) {

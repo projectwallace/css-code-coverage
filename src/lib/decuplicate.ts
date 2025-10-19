@@ -1,4 +1,4 @@
-import type { Coverage, Range } from './parse-coverage.ts'
+import type { Coverage, Range } from './parse-coverage.js'
 /**
  * @description
  * prerequisites
@@ -6,7 +6,7 @@ import type { Coverage, Range } from './parse-coverage.ts'
  * - if a duplicate stylesheet enters the room, we add it's ranges to the existing stylesheet's ranges
  * - only bytes of deduplicated stylesheets are counted
  */
-export function deduplicate_entries(entries: Coverage[]): Map<Coverage['text'], Pick<Coverage, 'ranges' | 'url'>> {
+export function deduplicate_entries(entries: Coverage[]): Coverage[] {
 	let checked_stylesheets = new Map<string, { url: string; ranges: Range[] }>()
 
 	for (let entry of entries) {
@@ -36,5 +36,5 @@ export function deduplicate_entries(entries: Coverage[]): Map<Coverage['text'], 
 		}
 	}
 
-	return checked_stylesheets
+	return Array.from(checked_stylesheets, ([text, { url, ranges }]) => ({ text, url, ranges }))
 }
