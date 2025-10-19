@@ -25,18 +25,20 @@
   },
   "type": "module",
   "files": [
-    "dist",
-    "src/cli"
+    "dist"
   ],
-  "main": "dist/css-code-coverage.js",
-  "exports": {
-    "types": "./dist/index.d.ts",
-    "default": "./dist/css-code-coverage.js"
+  "bin": {
+    "css-coverage": "dist/cli/cli.js"
   },
-  "types": "dist/index.d.ts",
+  "main": "dist/lib/index.js",
+  "exports": {
+    "types": "./dist/lib/index.d.ts",
+    "default": "./dist/lib/index.js"
+  },
+  "types": "dist/lib/index.d.ts",
   "scripts": {
     "test": "c8 --reporter=text playwright test",
-    "build": "vite build",
+    "build": "tsc",
     "check": "tsc --noEmit",
     "lint": "oxlint --config .oxlintrc.json",
     "lint-package": "publint"

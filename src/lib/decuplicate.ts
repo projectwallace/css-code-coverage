@@ -1,4 +1,4 @@
-import type { Coverage, Range } from './parse-coverage.ts'
+import type { Coverage, Range } from './parse-coverage.js'
 /**
  * @description
  * prerequisites

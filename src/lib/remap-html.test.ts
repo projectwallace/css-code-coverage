@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
-import { remap_html } from './remap-html'
 import { DOMParser } from 'linkedom'
+import { remap_html } from './remap-html.js'
 
 function html_parser(html: string) {
 	return new DOMParser().parseFromString(html, 'text/html')

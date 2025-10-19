@@ -1,8 +1,8 @@
-import { is_valid_coverage, type Coverage, type Range } from './parse-coverage.ts'
-import { prettify } from './prettify.ts'
-import { deduplicate_entries } from './decuplicate.ts'
-import { filter_coverage } from './filter-entries.ts'
-import type { Parser } from './types.ts'
+import { is_valid_coverage, type Coverage, type Range } from './parse-coverage.js'
+import { prettify } from './prettify.js'
+import { deduplicate_entries } from './decuplicate.js'
+import { filter_coverage } from './filter-entries.js'
+import type { Parser } from './types.js'
 
 export type CoverageData = {
 	unused_bytes: number
@@ -134,8 +134,8 @@ export function calculate_coverage(coverage: Coverage[], parse_html?: Parser): C
 		]
 
 		for (let index = 1; index < line_coverage.length; index++) {
-			let is_covered = line_coverage[index]
-			if (is_covered !== line_coverage[index - 1]) {
+			let is_covered = line_coverage.at(index)
+			if (is_covered !== line_coverage.at(index - 1)) {
 				let last_chunk = chunks.at(-1)!
 				last_chunk.end_line = index
 				last_chunk.total_lines = index - last_chunk.start_line + 1
@@ -207,6 +207,6 @@ export function calculate_coverage(coverage: Coverage[], parse_html?: Parser): C
 	}
 }
 
-export type { Coverage, Range } from './parse-coverage.ts'
-export { parse_coverage } from './parse-coverage.ts'
-export type { Parser } from './types.ts'
+export type { Coverage, Range } from './parse-coverage.js'
+export { parse_coverage } from './parse-coverage.js'
+export type { Parser } from './types.js'

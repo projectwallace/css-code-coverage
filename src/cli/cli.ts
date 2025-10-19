@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
-import { validate_arguments, parse_arguments, InvalidArgumentsError } from './arguments.ts'
-import { program, MissingDataError } from './program.ts'
-import { read } from './file-reader.ts'
-import { print as pretty } from './reporters/pretty.ts'
-import { print as tap } from './reporters/tap.ts'
+import { validate_arguments, parse_arguments, InvalidArgumentsError } from './arguments.js'
+import { program, MissingDataError } from './program.js'
+import { read } from './file-reader.js'
+import { print as pretty } from './reporters/pretty.js'
+import { print as tap } from './reporters/tap.js'
 
 async function cli(cli_args: string[]) {
 	const args = parse_arguments(cli_args)

@@ -1,5 +1,5 @@
 import { format } from '@projectwallace/format-css'
-import type { Range, Coverage } from './parse-coverage.ts'
+import type { Range, Coverage } from './parse-coverage.js'
 // css-tree tokens: https://github.com/csstree/csstree/blob/be5ea1257009960c04cccdb58bb327263e27e3b3/lib/tokenizer/types.js
 import { tokenize, tokenTypes } from 'css-tree/tokenizer'
 

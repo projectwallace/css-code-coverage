@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { deduplicate_entries } from './decuplicate.ts'
+import { deduplicate_entries } from './decuplicate.js'
 
 test('handles a single entry', () => {
 	let entry = {

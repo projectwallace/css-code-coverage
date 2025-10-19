@@ -1,5 +1,5 @@
-import type { Parser } from './types'
-import type { Range } from './parse-coverage.ts'
+import type { Parser } from './types.js'
+import type { Range } from './parse-coverage.js'
 
 export function remap_html(parse_html: Parser, html: string, old_ranges: Range[]) {
 	let doc = parse_html(html)

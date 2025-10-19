@@ -1,4 +1,4 @@
-import { calculate_coverage, type Coverage, type CoverageResult } from '../lib/index.ts'
+import { calculate_coverage, type Coverage, type CoverageResult } from '../lib/index.js'
 import { DOMParser } from 'linkedom'
 
 function parse_html(html: string) {

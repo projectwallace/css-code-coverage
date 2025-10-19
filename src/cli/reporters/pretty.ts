@@ -1,7 +1,7 @@
 // oxlint-disable max-depth
 import { styleText } from 'node:util'
-import type { Report } from '../program'
-import type { CliArguments } from '../arguments'
+import type { Report } from '../program.js'
+import type { CliArguments } from '../arguments.js'
 
 // Re-indent because tabs in the terminal tend to be bigger than usual
 function indent(line?: string): string {

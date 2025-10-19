@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { generate_coverage } from './generate-coverage.ts'
+import { generate_coverage } from './generate-coverage'
 
 test('collects coverage from html <style> tag', async () => {
 	let html = `

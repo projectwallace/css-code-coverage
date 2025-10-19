@@ -1,5 +1,5 @@
-import type { CliArguments } from '../arguments'
-import type { Report } from '../program'
+import type { CliArguments } from '../arguments.js'
+import type { Report } from '../program.js'
 
 function version() {
 	console.log('TAP version 13')

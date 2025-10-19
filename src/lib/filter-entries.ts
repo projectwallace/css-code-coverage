@@ -1,7 +1,7 @@
-import type { Coverage } from './parse-coverage.ts'
-import { ext } from './ext.ts'
-import type { Parser } from './types.ts'
-import { remap_html } from './remap-html.ts'
+import type { Coverage } from './parse-coverage.js'
+import { ext } from './ext.js'
+import type { Parser } from './types.js'
+import { remap_html } from './remap-html.js'
 
 function is_html(text: string): boolean {
 	return /<\/?(html|body|head|div|span|script|style)/i.test(text)

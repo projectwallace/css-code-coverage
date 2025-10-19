@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { prettify } from './prettify.ts'
+import { prettify } from './prettify.js'
 
 test('simple rule prettification', () => {
 	let entries = [
