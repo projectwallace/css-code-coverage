@@ -57,12 +57,12 @@ export function calculate_coverage(coverage: Coverage[], parse_html?: Parser): C
 		throw new TypeError('No valid coverage data found')
 	}
 
-	let filtered_coverage = filter_coverage(coverage, parse_html)
-	let prettified_coverage = prettify(filtered_coverage)
-	let deduplicated = deduplicate_entries(prettified_coverage)
+	let filtered_coverage: Coverage[] = filter_coverage(coverage, parse_html)
+	let prettified_coverage: Coverage[] = prettify(filtered_coverage)
+	let deduplicated: Coverage[] = deduplicate_entries(prettified_coverage)
 
 	// Calculate coverage for each individual stylesheet we found
-	let coverage_per_stylesheet = Array.from(deduplicated).map(([text, { url, ranges }]) => {
+	let coverage_per_stylesheet = deduplicated.map(({ text, url, ranges }) => {
 		function is_line_covered(line: string, start_offset: number) {
 			let end = start_offset + line.length
 			let next_offset = end + 1 // account for newline character

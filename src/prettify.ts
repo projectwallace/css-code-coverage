@@ -3,18 +3,19 @@ import type { Range, Coverage } from './parse-coverage.ts'
 // css-tree tokens: https://github.com/csstree/csstree/blob/be5ea1257009960c04cccdb58bb327263e27e3b3/lib/tokenizer/types.js
 import { tokenize, tokenTypes } from 'css-tree/tokenizer'
 
+let irrelevant_tokens: Set<number> = new Set([
+	tokenTypes.EOF,
+	tokenTypes.BadString,
+	tokenTypes.BadUrl,
+	tokenTypes.WhiteSpace,
+	tokenTypes.Semicolon,
+	tokenTypes.Comment,
+	tokenTypes.Colon,
+])
+
 export function prettify(coverage: Coverage[]): Coverage[] {
 	return coverage.map(({ url, text, ranges }) => {
 		let formatted = format(text)
-		let irrelevant_tokens: Set<number> = new Set([
-			tokenTypes.EOF,
-			tokenTypes.BadString,
-			tokenTypes.BadUrl,
-			tokenTypes.WhiteSpace,
-			tokenTypes.Semicolon,
-			tokenTypes.Comment,
-			tokenTypes.Colon,
-		])
 
 		// Initialize the ranges with an empty array of token indexes
 		let ext_ranges: (Range & { tokens: number[] })[] = ranges.map(({ start, end }) => ({ start, end, tokens: [] }))

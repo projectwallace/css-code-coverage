@@ -61,7 +61,7 @@ export function print({ report, context }: Report, params: CliArguments) {
 					if (line_coverage[i] === 0) {
 						// Rewind cursor N lines to render N previous lines
 						for (let j = i - NUM_LEADING_LINES; j < i; j++) {
-							console.log(styleText('dim', line_number(j)), styleText('dim', lines[j]!))
+							console.log(styleText('dim', line_number(j)), styleText('dim', lines[j] || ''))
 						}
 						// Render uncovered lines while increasing cursor until reaching next covered block
 						while (line_coverage[i] === 0) {
