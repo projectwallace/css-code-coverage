@@ -28,17 +28,17 @@
     "dist"
   ],
   "bin": {
-    "css-coverage": "dist/cli/cli.js"
+    "css-coverage": "dist/cli.js"
   },
-  "main": "dist/lib/index.js",
+  "main": "dist/index.js",
   "exports": {
-    "types": "./dist/lib/index.d.ts",
-    "default": "./dist/lib/index.js"
+    "types": "./dist/index.d.ts",
+    "default": "./dist/index.js"
   },
-  "types": "dist/lib/index.d.ts",
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "c8 --reporter=text playwright test",
-    "build": "tsc",
+    "build": "tsdown",
     "check": "tsc --noEmit",
     "lint": "oxlint --config .oxlintrc.json",
     "lint-package": "publint"
@@ -50,9 +50,8 @@
     "linkedom": "^0.18.12",
     "oxlint": "^1.22.0",
     "publint": "^0.3.14",
-    "typescript": "^5.9.3",
-    "vite": "^7.1.9",
-    "vite-plugin-dts": "^4.5.4"
+    "tsdown": "^0.15.8",
+    "typescript": "^5.9.3"
   },
   "dependencies": {
     "@projectwallace/format-css": "^2.1.1",
