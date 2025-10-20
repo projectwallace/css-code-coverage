@@ -23,11 +23,13 @@ npm install @projectwallace/css-code-coverage
 ```ts
 import { calculate_coverage } from '@projectwallace/css-code-coverage'
 
-function parse_html(html) {
-	return new DOMParser().parseFromString(html, 'text/html')
-}
+let report = await calculcate_coverage(coverage_data)
 
-let report = calculcate_coverage(coverage_data, parse_html)
+// => report.line_coverage_ratio: 0.80
+// => report.byte_coverage_ratio: 0.85
+// => report.total_lines: 1000
+// => report.covered_lines: 800
+// etc.
 ```
 
 See [src/index.ts](https://github.com/projectwallace/css-code-coverage/blob/main/src/index.ts) for the data that's returned.
@@ -36,12 +38,30 @@ See [src/index.ts](https://github.com/projectwallace/css-code-coverage/blob/main
 
 There are two principal ways of collecting CSS Coverage data:
 
+### Coverage API (preferred)
+
+Both Puppeteer and Playwright provide an API to programmatically get the coverage data, allowing you to put that directly into this library. Here is the gist:
+
+```ts
+// Start collecting coverage
+await page.coverage.startCSSCoverage()
+// Load the page, do all sorts of interactions to increase coverage, etc.
+await page.goto('http://example.com')
+// Stop the coverage and store the result in a variable to pass along
+let coverage = await page.coverage.stopCSSCoverage()
+
+// Now we can process it
+import { calculate_coverage } from '@projectwallace/css-code-coverage'
+
+let report = await calculcate_coverage(coverage)
+```
+
 ### Browser devtools
 
 In Edge, Chrome or chromium you can manually collect coverage in the browser's DevTools. In all cases you'll generate coverage data manually and the browser will let you export the data to a JSON file. Note that this JSON contains both JS coverage as well as the CSS coverage. Learn how it works:
 
 - Collect coverage in Microsoft Edge: https://learn.microsoft.com/en-us/microsoft-edge/devtools-guide-chromium/coverage/
-- Collect coevrage in Google Chrome: https://developer.chrome.com/docs/devtools/coverage/
+- Collect coverage in Google Chrome: https://developer.chrome.com/docs/devtools/coverage/
 
 Additionally, DevTools Tips writes about it in their [explainer](https://devtoolstips.org/tips/en/detect-unused-code/).
 
@@ -67,46 +87,3 @@ for (let file of files) {
 	coverage_data.push(...parse_coverage(json_content))
 }
 ```
-
-### Coverage API
-
-Both Puppeteer and Playwright provide an API to programmatically get the coverage data, allowing you to put that directly into this library. Here is the gist:
-
-```ts
-// Start collecting coverage
-await page.coverage.startCSSCoverage()
-// Load the page, do all sorts of interactions to increase coverage, etc.
-await page.goto('http://example.com')
-// Stop the coverage and store the result in a variable to pass along
-let coverage = await page.coverage.stopCSSCoverage()
-
-// Now we can process it
-import { calculate_coverage } from '@projectwallace/css-code-coverage'
-
-function parse_html(html) {
-	return new DOMParser().parseFromString(html, 'text/html')
-}
-
-let report = calculcate_coverage(coverage, parse_html)
-```
-
-### Optional: coverage from `<style>` blocks
-
-Coverage generators also create coverage ranges for `<style>` blocks in HTML. If this applies to your code you should provide a HTML parser that we use to 'scrape' the HTML in case the browser gives us not just plain CSS contents. Depending on where you run this analysis you can use:
-
-1.  Browser:
-    ```ts
-    function parse_html(html) {
-    	return new DOMParser().parseFromString(html, 'text/html')
-    }
-    ```
-1.  Node (using [linkedom](https://github.com/WebReflection/linkedom) in this example, but other parsers could work, too):
-
-    ```ts
-    // $ npm install linkedom
-    import { DOMParser } from 'linkedom'
-
-    function parse_html(html: string) {
-    	return new DOMParser().parseFromString(html, 'text/html')
-    }
-    ```
