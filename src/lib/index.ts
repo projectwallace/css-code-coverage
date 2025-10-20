@@ -161,9 +161,9 @@ export async function calculate_coverage(coverage: Coverage[]): Promise<Coverage
 	let total_files_found = coverage.length
 
 	let filtered_coverage: Coverage[] = await filter_coverage(coverage)
-	let prettified_coverage: Coverage[] = prettify(filtered_coverage)
-	let deduplicated: Coverage[] = deduplicate_entries(prettified_coverage)
-	let coverage_per_stylesheet = deduplicated.map((stylesheet) => calculate_stylesheet_coverage(stylesheet))
+	let deduplicated: Coverage[] = deduplicate_entries(filtered_coverage)
+	let prettified_coverage: Coverage[] = prettify(deduplicated)
+	let coverage_per_stylesheet = prettified_coverage.map((stylesheet) => calculate_stylesheet_coverage(stylesheet))
 
 	// Calculate total coverage for all stylesheets combined
 	let { total_lines, total_covered_lines, total_uncovered_lines, total_bytes, total_used_bytes, total_unused_bytes } =
