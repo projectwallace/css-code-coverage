@@ -1,12 +1,23 @@
-import type { Parser } from './types.js'
 import type { Range } from './parse-coverage.js'
+import type { DOMParser as LinkedomParser } from 'linkedom'
 
-export function remap_html(parse_html: Parser, html: string, old_ranges: Range[]) {
-	let doc = parse_html(html)
+async function get_dom_parser(): Promise<DOMParser | LinkedomParser> {
+	if (typeof window !== 'undefined' && 'DOMParser' in window) {
+		/* v8 ignore */
+		return new window.DOMParser()
+	}
+
+	let { DOMParser } = await import('linkedom')
+	return new DOMParser() as LinkedomParser
+}
+
+export async function remap_html(html: string, old_ranges: Range[]) {
+	let dom_parser = await get_dom_parser()
+	let doc = dom_parser.parseFromString(html, 'text/html')
 	let combined_css = ''
 	let new_ranges = []
 	let current_offset = 0
-	let style_elements = doc.querySelectorAll('style')
+	let style_elements = doc.querySelectorAll('style') as NodeListOf<HTMLStyleElement>
 
 	for (let style_element of Array.from(style_elements)) {
 		let style_content = style_element.textContent

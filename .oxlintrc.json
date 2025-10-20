@@ -52,23 +52,5 @@
 		"default-case": "off",
 		"no-rest-spread-properties": "off",
 		"require-await": "warn"
-	},
-	"overrides": [
-		{
-			"files": [
-				"*.svelte"
-			],
-			"rules": {
-				"no-unassigned-vars": "off"
-			}
-		},
-		{
-			"files": [
-				".stylelintrc.mjs"
-			],
-			"rules": {
-				"unicorn/no-null": "off"
-			}
-		}
-	]
+	}
 }

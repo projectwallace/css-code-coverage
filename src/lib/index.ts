@@ -1,8 +1,7 @@
-import { is_valid_coverage, type Coverage, type Range } from './parse-coverage.js'
+import { type Coverage, type Range } from './parse-coverage.js'
 import { prettify } from './prettify.js'
 import { deduplicate_entries } from './decuplicate.js'
 import { filter_coverage } from './filter-entries.js'
-import type { Parser } from './types.js'
 
 export type CoverageData = {
 	unused_bytes: number
@@ -50,14 +49,10 @@ function ratio(fraction: number, total: number) {
  * 4. Calculate used/unused CSS bytes (fastest path, no inspection of the actual CSS needed)
  * 5. Calculate line-coverage, byte-coverage per stylesheet
  */
-export function calculate_coverage(coverage: Coverage[], parse_html?: Parser): CoverageResult {
+export async function calculate_coverage(coverage: Coverage[]): Promise<CoverageResult> {
 	let total_files_found = coverage.length
 
-	if (!is_valid_coverage(coverage)) {
-		throw new TypeError('No valid coverage data found')
-	}
-
-	let filtered_coverage: Coverage[] = filter_coverage(coverage, parse_html)
+	let filtered_coverage: Coverage[] = await filter_coverage(coverage)
 	let prettified_coverage: Coverage[] = prettify(filtered_coverage)
 	let deduplicated: Coverage[] = deduplicate_entries(prettified_coverage)
 
@@ -209,4 +204,3 @@ export function calculate_coverage(coverage: Coverage[], parse_html?: Parser): C
 
 export type { Coverage, Range } from './parse-coverage.js'
 export { parse_coverage } from './parse-coverage.js'
-export type { Parser } from './types.js'
