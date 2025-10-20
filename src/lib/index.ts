@@ -80,7 +80,7 @@ function calculate_stylesheet_coverage({ text, url, ranges }: Coverage) {
 
 		let prev_is_covered = index > 0 && line_coverage[index - 1] === 1
 
-		if (is_in_range && !is_closing_brace && !is_empty) {
+		if (is_in_range) {
 			is_covered = true
 		} else if ((is_empty || is_closing_brace) && prev_is_covered) {
 			is_covered = true
