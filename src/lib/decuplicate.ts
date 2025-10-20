@@ -36,5 +36,5 @@ export function deduplicate_entries(entries: Coverage[]): Coverage[] {
 		}
 	}
 
-	return Array.from(checked_stylesheets, ([text, { url, ranges }]) => ({ text, url, ranges }))
+	return Array.from(checked_stylesheets, ([text, { url, ranges }]) => ({ text, url, ranges: ranges.sort((a, b) => a.start - b.start) }))
 }
