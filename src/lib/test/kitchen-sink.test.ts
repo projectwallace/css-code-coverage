@@ -1,12 +1,12 @@
 import { test, expect } from '@playwright/test'
-import { calculate_coverage } from './index.js'
+import { calculate_coverage } from '../index.js'
 import { DOMParser } from 'linkedom'
 
 function parse_html(html: string) {
 	return new DOMParser().parseFromString(html, 'text/html')
 }
 
-test('proejctw wallace Container', () => {
+test('project wallace Container component', () => {
 	const coverage = [
 		{
 			url: 'http://localhost:4173/_app/immutable/assets/Container.n-2BXq6O.css',
