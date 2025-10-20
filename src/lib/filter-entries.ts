@@ -1,13 +1,12 @@
 import type { Coverage } from './parse-coverage.js'
 import { ext } from './ext.js'
-import type { Parser } from './types.js'
 import { remap_html } from './remap-html.js'
 
 function is_html(text: string): boolean {
 	return /<\/?(html|body|head|div|span|script|style)/i.test(text)
 }
 
-export function filter_coverage(coverage: Coverage[], parse_html?: Parser): Coverage[] {
+export async function filter_coverage(coverage: Coverage[]): Promise<Coverage[]> {
 	let result = []
 
 	for (let entry of coverage) {
@@ -21,12 +20,7 @@ export function filter_coverage(coverage: Coverage[], parse_html?: Parser): Cove
 		}
 
 		if (is_html(entry.text)) {
-			if (!parse_html) {
-				// No parser provided, cannot extract CSS from HTML, silently skip this entry
-				continue
-			}
-
-			let { css, ranges } = remap_html(parse_html, entry.text, entry.ranges)
+			let { css, ranges } = await remap_html(entry.text, entry.ranges)
 			result.push({
 				url: entry.url,
 				text: css,

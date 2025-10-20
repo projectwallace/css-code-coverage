@@ -1,12 +1,7 @@
 import { test, expect } from '@playwright/test'
 import { calculate_coverage } from '../index.js'
-import { DOMParser } from 'linkedom'
 
-function parse_html(html: string) {
-	return new DOMParser().parseFromString(html, 'text/html')
-}
-
-test('project wallace Container component', () => {
+test('project wallace Container component', async () => {
 	const coverage = [
 		{
 			url: 'http://localhost:4173/_app/immutable/assets/Container.n-2BXq6O.css',
@@ -20,7 +15,7 @@ test('project wallace Container component', () => {
 			],
 		},
 	]
-	let result = calculate_coverage(coverage, parse_html)
+	let result = await calculate_coverage(coverage)
 	let sheet = result.coverage_per_stylesheet.at(0)!
 
 	expect.soft(sheet.total_lines).toBe(44)

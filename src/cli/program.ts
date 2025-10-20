@@ -1,9 +1,4 @@
 import { calculate_coverage, type Coverage, type CoverageResult } from '../lib/index.js'
-import { DOMParser } from 'linkedom'
-
-function parse_html(html: string) {
-	return new DOMParser().parseFromString(html, 'text/html')
-}
 
 export class MissingDataError extends Error {
 	constructor() {
@@ -54,7 +49,7 @@ function validate_min_file_line_coverage(actual: number, expected: number | unde
 	}
 }
 
-export function program(
+export async function program(
 	{
 		min_file_coverage,
 		min_file_line_coverage,
@@ -67,7 +62,7 @@ export function program(
 	if (coverage_data.length === 0) {
 		throw new MissingDataError()
 	}
-	let coverage = calculate_coverage(coverage_data, parse_html)
+	let coverage = await calculate_coverage(coverage_data)
 	let min_line_coverage_result = validate_min_line_coverage(coverage.line_coverage_ratio, min_file_coverage)
 	let min_file_line_coverage_result = validate_min_file_line_coverage(
 		Math.min(...coverage.coverage_per_stylesheet.map((sheet) => sheet.line_coverage_ratio)),
