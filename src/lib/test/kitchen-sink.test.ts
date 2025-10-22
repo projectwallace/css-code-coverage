@@ -238,7 +238,14 @@ test.describe('Wallace mega soverage suite', () => {
 		expect.soft(result.total_lines).toBe(17)
 	})
 
-	test('Meter has full coverage', async () => {
+	test('Heading has full coverage', async () => {
+		let data = coverage.find(({ url }) => url.includes('Heading')) as Coverage
+		let result = await calculate_coverage([data])
+		expect.soft(result.line_coverage_ratio).toBe(1)
+		expect.soft(result.total_lines).toBe(37)
+	})
+
+	test('Meter has partial coverage', async () => {
 		let data = coverage.find(({ url }) => url.includes('Meter')) as Coverage
 		let result = await calculate_coverage([data])
 		expect.soft(result.line_coverage_ratio).not.toBe(1)
@@ -248,6 +255,20 @@ test.describe('Wallace mega soverage suite', () => {
 		expect.soft(sheet.chunks.map(({ is_covered, start_line, end_line }) => ({ is_covered, start_line, end_line }))).toEqual([
 			{ is_covered: true, start_line: 1, end_line: 22 },
 			{ is_covered: false, start_line: 23, end_line: 35 },
+		])
+	})
+
+	test('Container has partial coverage', async () => {
+		let data = coverage.find(({ url }) => url.includes('Container')) as Coverage
+		let result = await calculate_coverage([data])
+		expect.soft(result.line_coverage_ratio).not.toBe(1)
+		expect.soft(result.total_lines).toBe(44)
+
+		let sheet = result.coverage_per_stylesheet.at(0)!
+		expect.soft(sheet.chunks.map(({ is_covered, start_line, end_line }) => ({ is_covered, start_line, end_line }))).toEqual([
+			{ is_covered: true, start_line: 1, end_line: 21 },
+			{ is_covered: false, start_line: 22, end_line: 24 },
+			{ is_covered: true, start_line: 25, end_line: 44 },
 		])
 	})
 })

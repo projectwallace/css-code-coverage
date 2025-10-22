@@ -5,10 +5,25 @@ function dedupe_list(ranges: Range[]): Set<Range> {
 
 	outer: for (let range of ranges) {
 		for (let processed_range of new_ranges) {
+			// Case: an existing range fits within this range -> replace it
 			if (range.start <= processed_range.start && range.end >= processed_range.end) {
 				new_ranges.delete(processed_range)
 				new_ranges.add(range)
 				continue outer
+			}
+			// Case: this range fits within an existing range -> skip it
+			if (range.start >= processed_range.start && range.end <= processed_range.end) {
+				continue outer
+			}
+			// Case: ranges partially overlap
+			// { start: 324, end: 444 },
+			// { start: 364, end: 485 },
+			if (range.start < processed_range.end && range.start > processed_range.start && range.end > processed_range.end) {
+				new_ranges.delete(processed_range)
+				new_ranges.add({
+					start: processed_range.start,
+					end: range.end,
+				})
 			}
 		}
 		new_ranges.add(range)
