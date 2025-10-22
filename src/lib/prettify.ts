@@ -20,22 +20,23 @@ export function prettify(stylesheet: ChunkedCoverage): PrettifiedCoverage {
 		let css = format(stylesheet.text.slice(chunk.start_offset, chunk.end_offset - 1)).trim()
 
 		if (chunk.is_covered) {
+			let is_last = index === stylesheet.chunks.length - 1
 			if (index === 0) {
 				// mark the line between this chunk and the next on as covered
-				css = css + '\n'
+				css = css + (is_last ? '' : '\n')
 			} else if (index === stylesheet.chunks.length - 1) {
 				// mark the newline after the previous uncovered block as covered
 				css = '\n' + css
 			} else {
 				// mark the newline after the previous uncovered block as covered
 				// and mark the line between this chunk and the next on as covered
-				css = '\n' + css + '\n'
+				css = '\n' + css + (is_last ? '' : '\n')
 			}
 		}
 
 		let line_count = css.split('\n').length
 		let start_offset = offset
-		let end_offset = Math.max(offset + css.length - 1, 0)
+		let end_offset = offset + css.length - 1
 		let start_line = line
 		let end_line = line + line_count
 

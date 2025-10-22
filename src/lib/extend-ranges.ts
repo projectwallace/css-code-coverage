@@ -7,30 +7,25 @@ export function extend_ranges(coverage: Coverage[]): Coverage[] {
 	return coverage.map(({ text, ranges, url }) => {
 		// Adjust ranges to include @-rule name (only preludes included)
 		// Cannot reliably include closing } because it may not be the end of the range
-
-		console.log('Before extending')
-		console.log({
-			ranges: ranges.map((r) => ({
-				...r,
-				text: text.slice(r.start, r.end),
-			})),
-		})
-		console.log()
-
-		for (let range of ranges) {
+		let new_ranges = ranges.map((range, index) => {
+			let prev_range = ranges[index - 1]
 			// Add @atrule-name to the front of the range
-			// Heuristic: atrule names are no longer than 20 characters ('@font-palette-values'.length === 20)
-			for (let i = 1; i >= -LONGEST_ATRULE_NAME; i--) {
-				let char_position = range.start + i
+			// Heuristic: atrule names are no longer than LONGEST_ATRULE_NAME
+			for (let i = range.start; i >= range.start - LONGEST_ATRULE_NAME; i--) {
+				// Make sure to not overlap with the previous range
+				if (prev_range && prev_range.end > i) {
+					break
+				}
+
+				let char_position = i
 				if (text.charCodeAt(char_position) === AT_SIGN) {
 					// Move the start cursor back to the start of the @-sign
 					range.start = char_position
 
 					// Look if the next character might be the opening { of the atrule's block
-					// First eat all the whitespace that might be in-between
 					let next_offset = range.end
 					let next_char = text.charAt(next_offset)
-
+					// First eat all the whitespace that might be in-between
 					while (/\s/.test(next_char)) {
 						next_offset++
 						next_char = text.charAt(next_offset)
@@ -52,15 +47,25 @@ export function extend_ranges(coverage: Coverage[]): Coverage[] {
 			if (next_char === '}') {
 				range.end = offset + 1
 			}
-		}
 
-		console.log('EXTENDED RANGES')
-		console.log({
-			ranges: ranges.map((r) => ({
-				...r,
-				text: text.slice(r.start, r.end),
-			})),
+			return range
 		})
-		return { text, ranges, url }
+
+		// console.log('Before extending')
+		// console.log({
+		// 	ranges: ranges.map((r) => ({
+		// 		...r,
+		// 		text: text.slice(r.start, r.end),
+		// 	})),
+		// })
+		// console.log()
+		// console.log('after extending')
+		// console.log({
+		// 	ranges: new_ranges.map((r) => ({
+		// 		...r,
+		// 		text: text.slice(r.start, r.end),
+		// 	})),
+		// })
+		return { text, ranges: new_ranges, url }
 	})
 }

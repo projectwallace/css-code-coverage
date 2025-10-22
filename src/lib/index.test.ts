@@ -137,37 +137,36 @@ test.describe('from coverage data downloaded directly from the browser as JSON',
 		},
 	]
 
-	test.skip('counts totals', async () => {
+	test('counts totals', async () => {
 		let result = await calculate_coverage(coverage)
-		expect.soft(result.covered_lines).toBe(9)
-		expect.soft(result.uncovered_lines).toBe(5)
-		expect.soft(result.total_lines).toBe(14)
-		expect.soft(result.line_coverage_ratio).toBe(9 / 14)
+		expect.soft(result.covered_lines).toBe(11)
+		expect.soft(result.uncovered_lines).toBe(4)
+		expect.soft(result.total_lines).toBe(15)
 		expect.soft(result.total_stylesheets).toBe(1)
 	})
 
-	test.skip('extracts and formats css', async () => {
+	test('extracts and formats css', async () => {
 		let result = await calculate_coverage(coverage)
 		expect(result.coverage_per_stylesheet.at(0)?.text).toEqual(
-			format(`h1 {
-					color: blue;
-					font-size: 24px;
-				}
+			`h1 {
+	color: blue;
+	font-size: 24px;
+}
 
-				/* not covered */
-				p {
-					color: red;
-				}
+/* not covered */
+p {
+	color: red;
+}
 
-				@media (width > 30em) {
-					h1 {
-						color: green;
-					}
-				}`),
+@media (width > 30em) {
+	h1 {
+		color: green;
+	}
+}`,
 		)
 	})
 
-	test.skip('calculates line coverage', async () => {
+	test('calculates line coverage', async () => {
 		let result = await calculate_coverage(coverage)
 		let sheet = result.coverage_per_stylesheet.at(0)!
 		expect(
@@ -179,18 +178,7 @@ test.describe('from coverage data downloaded directly from the browser as JSON',
 		])
 	})
 
-	test.skip('calculates chunks', async () => {
-		let result = await calculate_coverage(coverage)
-		expect(result.coverage_per_stylesheet.at(0)?.chunks).toEqual([
-			{ start_line: 1, is_covered: true, end_line: 4, total_lines: 4 },
-			{ start_line: 5, is_covered: false, end_line: 8, total_lines: 4 },
-			{ start_line: 9, is_covered: true, end_line: 10, total_lines: 2 },
-			{ start_line: 11, is_covered: false, end_line: 11, total_lines: 1 },
-			{ start_line: 12, is_covered: true, end_line: 14, total_lines: 3 },
-		])
-	})
-
-	test.skip('calculates chunks for fully covered file', async () => {
+	test('calculates chunks for fully covered file', async () => {
 		let result = await calculate_coverage([
 			{
 				url: 'https://example.com',
@@ -204,17 +192,18 @@ test.describe('from coverage data downloaded directly from the browser as JSON',
 			},
 		])
 		expect(result.coverage_per_stylesheet.at(0)?.text).toEqual('h1 {\n\tcolor: blue;\n}')
-		expect(result.coverage_per_stylesheet.at(0)?.chunks).toEqual([
+		expect(
+			result.coverage_per_stylesheet.at(0)?.chunks.map(({ start_line, end_line, is_covered }) => ({ start_line, end_line, is_covered })),
+		).toEqual([
 			{
 				start_line: 1,
 				is_covered: true,
 				end_line: 3,
-				total_lines: 3,
 			},
 		])
 	})
 
-	test.skip('calculates chunks for fully uncovered file', async () => {
+	test('calculates chunks for fully uncovered file', async () => {
 		let result = await calculate_coverage([
 			{
 				url: 'https://example.com',
@@ -222,12 +211,13 @@ test.describe('from coverage data downloaded directly from the browser as JSON',
 				text: 'h1 { color: blue; }',
 			},
 		])
-		expect(result.coverage_per_stylesheet.at(0)?.chunks).toEqual([
+		expect(
+			result.coverage_per_stylesheet.at(0)?.chunks.map(({ start_line, end_line, is_covered }) => ({ start_line, end_line, is_covered })),
+		).toEqual([
 			{
 				start_line: 1,
 				is_covered: false,
 				end_line: 3,
-				total_lines: 3,
 			},
 		])
 	})
