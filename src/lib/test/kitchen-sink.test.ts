@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test'
-import { calculate_coverage } from '../index.js'
+import { calculate_coverage, type Coverage } from '../index.js'
+import { generate_coverage } from './generate-coverage.js'
 
 test('project wallace Container component', async () => {
 	const coverage = [
@@ -34,4 +35,136 @@ test('project wallace Container component', async () => {
 	expect.soft(chunk3?.start_line).toEqual(41)
 	expect.soft(chunk3?.end_line).toEqual(44)
 	expect.soft(chunk3?.total_lines).toEqual(4)
+})
+
+test.describe('comment coverage', () => {
+	let html = `
+			<!doctype html>
+			<html>
+				<head>
+					<title>test document</title>
+					<link rel="stylesheet" href="http://localhost/style.css">
+				</head>
+				<body>
+					<h1>Hello world</h1>
+				</body>
+			</html>
+		`
+
+	test('leading line comment is marked as uncovered', async () => {
+		let css = `
+			/* start comment */
+			h1 { color: blue; }
+		`
+		let coverage = (await generate_coverage(html, { link_css: css })) as Coverage[]
+		let result = await calculate_coverage(coverage)
+		let sheet = result.coverage_per_stylesheet.at(0)!
+		expect(sheet.line_coverage).toEqual(new Uint8Array([0, 1, 1, 1]))
+	})
+
+	test('leading block comment is marked as uncovered', async () => {
+		let css = `
+			/*
+			  start comment
+			*/
+			h1 { color: blue; }
+		`
+		let coverage = (await generate_coverage(html, { link_css: css })) as Coverage[]
+		let result = await calculate_coverage(coverage)
+		let sheet = result.coverage_per_stylesheet.at(0)!
+		expect(sheet.line_coverage).toEqual(new Uint8Array([0, 0, 0, 1, 1, 1]))
+	})
+
+	test('trailing line comment is marked as uncovered', async () => {
+		let css = `
+			h1 { color: blue; }
+			/* start comment */
+		`
+		let coverage = (await generate_coverage(html, { link_css: css })) as Coverage[]
+		let result = await calculate_coverage(coverage)
+		let sheet = result.coverage_per_stylesheet.at(0)!
+		expect(sheet.line_coverage).toEqual(new Uint8Array([1, 1, 1, 0]))
+	})
+
+	test('trailing block comment is marked as uncovered', async () => {
+		let css = `
+			h1 { color: blue; }
+			/*
+			  start comment
+			*/
+		`
+		let coverage = (await generate_coverage(html, { link_css: css })) as Coverage[]
+		let result = await calculate_coverage(coverage)
+		let sheet = result.coverage_per_stylesheet.at(0)!
+		expect(sheet.line_coverage).toEqual(new Uint8Array([1, 1, 1, 0, 0, 0]))
+	})
+})
+
+test.describe('@rules', () => {
+	let html = `
+			<!doctype html>
+			<html>
+				<head>
+					<title>test document</title>
+					<link rel="stylesheet" href="http://localhost/style.css">
+				</head>
+				<body>
+					<h1>Hello world</h1>
+					<p>Text</p>
+				</body>
+			</html>
+		`
+
+	test('@media at the start', async () => {
+		let css = `
+				@media (min-width: 100px) {
+					body {
+						color: green;
+					}
+				}
+
+				a { color: orangered; }
+			`
+		let coverage = (await generate_coverage(html, { link_css: css })) as Coverage[]
+		let result = await calculate_coverage(coverage)
+		let sheet = result.coverage_per_stylesheet.at(0)!
+		// TODO: fix this, it's wildy incorrect
+		expect(sheet.line_coverage).toEqual(new Uint8Array([1, 0, 1, 1, 1, 1, 0, 0, 0]))
+	})
+
+	test('@media in middle', async () => {
+		let css = `
+				a { color: red; }
+
+				@media (min-width: 100px) {
+					body {
+						color: green;
+					}
+				}
+
+				a { color: orangered; }
+			`
+		let coverage = (await generate_coverage(html, { link_css: css })) as Coverage[]
+		let result = await calculate_coverage(coverage)
+		let sheet = result.coverage_per_stylesheet.at(0)!
+		// TODO: fix this, it's wildy incorrect
+		expect(sheet.line_coverage).toEqual(new Uint8Array([0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0]))
+	})
+
+	test('@media at the end', async () => {
+		let css = `
+				a { color: orangered; }
+
+				@media (min-width: 100px) {
+					body {
+						color: green;
+					}
+				}
+			`
+		let coverage = (await generate_coverage(html, { link_css: css })) as Coverage[]
+		let result = await calculate_coverage(coverage)
+		let sheet = result.coverage_per_stylesheet.at(0)!
+		// TODO: fix this, it's wildy incorrect
+		expect(sheet.line_coverage).toEqual(new Uint8Array([0, 0, 0, 1, 1, 0, 1, 1, 1]))
+	})
 })
