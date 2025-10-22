@@ -1,8 +1,18 @@
 import { test, expect } from '@playwright/test'
 import { calculate_coverage, type Coverage } from '../index.js'
 import { generate_coverage } from './generate-coverage.js'
+import { format } from '@projectwallace/format-css'
 
 test('project wallace Container component', async () => {
+	// Coverage:
+	// first rule
+	// first MQ
+	// second MQ
+	// .size-auto { min-width: 120rem; }
+	// ...
+	// -> skip 5 rules
+	// ...
+	// .size-3xl { min-width: 80rem; }
 	const coverage = [
 		{
 			url: 'http://localhost:4173/_app/immutable/assets/Container.n-2BXq6O.css',
@@ -16,6 +26,7 @@ test('project wallace Container component', async () => {
 			],
 		},
 	]
+
 	let result = await calculate_coverage(coverage)
 	let sheet = result.coverage_per_stylesheet.at(0)!
 
@@ -35,6 +46,8 @@ test('project wallace Container component', async () => {
 	expect.soft(chunk3?.start_line).toEqual(41)
 	expect.soft(chunk3?.end_line).toEqual(44)
 	expect.soft(chunk3?.total_lines).toEqual(4)
+
+	expect.soft(sheet.text).toEqual(format(coverage.at(0)!.text))
 })
 
 test.describe('comment coverage', () => {
@@ -59,7 +72,12 @@ test.describe('comment coverage', () => {
 		let coverage = (await generate_coverage(html, { link_css: css })) as Coverage[]
 		let result = await calculate_coverage(coverage)
 		let sheet = result.coverage_per_stylesheet.at(0)!
-		expect(sheet.line_coverage).toEqual(new Uint8Array([0, 1, 1, 1]))
+		expect(
+			sheet.chunks.map(({ is_covered, start_line, end_line, total_lines }) => ({ is_covered, start_line, end_line, total_lines })),
+		).toEqual([
+			{ is_covered: false, start_line: 1, end_line: 1, total_lines: 1 },
+			{ is_covered: true, start_line: 2, end_line: 5, total_lines: 4 },
+		])
 	})
 
 	test('leading block comment is marked as uncovered', async () => {
@@ -72,7 +90,12 @@ test.describe('comment coverage', () => {
 		let coverage = (await generate_coverage(html, { link_css: css })) as Coverage[]
 		let result = await calculate_coverage(coverage)
 		let sheet = result.coverage_per_stylesheet.at(0)!
-		expect(sheet.line_coverage).toEqual(new Uint8Array([0, 0, 0, 1, 1, 1]))
+		expect(
+			sheet.chunks.map(({ is_covered, start_line, end_line, total_lines }) => ({ is_covered, start_line, end_line, total_lines })),
+		).toEqual([
+			{ is_covered: false, start_line: 1, end_line: 3, total_lines: 3 },
+			{ is_covered: true, start_line: 4, end_line: 7, total_lines: 4 },
+		])
 	})
 
 	test('trailing line comment is marked as uncovered', async () => {
@@ -83,7 +106,12 @@ test.describe('comment coverage', () => {
 		let coverage = (await generate_coverage(html, { link_css: css })) as Coverage[]
 		let result = await calculate_coverage(coverage)
 		let sheet = result.coverage_per_stylesheet.at(0)!
-		expect(sheet.line_coverage).toEqual(new Uint8Array([1, 1, 1, 0]))
+		expect(
+			sheet.chunks.map(({ is_covered, start_line, end_line, total_lines }) => ({ is_covered, start_line, end_line, total_lines })),
+		).toEqual([
+			{ is_covered: true, start_line: 1, end_line: 4, total_lines: 4 },
+			{ is_covered: false, start_line: 5, end_line: 5, total_lines: 1 },
+		])
 	})
 
 	test('trailing block comment is marked as uncovered', async () => {
@@ -96,7 +124,12 @@ test.describe('comment coverage', () => {
 		let coverage = (await generate_coverage(html, { link_css: css })) as Coverage[]
 		let result = await calculate_coverage(coverage)
 		let sheet = result.coverage_per_stylesheet.at(0)!
-		expect(sheet.line_coverage).toEqual(new Uint8Array([1, 1, 1, 0, 0, 0]))
+		expect(
+			sheet.chunks.map(({ is_covered, start_line, end_line, total_lines }) => ({ is_covered, start_line, end_line, total_lines })),
+		).toEqual([
+			{ is_covered: true, start_line: 1, end_line: 4, total_lines: 4 },
+			{ is_covered: false, start_line: 5, end_line: 7, total_lines: 3 },
+		])
 	})
 })
 
@@ -128,8 +161,11 @@ test.describe('@rules', () => {
 		let coverage = (await generate_coverage(html, { link_css: css })) as Coverage[]
 		let result = await calculate_coverage(coverage)
 		let sheet = result.coverage_per_stylesheet.at(0)!
-		// TODO: fix this, it's wildy incorrect
-		expect(sheet.line_coverage).toEqual(new Uint8Array([1, 0, 1, 1, 1, 1, 0, 0, 0]))
+
+		expect(sheet.chunks.map(({ is_covered, start_line, total_lines }) => ({ is_covered, start_line, total_lines }))).toEqual([
+			{ is_covered: true, start_line: 1, total_lines: 6 },
+			{ is_covered: false, start_line: 7, total_lines: 3 },
+		])
 	})
 
 	test('@media in middle', async () => {
@@ -147,24 +183,40 @@ test.describe('@rules', () => {
 		let coverage = (await generate_coverage(html, { link_css: css })) as Coverage[]
 		let result = await calculate_coverage(coverage)
 		let sheet = result.coverage_per_stylesheet.at(0)!
-		// TODO: fix this, it's wildy incorrect
-		expect(sheet.line_coverage).toEqual(new Uint8Array([0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0]))
+
+		expect(
+			sheet.chunks.map(({ is_covered, start_line, end_line, total_lines }) => ({ is_covered, start_line, end_line, total_lines })),
+		).toEqual([
+			{ is_covered: false, start_line: 1, end_line: 3, total_lines: 3 },
+			{ is_covered: true, start_line: 4, end_line: 10, total_lines: 7 },
+			{ is_covered: false, start_line: 11, end_line: 13, total_lines: 3 },
+		])
 	})
 
 	test('@media at the end', async () => {
 		let css = `
-				a { color: orangered; }
+			a { color: orangered; }
 
-				@media (min-width: 100px) {
-					body {
-						color: green;
-					}
+			@media (min-width: 100px) {
+				body {
+					color: green;
 				}
-			`
+			}
+		`
 		let coverage = (await generate_coverage(html, { link_css: css })) as Coverage[]
+		expect(coverage.at(0)!.ranges.map(({ start, end }) => css.substring(start, end))).toEqual([
+			`(min-width: 100px) `,
+			`body {\n\t\t\t\t\tcolor: green;\n\t\t\t\t}`,
+		])
+
 		let result = await calculate_coverage(coverage)
 		let sheet = result.coverage_per_stylesheet.at(0)!
-		// TODO: fix this, it's wildy incorrect
-		expect(sheet.line_coverage).toEqual(new Uint8Array([0, 0, 0, 1, 1, 0, 1, 1, 1]))
+
+		expect(
+			sheet.chunks.map(({ is_covered, start_line, end_line, total_lines }) => ({ is_covered, start_line, end_line, total_lines })),
+		).toEqual([
+			{ is_covered: false, start_line: 1, end_line: 3, total_lines: 3 },
+			{ is_covered: true, start_line: 4, end_line: 9, total_lines: 6 },
+		])
 	})
 })

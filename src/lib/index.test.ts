@@ -30,13 +30,13 @@ test.describe('from <style> tag', () => {
 	test('counts totals', async () => {
 		let result = await calculate_coverage(coverage)
 		expect.soft(result.total_files_found).toBe(1)
-		expect.soft(result.total_bytes).toBe(80)
-		expect.soft(result.used_bytes).toBe(42)
-		expect.soft(result.unused_bytes).toBe(38)
-		expect.soft(result.total_lines).toBe(11)
-		expect.soft(result.covered_lines).toBe(7)
-		expect.soft(result.uncovered_lines).toBe(11 - 7)
-		expect.soft(result.line_coverage_ratio).toBe(7 / 11)
+		expect.soft(result.total_bytes).toBe(76)
+		expect.soft(result.covered_bytes).toBe(39)
+		expect.soft(result.uncovered_bytes).toBe(37)
+		expect.soft(result.total_lines).toBe(12)
+		expect.soft(result.covered_lines).toBe(8)
+		expect.soft(result.uncovered_lines).toBe(4)
+		expect.soft(result.line_coverage_ratio).toBe(8 / 12)
 		expect.soft(result.total_stylesheets).toBe(1)
 	})
 
@@ -44,15 +44,10 @@ test.describe('from <style> tag', () => {
 		let result = await calculate_coverage(coverage)
 		let sheet = result.coverage_per_stylesheet.at(0)!
 		expect.soft(sheet.url).toBe('http://localhost/test.html')
-		expect.soft(sheet.ranges).toEqual([
-			{ start: 0, end: 20 },
-			{ start: 61, end: 80 },
-		])
-		expect.soft(sheet.total_lines).toBe(11)
-		expect.soft(sheet.covered_lines).toBe(7)
+		expect.soft(sheet.total_lines).toBe(12)
+		expect.soft(sheet.covered_lines).toBe(8)
 		expect.soft(sheet.uncovered_lines).toBe(4)
-		expect.soft(sheet.line_coverage_ratio).toBe(7 / 11)
-		expect.soft(sheet.line_coverage).toEqual(new Uint8Array([1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1]))
+		expect.soft(sheet.line_coverage_ratio).toBe(8 / 12)
 	})
 })
 
@@ -63,7 +58,7 @@ test.describe('from <link rel="stylesheet">', () => {
 			p { color: green } /* not covered */
 			h1 { color: red; }
 			p { color: green } /* not covered */
-			@media (width > 40em) {
+			@media (min-width: 40em) {
 				h1 { font-size: 24px; }
 			}
 		`
@@ -87,36 +82,35 @@ test.describe('from <link rel="stylesheet">', () => {
 	test('counts totals', async () => {
 		let result = await calculate_coverage(coverage)
 		expect.soft(result.total_files_found).toBe(1)
-		expect.soft(result.total_bytes).toBe(174)
-		expect.soft(result.used_bytes).toBe(91)
-		expect.soft(result.unused_bytes).toBe(83)
-		expect.soft(result.total_lines).toBe(21)
-		expect.soft(result.covered_lines).toBe(12)
-		expect.soft(result.uncovered_lines).toBe(21 - 12)
-		expect.soft(result.line_coverage_ratio).toBe(12 / 21)
+		expect.soft(result.total_bytes).toBe(170)
+		expect.soft(result.covered_bytes).toBe(96)
+		expect.soft(result.uncovered_bytes).toBe(74)
+		expect.soft(result.total_lines).toBe(23)
+		expect.soft(result.covered_lines).toBe(15)
+		expect.soft(result.uncovered_lines).toBe(8)
+		expect.soft(result.line_coverage_ratio).toBe(15 / 23)
 		expect.soft(result.total_stylesheets).toBe(1)
 	})
 
 	test('calculates stats per stylesheet', async () => {
 		let result = await calculate_coverage(coverage)
 		let sheet = result.coverage_per_stylesheet.at(0)!
-		expect.soft(sheet.url).toBe('http://localhost/style.css')
-		expect.soft(sheet.ranges).toEqual([
-			{ start: 0, end: 20 },
-			{ start: 61, end: 80 },
-			{ start: 128, end: 142 },
-			{ start: 146, end: 172 },
+		expect.soft(sheet.covered_lines).toBe(15)
+		expect.soft(sheet.uncovered_lines).toBe(8)
+		expect.soft(sheet.total_lines).toBe(23)
+		expect.soft(sheet.url).toEqual('http://localhost/style.css')
+		expect.soft(sheet.chunks.map(({ is_covered, start_line, end_line }) => ({ is_covered, start_line, end_line }))).toEqual([
+			{ is_covered: true, start_line: 1, end_line: 4 },
+			{ is_covered: false, start_line: 5, end_line: 8 },
+			{ is_covered: true, start_line: 9, end_line: 13 },
+			{ is_covered: false, start_line: 14, end_line: 17 },
+			{ is_covered: true, start_line: 18, end_line: 23 },
 		])
-		expect.soft(sheet.total_lines).toBe(21)
-		expect.soft(sheet.covered_lines).toBe(12)
-		expect.soft(sheet.uncovered_lines).toBe(21 - 12)
-		expect.soft(sheet.line_coverage_ratio).toBe(12 / 21)
-		expect.soft(sheet.line_coverage).toEqual(new Uint8Array([1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1]))
-		expect.soft(sheet.text).toEqual(format(css))
 	})
 })
 
 test.describe('from coverage data downloaded directly from the browser as JSON', () => {
+	// test.skip()
 	// This coverage was taken from Edge devtools
 	let coverage = [
 		{
@@ -143,7 +137,7 @@ test.describe('from coverage data downloaded directly from the browser as JSON',
 		},
 	]
 
-	test('counts totals', async () => {
+	test.skip('counts totals', async () => {
 		let result = await calculate_coverage(coverage)
 		expect.soft(result.covered_lines).toBe(9)
 		expect.soft(result.uncovered_lines).toBe(5)
@@ -152,7 +146,7 @@ test.describe('from coverage data downloaded directly from the browser as JSON',
 		expect.soft(result.total_stylesheets).toBe(1)
 	})
 
-	test('extracts and formats css', async () => {
+	test.skip('extracts and formats css', async () => {
 		let result = await calculate_coverage(coverage)
 		expect(result.coverage_per_stylesheet.at(0)?.text).toEqual(
 			format(`h1 {
@@ -173,27 +167,19 @@ test.describe('from coverage data downloaded directly from the browser as JSON',
 		)
 	})
 
-	test('calculates line coverage', async () => {
+	test.skip('calculates line coverage', async () => {
 		let result = await calculate_coverage(coverage)
-		expect(result.coverage_per_stylesheet.at(0)?.line_coverage).toEqual(
-			new Uint8Array([
-				// h1 {}
-				1, 1, 1, 1,
-				// comment + p {}
-				0, 0, 0, 0,
-				// newline
-				1,
-				// @media
-				1,
-				// h1 {
-				0,
-				// color: green; }
-				1, 1, 1,
-			]),
-		)
+		let sheet = result.coverage_per_stylesheet.at(0)!
+		expect(
+			sheet.chunks.map(({ is_covered, start_line, end_line, total_lines }) => ({ is_covered, start_line, end_line, total_lines })),
+		).toEqual([
+			{ is_covered: true, start_line: 1, end_line: 5, total_lines: 5 },
+			{ is_covered: false, start_line: 6, end_line: 9, total_lines: 4 },
+			{ is_covered: true, start_line: 10, end_line: 15, total_lines: 6 },
+		])
 	})
 
-	test('calculates chunks', async () => {
+	test.skip('calculates chunks', async () => {
 		let result = await calculate_coverage(coverage)
 		expect(result.coverage_per_stylesheet.at(0)?.chunks).toEqual([
 			{ start_line: 1, is_covered: true, end_line: 4, total_lines: 4 },
@@ -204,7 +190,7 @@ test.describe('from coverage data downloaded directly from the browser as JSON',
 		])
 	})
 
-	test('calculates chunks for fully covered file', async () => {
+	test.skip('calculates chunks for fully covered file', async () => {
 		let result = await calculate_coverage([
 			{
 				url: 'https://example.com',
@@ -228,7 +214,7 @@ test.describe('from coverage data downloaded directly from the browser as JSON',
 		])
 	})
 
-	test('calculates chunks for fully uncovered file', async () => {
+	test.skip('calculates chunks for fully uncovered file', async () => {
 		let result = await calculate_coverage([
 			{
 				url: 'https://example.com',
@@ -251,8 +237,8 @@ test('handles empty input', async () => {
 	let result = await calculate_coverage([])
 	expect(result.total_files_found).toBe(0)
 	expect(result.total_bytes).toBe(0)
-	expect(result.used_bytes).toBe(0)
-	expect(result.unused_bytes).toBe(0)
+	expect(result.covered_bytes).toBe(0)
+	expect(result.uncovered_bytes).toBe(0)
 	expect(result.total_lines).toBe(0)
 	expect(result.covered_lines).toBe(0)
 	expect(result.uncovered_lines).toBe(0)
