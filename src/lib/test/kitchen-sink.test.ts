@@ -1,7 +1,9 @@
 import { test, expect } from '@playwright/test'
-import { calculate_coverage, type Coverage } from '../index.js'
+import { calculate_coverage, type Coverage, type CoverageResult } from '../index.js'
 import { generate_coverage } from './generate-coverage.js'
 import { format } from '@projectwallace/format-css'
+import * as fs from 'node:fs/promises'
+import * as path from 'node:path'
 
 test('project wallace Container component', async () => {
 	// Coverage:
@@ -217,6 +219,35 @@ test.describe('@rules', () => {
 		).toEqual([
 			{ is_covered: false, start_line: 1, end_line: 3, total_lines: 3 },
 			{ is_covered: true, start_line: 4, end_line: 9, total_lines: 6 },
+		])
+	})
+})
+
+test.describe('Wallace mega soverage suite', () => {
+	let coverage: Coverage[]
+
+	test.beforeAll(async () => {
+		let file_contents = await fs.readFile(path.resolve('./src/lib/test/wallace.json'), 'utf-8')
+		coverage = JSON.parse(file_contents)
+	})
+
+	test('CopyButton has full coverage', async () => {
+		let data = coverage.find(({ url }) => url.includes('CopyButton')) as Coverage
+		let result = await calculate_coverage([data])
+		expect.soft(result.line_coverage_ratio).toBe(1)
+		expect.soft(result.total_lines).toBe(17)
+	})
+
+	test('Meter has full coverage', async () => {
+		let data = coverage.find(({ url }) => url.includes('Meter')) as Coverage
+		let result = await calculate_coverage([data])
+		expect.soft(result.line_coverage_ratio).not.toBe(1)
+		expect.soft(result.total_lines).toBe(35)
+
+		let sheet = result.coverage_per_stylesheet.at(0)!
+		expect.soft(sheet.chunks.map(({ is_covered, start_line, end_line }) => ({ is_covered, start_line, end_line }))).toEqual([
+			{ is_covered: true, start_line: 1, end_line: 22 },
+			{ is_covered: false, start_line: 23, end_line: 35 },
 		])
 	})
 })

@@ -1,4 +1,22 @@
 import type { Coverage, Range } from './parse-coverage.js'
+
+function dedupe_list(ranges: Range[]): Set<Range> {
+	let new_ranges: Set<Range> = new Set()
+
+	outer: for (let range of ranges) {
+		for (let processed_range of new_ranges) {
+			if (range.start <= processed_range.start && range.end >= processed_range.end) {
+				new_ranges.delete(processed_range)
+				new_ranges.add(range)
+				continue outer
+			}
+		}
+		new_ranges.add(range)
+	}
+
+	return new_ranges
+}
+
 /**
  * @description
  * prerequisites
@@ -7,7 +25,7 @@ import type { Coverage, Range } from './parse-coverage.js'
  * - only bytes of deduplicated stylesheets are counted
  */
 export function deduplicate_entries(entries: Coverage[]): Coverage[] {
-	let checked_stylesheets = new Map<string, { url: string; ranges: Range[] }>()
+	let checked_stylesheets = new Map<string, { url: string; ranges: Set<Range> }>()
 
 	for (let entry of entries) {
 		let text = entry.text
@@ -18,23 +36,30 @@ export function deduplicate_entries(entries: Coverage[]): Coverage[] {
 			// If not, add them
 			for (let range of entry.ranges) {
 				let found = false
+
 				for (let checked_range of ranges) {
+					// find exact range
 					if (checked_range.start === range.start && checked_range.end === range.end) {
 						found = true
 						break
 					}
 				}
+
 				if (!found) {
-					ranges.push(range)
+					ranges.add(range)
 				}
 			}
 		} else {
 			checked_stylesheets.set(text, {
 				url: entry.url,
-				ranges: entry.ranges,
+				ranges: dedupe_list(entry.ranges),
 			})
 		}
 	}
 
-	return Array.from(checked_stylesheets, ([text, { url, ranges }]) => ({ text, url, ranges: ranges.sort((a, b) => a.start - b.start) }))
+	return Array.from(checked_stylesheets, ([text, { url, ranges }]) => ({
+		text,
+		url,
+		ranges: Array.from(ranges).sort((a, b) => a.start - b.start),
+	}))
 }
