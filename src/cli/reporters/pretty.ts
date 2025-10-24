@@ -64,30 +64,26 @@ export function print({ report, context }: Report, params: CliArguments) {
 				console.log(styleText('dim', '─'.repeat(terminal_width)))
 
 				let lines = sheet.text.split('\n')
-				let line_coverage = sheet.line_coverage
 
-				for (let i = 0; i < lines.length; i++) {
-					if (line_coverage[i] === 1) continue
-
-					// Rewind cursor N lines to render N previous lines
-					for (let j = i - NUM_LEADING_LINES; j < i; j++) {
-						// Make sure that we don't try to start before line 0
-						if (j >= 0) {
-							console.log(styleText('dim', line_number(j)), styleText('dim', indent(lines[j])))
-						}
+				for (let chunk of sheet.chunks) {
+					let ls = chunk.css.split('\n')
+					// TODO FIX ME
+					for (let l = 0; l < ls.length; l++) {
+						console.log(styleText('red', line_number(l + chunk.start_line, false)), indent(ls[l]))
 					}
 
-					// Render uncovered lines while increasing cursor until reaching next covered block
-					while (line_coverage[i] === 0) {
-						console.log(styleText('red', line_number(i, false)), indent(lines[i]))
-						i++
-					}
-
-					// Forward cursor N lines to render N trailing lines
-					for (let end = i + NUM_TRAILING_LINES; i < end && i < lines.length; i++) {
-						console.log(styleText('dim', line_number(i)), styleText('dim', indent(lines[i])))
-					}
-
+					// Render N leading lines
+					// for (let x = Math.max(chunk.start_line - NUM_LEADING_LINES, 0); x < chunk.start_line; x++) {
+					// 	console.log(styleText('dim', line_number(x)), styleText('dim', indent(lines[x])))
+					// }
+					// Render the uncovered chunk
+					// for (let i = chunk.start_line; i <= chunk.end_line; i++) {
+					// 	console.log(styleText('red', line_number(i, false)), indent(lines[i]))
+					// }
+					// Render N trailing lines
+					// for (let y = chunk.end_line; Math.min(chunk.end_line + NUM_TRAILING_LINES, lines.length); y++) {
+					// 	console.log(styleText('dim', line_number(y)), styleText('dim', indent(lines[y])))
+					// }
 					// Show empty line between blocks
 					console.log()
 				}

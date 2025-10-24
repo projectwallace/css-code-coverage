@@ -232,26 +232,24 @@ test.describe('Wallace mega soverage suite', () => {
 	})
 
 	test('CopyButton has full coverage', async () => {
-		let data = coverage.find(({ url }) => url.includes('CopyButton')) as Coverage
-		let result = await calculate_coverage([data])
-		expect.soft(result.line_coverage_ratio).toBe(1)
-		expect.soft(result.total_lines).toBe(17)
+		let result = await calculate_coverage(coverage)
+		let sheet = result.coverage_per_stylesheet.find((s) => s.url.includes('CopyButton'))!
+		expect.soft(sheet.line_coverage_ratio).toBe(1)
+		expect.soft(sheet.total_lines).toBe(17)
 	})
 
 	test('Heading has full coverage', async () => {
-		let data = coverage.find(({ url }) => url.includes('Heading')) as Coverage
-		let result = await calculate_coverage([data])
-		expect.soft(result.line_coverage_ratio).toBe(1)
-		expect.soft(result.total_lines).toBe(37)
+		let result = await calculate_coverage(coverage)
+		let sheet = result.coverage_per_stylesheet.find((s) => s.url.includes('Heading'))!
+		expect.soft(sheet.line_coverage_ratio).toBe(1)
+		expect.soft(sheet.total_lines).toBe(37)
 	})
 
 	test('Meter has partial coverage', async () => {
-		let data = coverage.find(({ url }) => url.includes('Meter')) as Coverage
-		let result = await calculate_coverage([data])
-		expect.soft(result.line_coverage_ratio).not.toBe(1)
-		expect.soft(result.total_lines).toBe(35)
-
-		let sheet = result.coverage_per_stylesheet.at(0)!
+		let result = await calculate_coverage(coverage)
+		let sheet = result.coverage_per_stylesheet.find((s) => s.url.includes('Meter'))!
+		expect.soft(sheet.line_coverage_ratio).not.toBe(1)
+		expect.soft(sheet.total_lines).toBe(35)
 		expect.soft(sheet.chunks.map(({ is_covered, start_line, end_line }) => ({ is_covered, start_line, end_line }))).toEqual([
 			{ is_covered: true, start_line: 1, end_line: 22 },
 			{ is_covered: false, start_line: 23, end_line: 35 },
@@ -259,12 +257,10 @@ test.describe('Wallace mega soverage suite', () => {
 	})
 
 	test('Container has partial coverage', async () => {
-		let data = coverage.find(({ url }) => url.includes('Container')) as Coverage
-		let result = await calculate_coverage([data])
-		expect.soft(result.line_coverage_ratio).not.toBe(1)
-		expect.soft(result.total_lines).toBe(44)
-
-		let sheet = result.coverage_per_stylesheet.at(0)!
+		let result = await calculate_coverage(coverage)
+		let sheet = result.coverage_per_stylesheet.find((s) => s.url.includes('Container'))!
+		expect.soft(sheet.line_coverage_ratio).not.toBe(1)
+		expect.soft(sheet.total_lines).toBe(44)
 		expect.soft(sheet.chunks.map(({ is_covered, start_line, end_line }) => ({ is_covered, start_line, end_line }))).toEqual([
 			{ is_covered: true, start_line: 1, end_line: 21 },
 			{ is_covered: false, start_line: 22, end_line: 24 },
@@ -272,12 +268,23 @@ test.describe('Wallace mega soverage suite', () => {
 		])
 	})
 
+	test('Markdown has partial coverage', async () => {
+		let result = await calculate_coverage(coverage)
+		let sheet = result.coverage_per_stylesheet.find((s) => s.url.includes('Markdown'))!
+		expect.soft(sheet.line_coverage_ratio).not.toBe(1)
+		expect.soft(sheet.total_lines).toBe(202)
+		expect.soft(sheet.chunks.filter((c) => !c.is_covered).map(({ start_line, end_line }) => ({ start_line, end_line }))).toEqual([
+			{ start_line: 26, end_line: 38 }, // .markdown h4
+			{ start_line: 154, end_line: 157 }, // .markdown img
+			{ start_line: 179, end_line: 197 }, // .markdown aside
+		])
+	})
+
 	// This was a notoriously difficult one to fix
 	test('main sheet has partial coverage', async () => {
-		let data = coverage.find(({ url }) => url.endsWith('0.RC2DzJv0.css')) as Coverage
-		let result = await calculate_coverage([data])
-		let sheet = result.coverage_per_stylesheet.at(0)!
-		expect.soft(sheet.chunks.filter((c) => !c.is_covered).map(({ start_line, end_line, css }) => ({ start_line, end_line }))).toEqual([
+		let result = await calculate_coverage(coverage)
+		let sheet = result.coverage_per_stylesheet.find((s) => s.url.endsWith('0.RC2DzJv0.css'))!
+		expect.soft(sheet.chunks.filter((c) => !c.is_covered).map(({ start_line, end_line }) => ({ start_line, end_line }))).toEqual([
 			{ start_line: 77, end_line: 81 }, // @media print { .nav-list.svelte-1h32yp1
 			{ start_line: 127, end_line: 130 }, // .nav-popover-trigger.svelte-1h32yp1.invisible
 			{ start_line: 146, end_line: 152 }, // @supports not (right: anchor(end)) { .nav-popover
