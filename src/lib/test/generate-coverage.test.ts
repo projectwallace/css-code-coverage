@@ -71,6 +71,7 @@ test.describe('coverage quirks', () => {
 					</head>
 					<body>
 						<h1>Hello world</h1>
+						<p>Text</p>
 					</body>
 				</html>
 				`

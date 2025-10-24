@@ -1,4 +1,61 @@
 import type { Coverage, Range } from './parse-coverage.js'
+
+// Combine multiple adjecent ranges into a single one
+export function concatenate(ranges: Set<Range> | Range[]): Range[] {
+	let result: Range[] = []
+
+	for (let range of ranges) {
+		// Update the last range if this range starts at last-range-end + 1
+		if (result.length > 0 && (result.at(-1)!.end === range.start - 1 || result.at(-1)!.end === range.start)) {
+			result.at(-1)!.end = range.end
+		} else {
+			result.push(range)
+		}
+	}
+
+	return result
+}
+
+function dedupe_list(ranges: Range[]): Set<Range> {
+	let new_ranges: Set<Range> = new Set()
+
+	outer: for (let range of ranges) {
+		for (let processed_range of new_ranges) {
+			// Case: an existing range fits within this range -> replace it
+			// { start: 0, end: 100 },
+			// { start: 0, end: 200 }
+			if (range.start <= processed_range.start && range.end >= processed_range.end) {
+				new_ranges.delete(processed_range)
+				new_ranges.add(range)
+				continue outer
+			}
+
+			// Case: this range fits within an existing range -> skip it
+			// { start: 324, end: 485 }, --> exists
+			// { start: 364, end: 485 }, --> skip
+			// { start: 404, end: 485 }, --> skip
+			if (range.start >= processed_range.start && range.end <= processed_range.end) {
+				// console.log('skip', range)
+				continue outer
+			}
+			// Case: ranges partially overlap
+			// { start: 324, end: 444 },
+			// { start: 364, end: 485 },
+			if (range.start < processed_range.end && range.start > processed_range.start && range.end > processed_range.end) {
+				new_ranges.delete(processed_range)
+				new_ranges.add({
+					start: processed_range.start,
+					end: range.end,
+				})
+				continue outer
+			}
+		}
+		new_ranges.add(range)
+	}
+
+	return new_ranges
+}
+
 /**
  * @description
  * prerequisites
@@ -18,12 +75,15 @@ export function deduplicate_entries(entries: Coverage[]): Coverage[] {
 			// If not, add them
 			for (let range of entry.ranges) {
 				let found = false
+
 				for (let checked_range of ranges) {
+					// find exact range
 					if (checked_range.start === range.start && checked_range.end === range.end) {
 						found = true
 						break
 					}
 				}
+
 				if (!found) {
 					ranges.push(range)
 				}
@@ -36,5 +96,9 @@ export function deduplicate_entries(entries: Coverage[]): Coverage[] {
 		}
 	}
 
-	return Array.from(checked_stylesheets, ([text, { url, ranges }]) => ({ text, url, ranges }))
+	return Array.from(checked_stylesheets, ([text, { url, ranges }]) => ({
+		text,
+		url,
+		ranges: concatenate(dedupe_list(ranges.sort((a, b) => a.start - b.start))).sort((a, b) => a.start - b.start),
+	}))
 }

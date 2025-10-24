@@ -3,7 +3,6 @@ import type { DOMParser as LinkedomParser } from 'linkedom'
 
 async function get_dom_parser(): Promise<DOMParser | LinkedomParser> {
 	if (typeof window !== 'undefined' && 'DOMParser' in window) {
-		/* v8 ignore */
 		return new window.DOMParser()
 	}
 

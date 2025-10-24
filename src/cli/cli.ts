@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import { validate_arguments, parse_arguments, InvalidArgumentsError } from './arguments.js'
-import { program, MissingDataError } from './program.js'
+import { validate_arguments, parse_arguments } from './arguments.js'
+import { program } from './program.js'
 import { read } from './file-reader.js'
 import { print as pretty } from './reporters/pretty.js'
 import { print as tap } from './reporters/tap.js'
