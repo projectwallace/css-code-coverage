@@ -1,7 +1,7 @@
 {
   "name": "@projectwallace/css-code-coverage",
-  "version": "0.5.0",
-  "description": "",
+  "version": "0.6.0",
+  "description": "Generate useful CSS Code Coverage report from browser-reported coverage",
   "author": "Bart Veneman <bart@projectwallace.com>",
   "repository": {
     "type": "git",
@@ -55,7 +55,6 @@
   },
   "dependencies": {
     "@projectwallace/format-css": "^2.1.1",
-    "css-tree": "^3.1.0",
     "valibot": "^1.1.0"
   }
 }
