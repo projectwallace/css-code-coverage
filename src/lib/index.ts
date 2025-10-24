@@ -88,7 +88,9 @@ export async function calculate_coverage(coverage: Coverage[]): Promise<Coverage
 
 	let filtered_coverage: Coverage[] = await filter_coverage(coverage)
 	let deduplicated: Coverage[] = deduplicate_entries(filtered_coverage)
+	// console.log(deduplicated.find((s) => s.url.includes('Container')))
 	let extended: Coverage[] = extend_ranges(deduplicated)
+	// console.log(extended.find((s) => s.url.includes('Container')))
 	let chunkified: ChunkedCoverage[] = extended.map((sheet) => chunkify(sheet))
 	let prettified: PrettifiedCoverage[] = chunkified.map((sheet) => prettify(sheet))
 	let coverage_per_stylesheet = prettified.map((stylesheet) => calculate_stylesheet_coverage(stylesheet))

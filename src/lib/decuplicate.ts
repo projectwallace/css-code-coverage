@@ -1,7 +1,7 @@
 import type { Coverage, Range } from './parse-coverage.js'
 
 // Combine multiple adjecent ranges into a single one
-export function concatenate(ranges: Set<Range>): Range[] {
+export function concatenate(ranges: Set<Range> | Range[]): Range[] {
 	let result: Range[] = []
 
 	for (let range of ranges) {
@@ -22,13 +22,20 @@ function dedupe_list(ranges: Range[]): Set<Range> {
 	outer: for (let range of ranges) {
 		for (let processed_range of new_ranges) {
 			// Case: an existing range fits within this range -> replace it
+			// { start: 0, end: 100 },
+			// { start: 0, end: 200 }
 			if (range.start <= processed_range.start && range.end >= processed_range.end) {
 				new_ranges.delete(processed_range)
 				new_ranges.add(range)
 				continue outer
 			}
+
 			// Case: this range fits within an existing range -> skip it
+			// { start: 324, end: 485 }, --> exists
+			// { start: 364, end: 485 }, --> skip
+			// { start: 404, end: 485 }, --> skip
 			if (range.start >= processed_range.start && range.end <= processed_range.end) {
+				// console.log('skip', range)
 				continue outer
 			}
 			// Case: ranges partially overlap
@@ -40,6 +47,7 @@ function dedupe_list(ranges: Range[]): Set<Range> {
 					start: processed_range.start,
 					end: range.end,
 				})
+				continue outer
 			}
 		}
 		new_ranges.add(range)
@@ -56,7 +64,7 @@ function dedupe_list(ranges: Range[]): Set<Range> {
  * - only bytes of deduplicated stylesheets are counted
  */
 export function deduplicate_entries(entries: Coverage[]): Coverage[] {
-	let checked_stylesheets = new Map<string, { url: string; ranges: Set<Range> }>()
+	let checked_stylesheets = new Map<string, { url: string; ranges: Range[] }>()
 
 	for (let entry of entries) {
 		let text = entry.text
@@ -77,13 +85,13 @@ export function deduplicate_entries(entries: Coverage[]): Coverage[] {
 				}
 
 				if (!found) {
-					ranges.add(range)
+					ranges.push(range)
 				}
 			}
 		} else {
 			checked_stylesheets.set(text, {
 				url: entry.url,
-				ranges: dedupe_list(entry.ranges),
+				ranges: entry.ranges,
 			})
 		}
 	}
@@ -91,6 +99,6 @@ export function deduplicate_entries(entries: Coverage[]): Coverage[] {
 	return Array.from(checked_stylesheets, ([text, { url, ranges }]) => ({
 		text,
 		url,
-		ranges: concatenate(ranges).sort((a, b) => a.start - b.start),
+		ranges: concatenate(dedupe_list(ranges.sort((a, b) => a.start - b.start))).sort((a, b) => a.start - b.start),
 	}))
 }

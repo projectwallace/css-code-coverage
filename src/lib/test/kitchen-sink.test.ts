@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { calculate_coverage, type Coverage, type CoverageResult } from '../index.js'
+import { calculate_coverage, parse_coverage, type Coverage, type CoverageResult } from '../index.js'
 import { generate_coverage } from './generate-coverage.js'
 import { format } from '@projectwallace/format-css'
 import * as fs from 'node:fs/promises'
@@ -227,8 +227,14 @@ test.describe('Wallace mega soverage suite', () => {
 	let coverage: Coverage[]
 
 	test.beforeAll(async () => {
-		let file_contents = await fs.readFile(path.resolve('./src/lib/test/wallace.json'), 'utf-8')
-		coverage = JSON.parse(file_contents)
+		let files = await fs.readdir('./src/lib/test/fixtures')
+		let json_files = files.filter((file) => file.endsWith('json'))
+		coverage = []
+		for (let file of json_files) {
+			let contents = await fs.readFile(path.join('./src/lib/test/fixtures', file), 'utf-8')
+			let parsed = parse_coverage(contents)
+			coverage.push(...parsed)
+		}
 	})
 
 	test('CopyButton has full coverage', async () => {
@@ -261,6 +267,7 @@ test.describe('Wallace mega soverage suite', () => {
 		let sheet = result.coverage_per_stylesheet.find((s) => s.url.includes('Container'))!
 		expect.soft(sheet.line_coverage_ratio).not.toBe(1)
 		expect.soft(sheet.total_lines).toBe(44)
+		expect.soft(sheet.uncovered_lines).toBe(3)
 		expect.soft(sheet.chunks.map(({ is_covered, start_line, end_line }) => ({ is_covered, start_line, end_line }))).toEqual([
 			{ is_covered: true, start_line: 1, end_line: 21 },
 			{ is_covered: false, start_line: 22, end_line: 24 },

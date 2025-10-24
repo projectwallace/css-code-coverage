@@ -65,25 +65,19 @@ export function print({ report, context }: Report, params: CliArguments) {
 
 				let lines = sheet.text.split('\n')
 
-				for (let chunk of sheet.chunks) {
-					let ls = chunk.css.split('\n')
-					// TODO FIX ME
-					for (let l = 0; l < ls.length; l++) {
-						console.log(styleText('red', line_number(l + chunk.start_line, false)), indent(ls[l]))
-					}
-
+				for (let chunk of sheet.chunks.filter((chunk) => !chunk.is_covered)) {
 					// Render N leading lines
-					// for (let x = Math.max(chunk.start_line - NUM_LEADING_LINES, 0); x < chunk.start_line; x++) {
-					// 	console.log(styleText('dim', line_number(x)), styleText('dim', indent(lines[x])))
-					// }
+					for (let x = Math.max(chunk.start_line - NUM_LEADING_LINES, 0); x < chunk.start_line; x++) {
+						console.log(styleText('dim', line_number(x)), styleText('dim', indent(lines[x - 1])))
+					}
 					// Render the uncovered chunk
-					// for (let i = chunk.start_line; i <= chunk.end_line; i++) {
-					// 	console.log(styleText('red', line_number(i, false)), indent(lines[i]))
-					// }
+					for (let i = chunk.start_line; i <= chunk.end_line; i++) {
+						console.log(styleText('red', line_number(i, false)), indent(lines[i - 1]))
+					}
 					// Render N trailing lines
-					// for (let y = chunk.end_line; Math.min(chunk.end_line + NUM_TRAILING_LINES, lines.length); y++) {
-					// 	console.log(styleText('dim', line_number(y)), styleText('dim', indent(lines[y])))
-					// }
+					for (let y = chunk.end_line; y < Math.min(chunk.end_line + NUM_TRAILING_LINES, lines.length); y++) {
+						console.log(styleText('dim', line_number(y)), styleText('dim', indent(lines[y - 1])))
+					}
 					// Show empty line between blocks
 					console.log()
 				}
