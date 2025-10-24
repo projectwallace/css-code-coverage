@@ -30,6 +30,7 @@ export async function filter_coverage(coverage: Coverage[]): Promise<Coverage[]>
 		}
 
 		// At this point it can only be CSS
+		// TODO: that's not true, check if it's css-like of js-like
 		result.push({
 			url: entry.url,
 			text: entry.text,

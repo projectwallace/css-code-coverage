@@ -38,6 +38,7 @@ export function extend_ranges(coverage: Coverage[]): Coverage[] {
 				}
 			}
 
+			// If the next non-whitespace character is }, add it to the current range
 			let offset = range.end
 			let next_char = text.charAt(offset)
 			while (/\s/.test(next_char)) {
@@ -51,21 +52,6 @@ export function extend_ranges(coverage: Coverage[]): Coverage[] {
 			return range
 		})
 
-		// console.log('Before extending')
-		// console.log({
-		// 	ranges: ranges.map((r) => ({
-		// 		...r,
-		// 		text: text.slice(r.start, r.end),
-		// 	})),
-		// })
-		// console.log()
-		// console.log('after extending')
-		// console.log({
-		// 	ranges: new_ranges.map((r) => ({
-		// 		...r,
-		// 		text: text.slice(r.start, r.end),
-		// 	})),
-		// })
 		return { text, ranges: new_ranges, url }
 	})
 }

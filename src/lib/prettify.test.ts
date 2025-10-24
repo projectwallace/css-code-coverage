@@ -1,10 +1,10 @@
 import { test, expect } from '@playwright/test'
 import { prettify } from './prettify'
 
-test('simple range at start', () => {})
-test('simple range at middle', () => {})
-test('simple range at end', () => {})
+test.skip('simple range at start', () => {})
+test.skip('simple range at middle', () => {})
+test.skip('simple range at end', () => {})
 
-test('atrule at start', () => {})
-test('atrule at middle', () => {})
-test('atrule at end', () => {})
+test.skip('atrule at start', () => {})
+test.skip('atrule at middle', () => {})
+test.skip('atrule at end', () => {})
