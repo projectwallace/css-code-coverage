@@ -1,6 +1,6 @@
 import { type Coverage, type Range } from './parse-coverage.js'
 import { prettify, type PrettifiedChunk, type PrettifiedCoverage } from './prettify.js'
-import { deduplicate_entries } from './decuplicate.js'
+import { deduplicate_entries, concatenate } from './decuplicate.js'
 import { filter_coverage } from './filter-entries.js'
 import { extend_ranges } from './extend-ranges.js'
 import { chunkify, type ChunkedCoverage } from './chunkify.js'
@@ -95,6 +95,26 @@ export async function calculate_coverage(coverage: Coverage[]): Promise<Coverage
 	// console.log('extended')
 	// console.log(extended.at(0))
 	// console.log()
+	// let concatenated: Coverage[] = extended.map((cov) => ({
+	// 	...cov,
+	// 	ranges: concatenate(cov.ranges),
+	// }))
+	// console.log('concatenated')
+	// console.log(concatenated.at(0))
+	// console.log()
+	// if (concatenated.at(0)!.ranges[0].start !== 0) {
+	// 	console.log(0, concatenated.at(0)!.ranges[0].start)
+	// 	console.log(concatenated.at(0)!.text.substring(0, concatenated.at(0)!.ranges[0].start))
+	// 	console.log()
+	// }
+	// for (let i = 0; i < concatenated.at(0)!.ranges.length; i++) {
+	// 	let str = concatenated.at(0)!.text.slice(concatenated.at(0)!.ranges[i].end, concatenated.at(0)!.ranges[i + 1]?.start)
+	// 	if (str.trim().length > 0) {
+	// 		console.log(concatenated.at(0)!.ranges[i].end, concatenated.at(0)!.ranges[i + 1]?.start)
+	// 		console.log(str)
+	// 		console.log()
+	// 	}
+	// }
 	let chunkified: ChunkedCoverage[] = extended.map((sheet) => chunkify(sheet))
 	// console.log('chunkified')
 	// console.log(chunkified.at(0))

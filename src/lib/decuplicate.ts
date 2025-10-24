@@ -1,5 +1,21 @@
 import type { Coverage, Range } from './parse-coverage.js'
 
+// Combine multiple adjecent ranges into a single one
+export function concatenate(ranges: Set<Range>): Range[] {
+	let result: Range[] = []
+
+	for (let range of ranges) {
+		// Update the last range if this range starts at last-range-end + 1
+		if (result.length > 0 && (result.at(-1)!.end === range.start - 1 || result.at(-1)!.end === range.start)) {
+			result.at(-1)!.end = range.end
+		} else {
+			result.push(range)
+		}
+	}
+
+	return result
+}
+
 function dedupe_list(ranges: Range[]): Set<Range> {
 	let new_ranges: Set<Range> = new Set()
 
@@ -75,6 +91,6 @@ export function deduplicate_entries(entries: Coverage[]): Coverage[] {
 	return Array.from(checked_stylesheets, ([text, { url, ranges }]) => ({
 		text,
 		url,
-		ranges: Array.from(ranges).sort((a, b) => a.start - b.start),
+		ranges: concatenate(ranges).sort((a, b) => a.start - b.start),
 	}))
 }

@@ -271,4 +271,22 @@ test.describe('Wallace mega soverage suite', () => {
 			{ is_covered: true, start_line: 25, end_line: 44 },
 		])
 	})
+
+	// This was a notoriously difficult one to fix
+	test('main sheet has partial coverage', async () => {
+		let data = coverage.find(({ url }) => url.endsWith('0.RC2DzJv0.css')) as Coverage
+		let result = await calculate_coverage([data])
+		let sheet = result.coverage_per_stylesheet.at(0)!
+		expect.soft(sheet.chunks.filter((c) => !c.is_covered).map(({ start_line, end_line, css }) => ({ start_line, end_line }))).toEqual([
+			{ start_line: 77, end_line: 81 }, // @media print { .nav-list.svelte-1h32yp1
+			{ start_line: 127, end_line: 130 }, // .nav-popover-trigger.svelte-1h32yp1.invisible
+			{ start_line: 146, end_line: 152 }, // @supports not (right: anchor(end)) { .nav-popover
+			{ start_line: 171, end_line: 173 }, // .popover-item.svelte-1h32yp1[aria-current=\"page\"]:hover
+			{ start_line: 198, end_line: 202 }, // @media print { .footer.svelte-jz8lnl
+			{ start_line: 275, end_line: 277 }, // .shortcut.svelte-1c8nzn6:hover
+			{ start_line: 296, end_line: 298 }, // .cmd-k.svelte-1ux7hi0:focus-visible
+			{ start_line: 1291, end_line: 1293 }, // .theme-popover-trigger.svelte-mls84d:focus-visible
+			{ start_line: 1318, end_line: 1324 }, // @supports not (right: anchor(end)) { .theme-popover.svelte-mls84d
+		])
+	})
 })

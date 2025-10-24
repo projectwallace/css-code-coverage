@@ -30,7 +30,7 @@ export function prettify(stylesheet: ChunkedCoverage): PrettifiedCoverage {
 			} else {
 				// mark the newline after the previous uncovered block as covered
 				// and mark the line between this chunk and the next on as covered
-				css = '\n' + css + (is_last ? '' : '\n')
+				css = '\n' + css + '\n'
 			}
 		}
 
