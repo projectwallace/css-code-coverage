@@ -5,7 +5,7 @@ import { format } from '@projectwallace/format-css'
 import * as fs from 'node:fs/promises'
 import * as path from 'node:path'
 
-test('project wallace Container component', async () => {
+test('project wallace Container component', () => {
 	// Coverage:
 	// first rule
 	// first MQ
@@ -29,7 +29,7 @@ test('project wallace Container component', async () => {
 		},
 	]
 
-	let result = await calculate_coverage(coverage)
+	let result = calculate_coverage(coverage)
 	let sheet = result.coverage_per_stylesheet.at(0)!
 
 	expect.soft(sheet.total_lines).toBe(44)
@@ -72,7 +72,7 @@ test.describe('comment coverage', () => {
 			h1 { color: blue; }
 		`
 		let coverage = (await generate_coverage(html, { link_css: css })) as Coverage[]
-		let result = await calculate_coverage(coverage)
+		let result = calculate_coverage(coverage)
 		let sheet = result.coverage_per_stylesheet.at(0)!
 		expect(
 			sheet.chunks.map(({ is_covered, start_line, end_line, total_lines }) => ({ is_covered, start_line, end_line, total_lines })),
@@ -90,7 +90,7 @@ test.describe('comment coverage', () => {
 			h1 { color: blue; }
 		`
 		let coverage = (await generate_coverage(html, { link_css: css })) as Coverage[]
-		let result = await calculate_coverage(coverage)
+		let result = calculate_coverage(coverage)
 		let sheet = result.coverage_per_stylesheet.at(0)!
 		expect(
 			sheet.chunks.map(({ is_covered, start_line, end_line, total_lines }) => ({ is_covered, start_line, end_line, total_lines })),
@@ -106,7 +106,7 @@ test.describe('comment coverage', () => {
 			/* start comment */
 		`
 		let coverage = (await generate_coverage(html, { link_css: css })) as Coverage[]
-		let result = await calculate_coverage(coverage)
+		let result = calculate_coverage(coverage)
 		let sheet = result.coverage_per_stylesheet.at(0)!
 		expect(
 			sheet.chunks.map(({ is_covered, start_line, end_line, total_lines }) => ({ is_covered, start_line, end_line, total_lines })),
@@ -124,7 +124,7 @@ test.describe('comment coverage', () => {
 			*/
 		`
 		let coverage = (await generate_coverage(html, { link_css: css })) as Coverage[]
-		let result = await calculate_coverage(coverage)
+		let result = calculate_coverage(coverage)
 		let sheet = result.coverage_per_stylesheet.at(0)!
 		expect(
 			sheet.chunks.map(({ is_covered, start_line, end_line, total_lines }) => ({ is_covered, start_line, end_line, total_lines })),
@@ -161,7 +161,7 @@ test.describe('@rules', () => {
 				a { color: orangered; }
 			`
 		let coverage = (await generate_coverage(html, { link_css: css })) as Coverage[]
-		let result = await calculate_coverage(coverage)
+		let result = calculate_coverage(coverage)
 		let sheet = result.coverage_per_stylesheet.at(0)!
 
 		expect(sheet.chunks.map(({ is_covered, start_line, total_lines }) => ({ is_covered, start_line, total_lines }))).toEqual([
@@ -183,7 +183,7 @@ test.describe('@rules', () => {
 				a { color: orangered; }
 			`
 		let coverage = (await generate_coverage(html, { link_css: css })) as Coverage[]
-		let result = await calculate_coverage(coverage)
+		let result = calculate_coverage(coverage)
 		let sheet = result.coverage_per_stylesheet.at(0)!
 
 		expect(
@@ -211,7 +211,7 @@ test.describe('@rules', () => {
 			`body {\n\t\t\t\t\tcolor: green;\n\t\t\t\t}`,
 		])
 
-		let result = await calculate_coverage(coverage)
+		let result = calculate_coverage(coverage)
 		let sheet = result.coverage_per_stylesheet.at(0)!
 
 		expect(
@@ -237,22 +237,22 @@ test.describe('Wallace mega soverage suite', () => {
 		}
 	})
 
-	test('CopyButton has full coverage', async () => {
-		let result = await calculate_coverage(coverage)
+	test('CopyButton has full coverage', () => {
+		let result = calculate_coverage(coverage)
 		let sheet = result.coverage_per_stylesheet.find((s) => s.url.includes('CopyButton'))!
 		expect.soft(sheet.line_coverage_ratio).toBe(1)
 		expect.soft(sheet.total_lines).toBe(17)
 	})
 
-	test('Heading has full coverage', async () => {
-		let result = await calculate_coverage(coverage)
+	test('Heading has full coverage', () => {
+		let result = calculate_coverage(coverage)
 		let sheet = result.coverage_per_stylesheet.find((s) => s.url.includes('Heading'))!
 		expect.soft(sheet.line_coverage_ratio).toBe(1)
 		expect.soft(sheet.total_lines).toBe(37)
 	})
 
-	test('Meter has partial coverage', async () => {
-		let result = await calculate_coverage(coverage)
+	test('Meter has partial coverage', () => {
+		let result = calculate_coverage(coverage)
 		let sheet = result.coverage_per_stylesheet.find((s) => s.url.includes('Meter'))!
 		expect.soft(sheet.line_coverage_ratio).not.toBe(1)
 		expect.soft(sheet.total_lines).toBe(35)
@@ -262,8 +262,8 @@ test.describe('Wallace mega soverage suite', () => {
 		])
 	})
 
-	test('Container has partial coverage', async () => {
-		let result = await calculate_coverage(coverage)
+	test('Container has partial coverage', () => {
+		let result = calculate_coverage(coverage)
 		let sheet = result.coverage_per_stylesheet.find((s) => s.url.includes('Container'))!
 		expect.soft(sheet.line_coverage_ratio).not.toBe(1)
 		expect.soft(sheet.total_lines).toBe(44)
@@ -275,8 +275,8 @@ test.describe('Wallace mega soverage suite', () => {
 		])
 	})
 
-	test('Markdown has partial coverage', async () => {
-		let result = await calculate_coverage(coverage)
+	test('Markdown has partial coverage', () => {
+		let result = calculate_coverage(coverage)
 		let sheet = result.coverage_per_stylesheet.find((s) => s.url.includes('Markdown'))!
 		expect.soft(sheet.line_coverage_ratio).not.toBe(1)
 		expect.soft(sheet.total_lines).toBe(202)
@@ -288,8 +288,8 @@ test.describe('Wallace mega soverage suite', () => {
 	})
 
 	// This was a notoriously difficult one to fix
-	test('main sheet has partial coverage', async () => {
-		let result = await calculate_coverage(coverage)
+	test('main sheet has partial coverage', () => {
+		let result = calculate_coverage(coverage)
 		let sheet = result.coverage_per_stylesheet.find((s) => s.url.endsWith('0.RC2DzJv0.css'))!
 		expect.soft(sheet.chunks.filter((c) => !c.is_covered).map(({ start_line, end_line }) => ({ start_line, end_line }))).toEqual([
 			{ start_line: 77, end_line: 81 }, // @media print { .nav-list.svelte-1h32yp1
