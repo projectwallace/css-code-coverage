@@ -53,7 +53,7 @@ let coverage = await page.coverage.stopCSSCoverage()
 // Now we can process it
 import { calculate_coverage } from '@projectwallace/css-code-coverage'
 
-let report = await calculcate_coverage(coverage)
+let report = calculcate_coverage(coverage)
 ```
 
 ### Browser devtools

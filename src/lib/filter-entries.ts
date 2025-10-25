@@ -6,7 +6,7 @@ function is_html(text: string): boolean {
 	return /<\/?(html|body|head|div|span|script|style)/i.test(text)
 }
 
-export async function filter_coverage(coverage: Coverage[]): Promise<Coverage[]> {
+export function filter_coverage(coverage: Coverage[]): Coverage[] {
 	let result = []
 
 	for (let entry of coverage) {
@@ -20,7 +20,7 @@ export async function filter_coverage(coverage: Coverage[]): Promise<Coverage[]>
 		}
 
 		if (is_html(entry.text)) {
-			let { css, ranges } = await remap_html(entry.text, entry.ranges)
+			let { css, ranges } = remap_html(entry.text, entry.ranges)
 			result.push({
 				url: entry.url,
 				text: css,

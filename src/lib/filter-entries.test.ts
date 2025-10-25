@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 import { filter_coverage } from './filter-entries.js'
 
-test('filters out JS files', async () => {
+test('filters out JS files', () => {
 	let entries = [
 		{
 			url: 'http://example.com/script.js',
@@ -9,10 +9,10 @@ test('filters out JS files', async () => {
 			ranges: [{ start: 0, end: 25 }],
 		},
 	]
-	expect(await filter_coverage(entries)).toEqual([])
+	expect(filter_coverage(entries)).toEqual([])
 })
 
-test('keeps files with CSS extension', async () => {
+test('keeps files with CSS extension', () => {
 	let entries = [
 		{
 			url: 'http://example.com/styles.css',
@@ -20,10 +20,10 @@ test('keeps files with CSS extension', async () => {
 			ranges: [{ start: 0, end: 13 }],
 		},
 	]
-	expect(await filter_coverage(entries)).toEqual(entries)
+	expect(filter_coverage(entries)).toEqual(entries)
 })
 
-test('keeps extension-less URL with HTML text', async () => {
+test('keeps extension-less URL with HTML text', () => {
 	let entries = [
 		{
 			url: 'http://example.com',
@@ -38,10 +38,10 @@ test('keeps extension-less URL with HTML text', async () => {
 			ranges: [{ start: 0, end: 13 }], // ranges are remapped
 		},
 	]
-	expect(await filter_coverage(entries)).toEqual(expected)
+	expect(filter_coverage(entries)).toEqual(expected)
 })
 
-test('keeps extension-less URL with CSS text (running coverage in vite dev mode)', async () => {
+test('keeps extension-less URL with CSS text (running coverage in vite dev mode)', () => {
 	let entries = [
 		{
 			url: 'http://example.com',
@@ -49,5 +49,5 @@ test('keeps extension-less URL with CSS text (running coverage in vite dev mode)
 			ranges: [{ start: 0, end: 13 }],
 		},
 	]
-	expect(await filter_coverage(entries)).toEqual(entries)
+	expect(filter_coverage(entries)).toEqual(entries)
 })

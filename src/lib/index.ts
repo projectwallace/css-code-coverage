@@ -83,10 +83,10 @@ function calculate_stylesheet_coverage({ text, url, chunks }: PrettifiedCoverage
  * 4. Calculate used/unused CSS bytes (fastest path, no inspection of the actual CSS needed)
  * 5. Calculate line-coverage, byte-coverage per stylesheet
  */
-export async function calculate_coverage(coverage: Coverage[]): Promise<CoverageResult> {
+export function calculate_coverage(coverage: Coverage[]): CoverageResult {
 	let total_files_found = coverage.length
 
-	let filtered_coverage: Coverage[] = await filter_coverage(coverage)
+	let filtered_coverage: Coverage[] = filter_coverage(coverage)
 	let deduplicated: Coverage[] = deduplicate_entries(filtered_coverage)
 	let extended: Coverage[] = extend_ranges(deduplicated)
 	let chunkified: ChunkedCoverage[] = extended.map((sheet) => chunkify(sheet))
