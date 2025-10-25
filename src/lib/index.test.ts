@@ -2,7 +2,6 @@ import { test, expect } from '@playwright/test'
 import { generate_coverage } from './test/generate-coverage.js'
 import { calculate_coverage } from './index.js'
 import type { Coverage } from './parse-coverage.js'
-import { format } from '@projectwallace/format-css'
 
 test.describe('from <style> tag', () => {
 	let coverage: Coverage[]
