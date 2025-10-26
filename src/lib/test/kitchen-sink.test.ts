@@ -304,19 +304,3 @@ test.describe('Wallace mega soverage suite', () => {
 		])
 	})
 })
-
-// test.describe('Coverage JSON downloaded from browser with mixed data', () => {
-// 	let coverage: Coverage[]
-
-// 	test.beforeAll(async () => {
-// 		let path = './src/lib/test/fixtures/css-tricks.json'
-// 		let contents = await fs.readFile(path, 'utf8')
-// 		coverage = parse_coverage(contents)
-// 	})
-
-// 	test.only('#1', () => {
-// 		let result = calculate_coverage(coverage)
-
-// 		expect.soft(result.total_stylesheets).toEqual(7)
-// 	})
-// })
