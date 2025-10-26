@@ -7,10 +7,11 @@ import { print as pretty } from './reporters/pretty.js'
 import { print as tap } from './reporters/tap.js'
 
 async function cli(cli_args: string[]) {
-	const args = parse_arguments(cli_args)
-	let params = validate_arguments(args)
+	console.log(cli_args)
+	let params = validate_arguments(parse_arguments(cli_args))
+	console.log(params)
 	let coverage_data = await read(params['coverage-dir'])
-	let report = await program(
+	let report = program(
 		{
 			min_file_coverage: params['min-line-coverage'],
 			min_file_line_coverage: params['min-file-line-coverage'],
