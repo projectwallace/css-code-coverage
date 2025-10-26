@@ -49,7 +49,7 @@ function validate_min_file_line_coverage(actual: number, expected: number | unde
 	}
 }
 
-export async function program(
+export function program(
 	{
 		min_file_coverage,
 		min_file_line_coverage,
@@ -62,7 +62,7 @@ export async function program(
 	if (coverage_data.length === 0) {
 		throw new MissingDataError()
 	}
-	let coverage = await calculate_coverage(coverage_data)
+	let coverage = calculate_coverage(coverage_data)
 	let min_line_coverage_result = validate_min_line_coverage(coverage.line_coverage_ratio, min_file_coverage)
 	let min_file_line_coverage_result = validate_min_file_line_coverage(
 		Math.min(...coverage.coverage_per_stylesheet.map((sheet) => sheet.line_coverage_ratio)),
