@@ -36,10 +36,16 @@ test('finds style tags with attributes', () => {
 	expect(parse('<style data-attr data-testid="yup">.css{}</style>')).toEqual([{ textContent: '.css{}' }])
 })
 
-test('ignores style tags without end tag', () => {
-	expect(parse('<style>.css{}')).toEqual([])
-})
+test.describe('invalid tags', () => {
+	test('ignores style tags without end tag', () => {
+		expect(parse('<style>.css{}')).toEqual([])
+	})
 
-test('ignores style tags without closing opening tag', () => {
-	expect(parse('<style .css{}')).toEqual([])
+	test('ignores style tags without closing opening tag', () => {
+		expect(parse('<style .css{}')).toEqual([])
+	})
+
+	test('custom element: <style-thing>', () => {
+		expect(parse('<style-thing>.css{}</style-thing>')).toEqual([])
+	})
 })

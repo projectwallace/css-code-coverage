@@ -6,6 +6,26 @@ function is_html(text: string): boolean {
 	return /<\/?(html|body|head|div|span|script|style)/i.test(text)
 }
 
+// Matches: element selectors, class/id selectors, attribute selectors, @rules
+const SELECTOR_REGEX = /(@[a-z-]+|\[[^\]]+\]|[a-zA-Z_#.-][a-zA-Z0-9_-]*)\s*\{/
+// Check for CSS properties (property: value pattern)
+const DECLARATION_REGEX = /^\s*[a-zA-Z-]+\s*:\s*.+;?\s*$/m
+
+function is_css_like(text: string): boolean {
+	return SELECTOR_REGEX.test(text) || DECLARATION_REGEX.test(text)
+}
+
+function is_js_like(text: string): boolean {
+	try {
+		// Only parses the input, does not execute it.
+		// NEVER EXECUTE THIS UNTRUSTED CODE!!!
+		new Function(text)
+		return true
+	} catch {
+		return false
+	}
+}
+
 export function filter_coverage(coverage: Coverage[]): Coverage[] {
 	let result = []
 
@@ -29,13 +49,13 @@ export function filter_coverage(coverage: Coverage[]): Coverage[] {
 			continue
 		}
 
-		// At this point it can only be CSS
-		// TODO: that's not true, check if it's css-like of js-like
-		result.push({
-			url: entry.url,
-			text: entry.text,
-			ranges: entry.ranges,
-		})
+		if (is_css_like(entry.text) && !is_js_like(entry.text)) {
+			result.push({
+				url: entry.url,
+				text: entry.text,
+				ranges: entry.ranges,
+			})
+		}
 	}
 
 	return result
