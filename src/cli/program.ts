@@ -1,6 +1,6 @@
 import { calculate_coverage, type Coverage, type CoverageResult } from '../lib/index.js'
 
-export class MissingDataError extends Error {
+class MissingDataError extends Error {
 	constructor() {
 		super('No data to analyze')
 	}

@@ -36,7 +36,7 @@ export type CliArguments = {
 
 type ArgumentIssue = { path?: string; message: string }
 
-export class InvalidArgumentsError extends Error {
+class InvalidArgumentsError extends Error {
 	readonly issues: ArgumentIssue[]
 
 	constructor(issues: ArgumentIssue[]) {

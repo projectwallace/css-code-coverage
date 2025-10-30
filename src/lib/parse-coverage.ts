@@ -15,7 +15,7 @@ let CoverageSchema = v.object({
 
 export type Coverage = v.InferInput<typeof CoverageSchema>
 
-export function is_valid_coverage(input: unknown): boolean {
+function is_valid_coverage(input: unknown): boolean {
 	let result = v.safeParse(v.array(CoverageSchema), input)
 	return result.success
 }

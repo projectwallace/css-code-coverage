@@ -1,7 +1,7 @@
 import type { Coverage, Range } from './parse-coverage.js'
 
 // Combine multiple adjecent ranges into a single one
-export function concatenate(ranges: Set<Range> | Range[]): Range[] {
+function concatenate(ranges: Set<Range> | Range[]): Range[] {
 	let result: Range[] = []
 
 	for (let range of ranges) {

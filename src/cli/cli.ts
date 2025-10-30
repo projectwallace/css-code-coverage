@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-import { styleText } from 'node:util'
-import { console } from 'node:inspector'
 import { validate_arguments, parse_arguments } from './arguments.js'
 import { program } from './program.js'
 import { read } from './file-reader.js'
