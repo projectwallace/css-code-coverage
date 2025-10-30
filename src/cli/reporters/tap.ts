@@ -25,7 +25,7 @@ function meta(data: Record<string | number, string | number>) {
 	console.log('  ...')
 }
 
-export function print({ report, context }: Report, params: CliArguments) {
+export function print({ report, context }: Report, params: CliArguments): void {
 	let total_files = context.coverage.coverage_per_stylesheet.length
 	let total_checks = total_files + 1
 	let checks_added = 1
