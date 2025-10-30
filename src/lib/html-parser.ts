@@ -2,7 +2,7 @@ export interface Element {
 	textContent: string
 }
 
-export interface Document {
+interface Document {
 	querySelectorAll(selector: 'style'): Element[]
 }
 
