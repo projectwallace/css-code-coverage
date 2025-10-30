@@ -76,7 +76,9 @@ export function print_lines({ report, context }: Report, params: CliArguments, {
 				if (min_file_line_coverage && min_file_line_coverage !== 0 && sheet.line_coverage_ratio < min_file_line_coverage) {
 					let lines_to_cover = min_file_line_coverage * sheet.total_lines - sheet.covered_lines
 					output.push(
-						`Tip: cover ${Math.ceil(lines_to_cover)} more lines to meet the file threshold of ${percentage(min_file_line_coverage)}`,
+						`Tip: cover ${Math.ceil(lines_to_cover)} more ${
+							lines_to_cover === 1 ? 'line' : 'lines'
+						} to meet the file threshold of ${percentage(min_file_line_coverage)}`,
 					)
 				}
 				output.push(styleText('dim', '─'.repeat(print_width)))
