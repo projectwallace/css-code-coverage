@@ -8,22 +8,26 @@ function indent(line?: string): string {
 	return (line || '').replace(/^\t+/, (tabs) => ' '.repeat(tabs.length * 4))
 }
 
-function percentage(ratio: number): string {
-	return `${(ratio * 100).toFixed(2)}%`
+let line_number = (num: number, covered: boolean = true) => `${num.toString().padStart(5, ' ')} ${covered ? '│' : '━'} `
+
+function percentage(ratio: number, decimals: number = 2): string {
+	return `${(ratio * 100).toFixed(ratio === 1 ? 0 : decimals)}%`
 }
 
-type TextStyle = 'bold' | 'red' | 'dim' | 'green'
-type StyleTextFn = (style: TextStyle | TextStyle[], input: string) => string
+export type TextStyle = 'bold' | 'red' | 'dim' | 'green'
 
-export function print_lines(
-	{ report, context }: Report,
-	params: CliArguments,
-	{ styleText, print_width }: { styleText: StyleTextFn; print_width?: number },
-) {
+export type StyleTextFn = (style: TextStyle | TextStyle[], input: string) => string
+
+export type PrintLinesDependencies = {
+	styleText: StyleTextFn
+	print_width?: number
+}
+
+export function print_lines({ report, context }: Report, params: CliArguments, { styleText, print_width }: PrintLinesDependencies) {
 	let output: (string | undefined)[] = []
 
 	if (report.min_line_coverage.ok) {
-		output.push(`${styleText(['bold', 'green'], 'Success')}: total line coverage is ${percentage(report.min_line_coverage.actual)}%`)
+		output.push(`${styleText(['bold', 'green'], 'Success')}: total line coverage is ${percentage(report.min_line_coverage.actual)}`)
 	} else {
 		output.push(
 			`${styleText(['bold', 'red'], 'Failed')}: line coverage is ${percentage(
@@ -35,7 +39,7 @@ export function print_lines(
 	if (report.min_file_line_coverage.expected !== undefined) {
 		let { expected, actual, ok } = report.min_file_line_coverage
 		if (ok) {
-			output.push(`${styleText(['bold', 'green'], 'Success')}: all files pass minimum line coverage of ${percentage(expected)}%`)
+			output.push(`${styleText(['bold', 'green'], 'Success')}: all files pass minimum line coverage of ${percentage(expected)}`)
 		} else {
 			let num_files_failed = context.coverage.coverage_per_stylesheet.filter((sheet) => sheet.line_coverage_ratio < expected!).length
 			output.push(
@@ -54,7 +58,6 @@ export function print_lines(
 		const NUM_LEADING_LINES = 3
 		const NUM_TRAILING_LINES = NUM_LEADING_LINES
 		print_width = print_width ?? 80
-		let line_number = (num: number, covered: boolean = true) => `${num.toString().padStart(5, ' ')} ${covered ? '│' : '━'} `
 		let min_file_line_coverage = report.min_file_line_coverage.expected
 
 		for (let sheet of context.coverage.coverage_per_stylesheet.sort((a, b) => a.line_coverage_ratio - b.line_coverage_ratio)) {
@@ -82,7 +85,7 @@ export function print_lines(
 
 				for (let chunk of sheet.chunks.filter((chunk) => !chunk.is_covered)) {
 					// Render N leading lines
-					for (let x = Math.max(chunk.start_line - NUM_LEADING_LINES, 0); x < chunk.start_line; x++) {
+					for (let x = Math.max(chunk.start_line - NUM_LEADING_LINES, 1); x < chunk.start_line; x++) {
 						output.push([styleText('dim', line_number(x)), styleText('dim', indent(lines[x - 1]))].join(''))
 					}
 					// Render the uncovered chunk
@@ -90,7 +93,7 @@ export function print_lines(
 						output.push([styleText('red', line_number(i, false)), indent(lines[i - 1])].join(''))
 					}
 					// Render N trailing lines
-					for (let y = chunk.end_line; y < Math.min(chunk.end_line + NUM_TRAILING_LINES, lines.length); y++) {
+					for (let y = chunk.end_line + 1; y < Math.min(chunk.end_line + NUM_TRAILING_LINES, lines.length); y++) {
 						output.push([styleText('dim', line_number(y)), styleText('dim', indent(lines[y - 1]))].join(''))
 					}
 					// Show empty line between blocks
@@ -104,5 +107,7 @@ export function print_lines(
 }
 
 export function print(report: Report, params: CliArguments): void {
-	print_lines(report, params, { styleText, print_width: process.stdout.columns }).map((line) => console.log(line))
+	for (let line of print_lines(report, params, { styleText, print_width: process.stdout.columns })) {
+		console.log(line)
+	}
 }
