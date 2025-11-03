@@ -2,7 +2,7 @@ import type { Coverage } from './parse-coverage.js'
 import { ext } from './ext.js'
 import { remap_html } from './remap-html.js'
 
-export function is_html(text: string): boolean {
+function is_html(text: string): boolean {
 	return /<\/?(html|body|head|div|span|script|style)/i.test(text)
 }
 
@@ -11,11 +11,11 @@ const SELECTOR_REGEX = /(@[a-z-]+|\[[^\]]+\]|[a-zA-Z_#.-][a-zA-Z0-9_-]*)\s*\{/
 // Check for CSS properties (property: value pattern)
 const DECLARATION_REGEX = /^\s*[a-zA-Z-]+\s*:\s*.+;?\s*$/m
 
-export function is_css_like(text: string): boolean {
+function is_css_like(text: string): boolean {
 	return SELECTOR_REGEX.test(text) || DECLARATION_REGEX.test(text)
 }
 
-export function is_js_like(text: string): boolean {
+function is_js_like(text: string): boolean {
 	try {
 		// Only parses the input, does not execute it.
 		// NEVER EXECUTE THIS UNTRUSTED CODE!!!
