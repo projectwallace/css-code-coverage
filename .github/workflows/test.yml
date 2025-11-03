@@ -81,10 +81,22 @@ jobs:
           cache: 'npm'
           node-version: 22
       - run: npm ci --ignore-scripts --no-audit --no-fund
-      - name: Build package
-        run: npm run build
-      - name: Lint package
-        run: npm run lint-package
+      - run: npm run build
+      - run: npm run lint-package
+
+  bundle-analysis:
+    name: Report bundle analysis (codecov)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          cache: 'npm'
+          node-version: 22
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm run build
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   npm-audit:
     name: Audit packages
@@ -97,5 +109,4 @@ jobs:
         with:
           cache: 'npm'
           node-version: 22
-      - name: npm audit
-        run: npm audit --audit-level=high
+      - run: npm audit --audit-level=high

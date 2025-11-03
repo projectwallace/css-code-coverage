@@ -11,6 +11,7 @@ export default defineConfig([
 				enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
 				bundleName: 'index.js',
 				uploadToken: process.env.CODECOV_TOKEN,
+				telemetry: false,
 			}),
 		],
 	},
