@@ -10,6 +10,8 @@ export type ChunkedCoverage = Omit<Coverage, 'ranges'> & {
 	chunks: Chunk[]
 }
 
+const WHITESPACE_ONLY_REGEX = /^\s+$/
+
 function merge(stylesheet: ChunkedCoverage): ChunkedCoverage {
 	let new_chunks: Chunk[] = []
 	let previous_chunk: Chunk | undefined
@@ -18,7 +20,7 @@ function merge(stylesheet: ChunkedCoverage): ChunkedCoverage {
 		let chunk = stylesheet.chunks.at(i)!
 
 		// If the current chunk is only whitespace or empty, ignore it
-		if (/^\s+$/.test(stylesheet.text.slice(chunk.start_offset, chunk.end_offset))) {
+		if (WHITESPACE_ONLY_REGEX.test(stylesheet.text.slice(chunk.start_offset, chunk.end_offset))) {
 			continue
 		}
 
@@ -32,7 +34,10 @@ function merge(stylesheet: ChunkedCoverage): ChunkedCoverage {
 				continue
 			}
 			// If the current chunk is only whitespace or empty, add it to the previous
-			else if (/^\s+$/.test(stylesheet.text.slice(chunk.start_offset, chunk.end_offset)) || chunk.end_offset === chunk.start_offset) {
+			else if (
+				WHITESPACE_ONLY_REGEX.test(stylesheet.text.slice(chunk.start_offset, chunk.end_offset)) ||
+				chunk.end_offset === chunk.start_offset
+			) {
 				latest_chunk.end_offset = chunk.end_offset
 				// do not update previous_chunk
 				continue
