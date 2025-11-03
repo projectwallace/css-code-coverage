@@ -59,9 +59,6 @@ export function program(
 	},
 	coverage_data: Coverage[],
 ) {
-	if (coverage_data.length === 0) {
-		throw new MissingDataError()
-	}
 	let coverage = calculate_coverage(coverage_data)
 	let min_line_coverage_result = validate_min_line_coverage(coverage.line_coverage_ratio, min_file_coverage)
 	let min_file_line_coverage_result = validate_min_file_line_coverage(

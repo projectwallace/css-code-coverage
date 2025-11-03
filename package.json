@@ -37,7 +37,7 @@
   },
   "types": "dist/index.d.ts",
   "scripts": {
-    "test": "c8 --reporter=text playwright test",
+    "test": "c8 --reporter=text --reporter=lcov playwright test",
     "build": "tsdown",
     "check": "tsc --noEmit",
     "lint": "oxlint --config .oxlintrc.json",

@@ -25,6 +25,10 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install chromium --only-shell
       - run: npm test -- --forbid-only
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   check-ts:
     name: Check types
