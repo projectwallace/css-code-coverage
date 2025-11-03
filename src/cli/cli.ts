@@ -25,8 +25,8 @@ async function cli(cli_args: string[]) {
 		return tap(report, params)
 	}
 	if (params.reporter === 'json') {
-		// oxlint-disable-next-line no-null
-		return console.log(JSON.stringify(report))
+		let log = JSON.stringify(report)
+		return report.report.ok ? console.log(log) : console.error(log)
 	}
 	return pretty(report, params)
 }

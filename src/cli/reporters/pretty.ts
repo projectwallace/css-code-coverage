@@ -109,7 +109,9 @@ export function print_lines({ report, context }: Report, params: CliArguments, {
 }
 
 export function print(report: Report, params: CliArguments): void {
+	let logger = report.report.ok ? console.log : console.error
+
 	for (let line of print_lines(report, params, { styleText, print_width: process.stdout.columns })) {
-		console.log(line)
+		logger(line)
 	}
 }

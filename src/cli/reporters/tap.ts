@@ -14,7 +14,7 @@ function ok(n: number, description?: string) {
 }
 
 function not_ok(n: number, description?: string) {
-	console.log(`not ok ${n} ${description ? `- ${description}` : ''}`)
+	console.error(`not ok ${n} ${description ? `- ${description}` : ''}`)
 }
 
 function meta(data: Record<string | number, string | number>) {
