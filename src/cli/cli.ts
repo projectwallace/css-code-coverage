@@ -24,6 +24,10 @@ async function cli(cli_args: string[]) {
 	if (params.reporter === 'tap') {
 		return tap(report, params)
 	}
+	if (params.reporter === 'json') {
+		// oxlint-disable-next-line no-null
+		return console.log(JSON.stringify(report))
+	}
 	return pretty(report, params)
 }
 
