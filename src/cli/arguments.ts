@@ -10,6 +10,7 @@ const show_uncovered_options = {
 const reporters = {
 	pretty: 'pretty',
 	tap: 'tap',
+	json: 'json',
 } as const
 
 let CoverageDirSchema = v.pipe(v.string(), v.nonEmpty())
