@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 import { parse_arguments, validate_arguments } from './arguments'
 
 test.describe('--coverage-dir', () => {
-	let cov = '--min-line-coverage=1'
+	let cov = '--min-coverage=1'
 
 	test('missing --coverage-dir', () => {
 		expect(() => validate_arguments(parse_arguments([cov]))).toThrowError()
@@ -18,51 +18,51 @@ test.describe('--coverage-dir', () => {
 	})
 })
 
-test.describe('--min-line-coverage', () => {
+test.describe('--min-coverage', () => {
 	let dir = '--coverage-dir=coverage'
 
-	test('missing --min-line-coverage', () => {
+	test('missing --min-coverage', () => {
 		expect(() => validate_arguments(parse_arguments([dir]))).toThrowError()
 	})
 
-	test('empty --min-line-coverage', () => {
-		expect(() => validate_arguments(parse_arguments([dir, '--min-line-coverage']))).toThrowError()
+	test('empty --min-coverage', () => {
+		expect(() => validate_arguments(parse_arguments([dir, '--min-coverage']))).toThrowError()
 	})
 
-	test('invalid --min-line-coverage=-1', () => {
-		expect(() => validate_arguments(parse_arguments([dir, '--min-line-coverage=-1']))).toThrowError()
+	test('invalid --min-coverage=-1', () => {
+		expect(() => validate_arguments(parse_arguments([dir, '--min-coverage=-1']))).toThrowError()
 	})
 
-	test('valid --min-line-coverage=.8', () => {
-		let result = validate_arguments(parse_arguments([dir, '--min-line-coverage=.8']))
-		expect(result['min-line-coverage']).toEqual(0.8)
+	test('valid --min-coverage=.8', () => {
+		let result = validate_arguments(parse_arguments([dir, '--min-coverage=.8']))
+		expect(result['min-coverage']).toEqual(0.8)
 	})
 })
 
-test.describe('--min-file-line-coverage', () => {
-	let args = ['--coverage-dir=coverage', '--min-line-coverage=1']
+test.describe('--min-file-coverage', () => {
+	let args = ['--coverage-dir=coverage', '--min-coverage=1']
 
-	test('missing --min-file-line-coverage', () => {
+	test('missing --min-file-coverage', () => {
 		expect.soft(() => validate_arguments(parse_arguments([...args]))).not.toThrowError()
-		expect.soft(validate_arguments(parse_arguments([...args]))['min-file-line-coverage']).toEqual(0)
+		expect.soft(validate_arguments(parse_arguments([...args]))['min-file-coverage']).toEqual(0)
 	})
 
-	test('empty --min-file-line-coverage', () => {
-		expect.soft(() => validate_arguments(parse_arguments([...args, '--min-file-line-coverage']))).toThrowError()
+	test('empty --min-file-coverage', () => {
+		expect.soft(() => validate_arguments(parse_arguments([...args, '--min-file-coverage']))).toThrowError()
 	})
 
-	test('invalid --min-file-line-coverage=-1', () => {
-		expect(() => validate_arguments(parse_arguments([...args, '--min-file-line-coverage=-1']))).toThrowError()
+	test('invalid --min-file-coverage=-1', () => {
+		expect(() => validate_arguments(parse_arguments([...args, '--min-file-coverage=-1']))).toThrowError()
 	})
 
-	test('valid --min-file-line-coverage=.8', () => {
-		let result = validate_arguments(parse_arguments([...args, '--min-file-line-coverage=.8']))
-		expect(result['min-file-line-coverage']).toEqual(0.8)
+	test('valid --min-file-coverage=.8', () => {
+		let result = validate_arguments(parse_arguments([...args, '--min-file-coverage=.8']))
+		expect(result['min-file-coverage']).toEqual(0.8)
 	})
 })
 
 test.describe('--reporter', () => {
-	let args = ['--coverage-dir=coverage', '--min-line-coverage=1']
+	let args = ['--coverage-dir=coverage', '--min-coverage=1']
 
 	test('missing --reporter', () => {
 		expect.soft(() => validate_arguments(parse_arguments([...args]))).not.toThrowError()
@@ -89,7 +89,7 @@ test.describe('--reporter', () => {
 })
 
 test.describe('--show-uncovered', () => {
-	let args = ['--coverage-dir=coverage', '--min-line-coverage=1']
+	let args = ['--coverage-dir=coverage', '--min-coverage=1']
 
 	test('missing --show-uncovered', () => {
 		expect.soft(() => validate_arguments(parse_arguments([...args]))).not.toThrowError()
