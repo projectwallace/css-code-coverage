@@ -5,8 +5,13 @@ import { program } from './program.js'
 import { read } from './file-reader.js'
 import { print as pretty } from './reporters/pretty.js'
 import { print as tap } from './reporters/tap.js'
+import { help } from './help.js'
 
 async function cli(cli_args: string[]) {
+	if (!cli_args || cli_args.length === 0 || cli_args.includes('--help') || cli_args.includes('-h')) {
+		return console.log(help())
+	}
+
 	let params = validate_arguments(parse_arguments(cli_args))
 	let coverage_data = await read(params['coverage-dir'])
 	let report = program(
