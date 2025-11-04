@@ -1,104 +1,60 @@
 import type { Coverage, Range } from './parse-coverage.js'
 
-// Combine multiple adjecent ranges into a single one
-function concatenate(ranges: Set<Range> | Range[]): Range[] {
-	let result: Range[] = []
+// 1. Merge and concatenate ranges
+function merge_ranges(ranges: Range[]): Range[] {
+	if (ranges.length === 0) return []
 
-	for (let range of ranges) {
-		// Update the last range if this range starts at last-range-end + 1
-		if (result.length > 0 && (result.at(-1)!.end === range.start - 1 || result.at(-1)!.end === range.start)) {
-			result.at(-1)!.end = range.end
+	// sort by start
+	ranges.sort((a, b) => a.start - b.start)
+
+	let merged: Range[] = [ranges[0]!]
+
+	for (let r of ranges.slice(1)) {
+		let last = merged.at(-1)
+
+		// merge overlapping or adjacent
+		if (last && r.start <= last.end + 1) {
+			if (r.end > last.end) {
+				last.end = r.end
+			}
 		} else {
-			result.push(range)
+			merged.push({ start: r.start, end: r.end })
 		}
 	}
 
-	return result
+	return merged
 }
 
-function dedupe_list(ranges: Range[]): Set<Range> {
-	let new_ranges: Set<Range> = new Set()
-
-	outer: for (let range of ranges) {
-		for (let processed_range of new_ranges) {
-			// Case: an existing range fits within this range -> replace it
-			// { start: 0, end: 100 },
-			// { start: 0, end: 200 }
-			if (range.start <= processed_range.start && range.end >= processed_range.end) {
-				new_ranges.delete(processed_range)
-				new_ranges.add(range)
-				continue outer
-			}
-
-			// Case: this range fits within an existing range -> skip it
-			// { start: 324, end: 485 }, --> exists
-			// { start: 364, end: 485 }, --> skip
-			// { start: 404, end: 485 }, --> skip
-			if (range.start >= processed_range.start && range.end <= processed_range.end) {
-				// console.log('skip', range)
-				continue outer
-			}
-			// Case: ranges partially overlap
-			// { start: 324, end: 444 },
-			// { start: 364, end: 485 },
-			if (range.start < processed_range.end && range.start > processed_range.start && range.end > processed_range.end) {
-				new_ranges.delete(processed_range)
-				new_ranges.add({
-					start: processed_range.start,
-					end: range.end,
-				})
-				continue outer
-			}
-		}
-		new_ranges.add(range)
+// 2. Merge ranges for a single stylesheet entry into an existing grouped sheet
+function merge_entry_ranges(sheet: { url: string; ranges: Range[] } | undefined, entry: Coverage): { url: string; ranges: Range[] } {
+	if (!sheet) {
+		return { url: entry.url, ranges: [...entry.ranges] }
 	}
 
-	return new_ranges
+	let seen = new Set(sheet.ranges.map((r) => `${r.start}:${r.end}`))
+
+	for (let range of entry.ranges) {
+		let id = `${range.start}:${range.end}`
+		if (!seen.has(id)) {
+			seen.add(id)
+			sheet.ranges.push({ ...range })
+		}
+	}
+
+	return sheet
 }
 
-/**
- * @description
- * prerequisites
- * - we check each stylesheet content only once (to avoid counting the same content multiple times)
- * - if a duplicate stylesheet enters the room, we add it's ranges to the existing stylesheet's ranges
- * - only bytes of deduplicated stylesheets are counted
- */
+// 3. Main function orchestrating the grouping and range merging
 export function deduplicate_entries(entries: Coverage[]): Coverage[] {
-	let checked_stylesheets = new Map<string, { url: string; ranges: Range[] }>()
+	let grouped = entries.reduce<Record<string, { url: string; ranges: Range[] }>>((acc, entry) => {
+		let key = entry.text
+		acc[key] = merge_entry_ranges(acc[key], entry)
+		return acc
+	}, Object.create(null))
 
-	for (let entry of entries) {
-		let text = entry.text
-		if (checked_stylesheets.has(text)) {
-			let sheet = checked_stylesheets.get(text)!
-			let ranges = sheet.ranges
-			// Check if the ranges are already in the checked_stylesheets map
-			// If not, add them
-			for (let range of entry.ranges) {
-				let found = false
-
-				for (let checked_range of ranges) {
-					// find exact range
-					if (checked_range.start === range.start && checked_range.end === range.end) {
-						found = true
-						break
-					}
-				}
-
-				if (!found) {
-					ranges.push(range)
-				}
-			}
-		} else {
-			checked_stylesheets.set(text, {
-				url: entry.url,
-				ranges: entry.ranges,
-			})
-		}
-	}
-
-	return Array.from(checked_stylesheets, ([text, { url, ranges }]) => ({
+	return Object.entries(grouped).map(([text, { url, ranges }]) => ({
 		text,
 		url,
-		ranges: concatenate(dedupe_list(ranges.sort((a, b) => a.start - b.start))).sort((a, b) => a.start - b.start),
+		ranges: merge_ranges(ranges),
 	}))
 }

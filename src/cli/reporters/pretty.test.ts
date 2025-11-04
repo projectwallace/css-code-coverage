@@ -164,7 +164,12 @@ test.describe('only --min-line-coverage', () => {
 
 	test('failure', () => {
 		const report = {
-			...context_empty,
+			context: {
+				coverage: {
+					total_lines: 10_000,
+					covered_lines: 5022,
+				} as CoverageResult,
+			},
 			report: {
 				ok: false,
 				...min_line_coverage_failure,
@@ -172,7 +177,10 @@ test.describe('only --min-line-coverage', () => {
 			},
 		} satisfies Report
 		let result = print(report, show_none, dependencies)
-		expect(result).toEqual(['Failed: line coverage is 50.22%% which is lower than the threshold of 1'])
+		expect(result).toEqual([
+			'Failed: line coverage is 50.22%% which is lower than the threshold of 1',
+			'Tip: cover 4978 more lines to meet the threshold of 100%',
+		])
 	})
 })
 

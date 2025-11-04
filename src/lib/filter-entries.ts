@@ -26,37 +26,29 @@ function is_js_like(text: string): boolean {
 	}
 }
 
-export function filter_coverage(coverage: Coverage[]): Coverage[] {
-	let result = []
-
-	for (let entry of coverage) {
-		let extension = ext(entry.url).toLowerCase()
-		if (extension === 'js') continue
-
-		// Always include CSS files
-		if (extension === 'css') {
-			result.push(entry)
-			continue
-		}
-
-		if (is_html(entry.text)) {
-			let { css, ranges } = remap_html(entry.text, entry.ranges)
-			result.push({
-				url: entry.url,
-				text: css,
-				ranges,
-			})
-			continue
-		}
-
-		if (is_css_like(entry.text) && !is_js_like(entry.text)) {
-			result.push({
-				url: entry.url,
-				text: entry.text,
-				ranges: entry.ranges,
-			})
-		}
+export function filter_coverage(acc: Coverage[], entry: Coverage): Coverage[] {
+	let extension = ext(entry.url).toLowerCase()
+	if (extension === 'js') return acc
+	if (extension === 'css') {
+		acc.push(entry)
+		return acc
 	}
-
-	return result
+	if (is_html(entry.text)) {
+		let { css, ranges } = remap_html(entry.text, entry.ranges)
+		acc.push({
+			url: entry.url,
+			text: css,
+			ranges,
+		})
+		return acc
+	}
+	if (is_css_like(entry.text) && !is_js_like(entry.text)) {
+		acc.push({
+			url: entry.url,
+			text: entry.text,
+			ranges: entry.ranges,
+		})
+		return acc
+	}
+	return acc
 }

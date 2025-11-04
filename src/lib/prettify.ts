@@ -17,13 +17,14 @@ export function prettify(stylesheet: ChunkedCoverage): PrettifiedCoverage {
 	let offset = 0
 
 	let pretty_chunks = stylesheet.chunks.map((chunk, index) => {
-		let css = format(stylesheet.text.slice(chunk.start_offset, chunk.end_offset - 1)).trim()
+		let chunk_css = stylesheet.text.substring(chunk.start_offset, chunk.end_offset - 1)
+		let css = format(chunk_css).trim()
 
 		if (chunk.is_covered) {
-			let is_last = index === stylesheet.chunks.length - 1
+			let is_last_chunk = index === stylesheet.chunks.length - 1
 			if (index === 0) {
 				// mark the line between this chunk and the next on as covered
-				css = css + (is_last ? '' : '\n')
+				css = css + (is_last_chunk ? '' : '\n')
 			} else if (index === stylesheet.chunks.length - 1) {
 				// mark the newline after the previous uncovered block as covered
 				css = '\n' + css

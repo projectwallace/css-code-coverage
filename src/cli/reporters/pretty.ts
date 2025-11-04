@@ -29,10 +29,15 @@ export function print_lines({ report, context }: Report, params: CliArguments, {
 	if (report.min_line_coverage.ok) {
 		output.push(`${styleText(['bold', 'green'], 'Success')}: total line coverage is ${percentage(report.min_line_coverage.actual)}`)
 	} else {
+		let { actual, expected } = report.min_line_coverage
 		output.push(
-			`${styleText(['bold', 'red'], 'Failed')}: line coverage is ${percentage(
-				report.min_line_coverage.actual,
-			)}% which is lower than the threshold of ${report.min_line_coverage.expected}`,
+			`${styleText(['bold', 'red'], 'Failed')}: line coverage is ${percentage(actual)}% which is lower than the threshold of ${expected}`,
+		)
+		let lines_to_cover = expected * context.coverage.total_lines - context.coverage.covered_lines
+		output.push(
+			`Tip: cover ${Math.ceil(lines_to_cover)} more ${lines_to_cover === 1 ? 'line' : 'lines'} to meet the threshold of ${percentage(
+				expected,
+			)}`,
 		)
 	}
 
@@ -59,6 +64,9 @@ export function print_lines({ report, context }: Report, params: CliArguments, {
 		const NUM_TRAILING_LINES = NUM_LEADING_LINES
 		print_width = print_width ?? 80
 		let min_file_line_coverage = report.min_file_line_coverage.expected
+
+		// Show empty line between report header and chunks output
+		output.push()
 
 		for (let sheet of context.coverage.coverage_per_stylesheet.sort((a, b) => a.line_coverage_ratio - b.line_coverage_ratio)) {
 			if (
