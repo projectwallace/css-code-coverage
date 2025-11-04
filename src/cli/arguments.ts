@@ -21,16 +21,16 @@ let ReporterSchema = v.pipe(v.string(), v.enum(reporters))
 
 let CliArgumentsSchema = v.object({
 	'coverage-dir': CoverageDirSchema,
-	'min-line-coverage': RatioPercentageSchema,
-	'min-file-line-coverage': v.optional(RatioPercentageSchema),
+	'min-coverage': RatioPercentageSchema,
+	'min-file-coverage': v.optional(RatioPercentageSchema),
 	'show-uncovered': v.optional(ShowUncoveredSchema, show_uncovered_options.violations),
 	reporter: v.optional(ReporterSchema, reporters.pretty),
 })
 
 export type CliArguments = {
 	'coverage-dir': string
-	'min-line-coverage': number
-	'min-file-line-coverage'?: number
+	'min-coverage': number
+	'min-file-coverage'?: number
 	'show-uncovered': keyof typeof show_uncovered_options
 	reporter: keyof typeof reporters
 }
@@ -64,15 +64,14 @@ export function validate_arguments(args: ReturnType<typeof parse_arguments>): Cl
 export function parse_arguments(args: string[]) {
 	let { values } = parseArgs({
 		args,
-		allowPositionals: true,
 		options: {
 			'coverage-dir': {
 				type: 'string',
 			},
-			'min-line-coverage': {
+			'min-coverage': {
 				type: 'string',
 			},
-			'min-file-line-coverage': {
+			'min-file-coverage': {
 				type: 'string',
 				default: '0',
 			},

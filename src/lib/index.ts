@@ -72,23 +72,12 @@ function calculate_stylesheet_coverage({ text, url, chunks }: PrettifiedCoverage
 	}
 }
 
-/**
- * @description
- * CSS Code Coverage calculation
- *
- * These are the steps performed to calculate coverage:
- * 1. Filter eligible files / validate input
- * 2. Prettify the CSS dicovered in each Coverage and update their ranges
- * 3. De-duplicate Coverages: merge all ranges for CSS sources occurring multiple times
- * 4. Calculate used/unused CSS bytes (fastest path, no inspection of the actual CSS needed)
- * 5. Calculate line-coverage, byte-coverage per stylesheet
- */
 export function calculate_coverage(coverage: Coverage[]): CoverageResult {
 	let total_files_found = coverage.length
 
-	let filtered_coverage: Coverage[] = filter_coverage(coverage)
-	let deduplicated: Coverage[] = deduplicate_entries(filtered_coverage)
-	let extended: Coverage[] = extend_ranges(deduplicated)
+	let filtered_coverage = coverage.reduce<Coverage[]>((acc, entry) => filter_coverage(acc, entry), [])
+	let deduplicated: Coverage[] = filtered_coverage.reduce<Coverage[]>((entries, entry) => deduplicate_entries(entries.concat(entry)), [])
+	let extended: Coverage[] = deduplicated.map((coverage) => extend_ranges(coverage))
 	let chunkified: ChunkedCoverage[] = extended.map((sheet) => chunkify(sheet))
 	let prettified: PrettifiedCoverage[] = chunkified.map((sheet) => prettify(sheet))
 	let coverage_per_stylesheet = prettified.map((stylesheet) => calculate_stylesheet_coverage(stylesheet))
