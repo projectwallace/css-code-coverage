@@ -64,7 +64,6 @@ export function validate_arguments(args: ReturnType<typeof parse_arguments>): Cl
 export function parse_arguments(args: string[]) {
 	let { values } = parseArgs({
 		args,
-		allowPositionals: true,
 		options: {
 			'coverage-dir': {
 				type: 'string',
