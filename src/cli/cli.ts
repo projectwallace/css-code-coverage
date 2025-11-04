@@ -11,8 +11,8 @@ async function cli(cli_args: string[]) {
 	let coverage_data = await read(params['coverage-dir'])
 	let report = program(
 		{
-			min_file_coverage: params['min-line-coverage'],
-			min_file_line_coverage: params['min-file-line-coverage'],
+			min_coverage: params['min-coverage'],
+			min_file_coverage: params['min-file-coverage'],
 		},
 		coverage_data,
 	)

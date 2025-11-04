@@ -1,11 +1,5 @@
 import { calculate_coverage, type Coverage, type CoverageResult } from '../lib/index.js'
 
-class MissingDataError extends Error {
-	constructor() {
-		super('No data to analyze')
-	}
-}
-
 export type Report = {
 	context: {
 		coverage: CoverageResult
@@ -51,19 +45,19 @@ function validate_min_file_line_coverage(actual: number, expected: number | unde
 
 export function program(
 	{
+		min_coverage,
 		min_file_coverage,
-		min_file_line_coverage,
 	}: {
-		min_file_coverage: number
-		min_file_line_coverage?: number
+		min_coverage: number
+		min_file_coverage?: number
 	},
 	coverage_data: Coverage[],
 ) {
 	let coverage = calculate_coverage(coverage_data)
-	let min_line_coverage_result = validate_min_line_coverage(coverage.line_coverage_ratio, min_file_coverage)
-	let min_file_line_coverage_result = validate_min_file_line_coverage(
+	let min_coverage_result = validate_min_line_coverage(coverage.line_coverage_ratio, min_coverage)
+	let min_file_coverage_result = validate_min_file_line_coverage(
 		Math.min(...coverage.coverage_per_stylesheet.map((sheet) => sheet.line_coverage_ratio)),
-		min_file_line_coverage,
+		min_file_coverage,
 	)
 
 	let result: Report = {
@@ -71,9 +65,9 @@ export function program(
 			coverage,
 		},
 		report: {
-			ok: min_line_coverage_result.ok && min_file_line_coverage_result.ok,
-			min_line_coverage: min_line_coverage_result,
-			min_file_line_coverage: min_file_line_coverage_result,
+			ok: min_coverage_result.ok && min_file_coverage_result.ok,
+			min_line_coverage: min_coverage_result,
+			min_file_line_coverage: min_file_coverage_result,
 		},
 	}
 
