@@ -5,6 +5,7 @@ import { program } from './program.js'
 import { read } from './file-reader.js'
 import { print as pretty } from './reporters/pretty.js'
 import { print as tap } from './reporters/tap.js'
+import { print as json } from './reporters/json.js'
 import { help } from './help.js'
 
 async function cli(cli_args: string[]) {
@@ -30,8 +31,7 @@ async function cli(cli_args: string[]) {
 		return tap(report, params)
 	}
 	if (params.reporter === 'json') {
-		let log = JSON.stringify(report)
-		return report.report.ok ? console.log(log) : console.error(log)
+		return json(report, params)
 	}
 	return pretty(report, params)
 }
