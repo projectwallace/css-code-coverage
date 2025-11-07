@@ -18,7 +18,11 @@
 		],
 		"declaration": true,
 		"rootDirs": ["src/lib", "src/cli"],
-		"outDir": "dist"
+		"outDir": "dist",
+		"paths": {
+			// So we can import like an external in the CLI
+			"@projectwallace/css-code-coverage": ["./src/lib/index.ts"]
+		}
 	},
 	"include": [
 		"src/lib/index.ts",
