@@ -87,3 +87,13 @@ for (let file of files) {
 	coverage_data.push(...parse_coverage(json_content))
 }
 ```
+
+## CLI
+
+Use the CLI tool (`css-coverage`) to check if coverage meets minimum requirements, globally and/or per file.
+
+```sh
+css-coverage --coverage-dir=<dir> --min-coverage=<number> [options]
+```
+
+[CLI docs](src/cli/README.md)
