@@ -1,6 +1,6 @@
 {
   "name": "@projectwallace/css-code-coverage",
-  "version": "0.8.0",
+  "version": "0.8.2",
   "description": "Generate useful CSS Code Coverage report from browser-reported coverage",
   "author": "Bart Veneman <bart@projectwallace.com>",
   "repository": {
