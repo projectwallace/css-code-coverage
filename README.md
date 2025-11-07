@@ -96,4 +96,4 @@ Use the CLI tool (`css-coverage`) to check if coverage meets minimum requirement
 css-coverage --coverage-dir=<dir> --min-coverage=<number> [options]
 ```
 
-[CLI docs]('src/cli/README.md)
+[CLI docs](src/cli/README.md)
