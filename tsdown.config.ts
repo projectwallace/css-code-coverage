@@ -20,6 +20,9 @@ export default defineConfig([
 		platform: 'node',
 		format: 'esm',
 		dts: false,
+		// The CLI references the Core via 'external' reference to prevent it
+		// from ending up as duplicate code in cli.js
+		external: ['@projectwallace/css-code-coverage'],
 		plugins: [
 			codecovVitePlugin({
 				enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
