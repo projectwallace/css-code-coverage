@@ -20,5 +20,13 @@ export default defineConfig([
 		platform: 'node',
 		format: 'esm',
 		dts: false,
+		plugins: [
+			codecovVitePlugin({
+				enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
+				bundleName: 'cli.js',
+				uploadToken: process.env.CODECOV_TOKEN,
+				telemetry: false,
+			}),
+		],
 	},
 ])
