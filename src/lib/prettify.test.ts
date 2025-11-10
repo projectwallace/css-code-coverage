@@ -1,5 +1,4 @@
-import { test, expect } from '@playwright/test'
-import { prettify } from './prettify'
+import { test } from '@playwright/test'
 
 test.skip('simple range at start', () => {})
 test.skip('simple range at middle', () => {})

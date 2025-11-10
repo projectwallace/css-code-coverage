@@ -16,7 +16,7 @@ function percentage(ratio: number, decimals: number = 2): string {
 
 export type TextStyle = 'bold' | 'red' | 'dim' | 'green'
 
-export type StyleTextFn = (style: TextStyle | TextStyle[], input: string) => string
+type StyleTextFn = (style: TextStyle | TextStyle[], input: string) => string
 
 export type PrintLinesDependencies = {
 	styleText: StyleTextFn

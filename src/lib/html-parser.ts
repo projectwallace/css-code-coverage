@@ -28,7 +28,7 @@ export class DOMParser {
 			pos = close + '</style>'.length
 		}
 		return {
-			querySelectorAll(selector: 'style') {
+			querySelectorAll(_selector: 'style') {
 				return styles
 			},
 		}
