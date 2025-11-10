@@ -1,9 +1,8 @@
 import { test, expect } from '@playwright/test'
-import { print_lines as print, PrintLinesDependencies, type StyleTextFn, TextStyle } from './pretty'
+import { print_lines as print, PrintLinesDependencies, TextStyle } from './pretty'
 import { Report } from '../program'
 import { CoverageResult } from '../../lib'
 import { CliArguments } from '../arguments'
-import { PrettifiedChunk } from '../../lib/prettify'
 
 // test matrix
 // ------------------------------
@@ -59,7 +58,6 @@ const min_file_line_coverage_failure = {
 }
 
 const show_none = { 'show-uncovered': 'none' } as CliArguments
-const show_all = { 'show-uncovered': 'all' } as CliArguments
 const show_violations = { 'show-uncovered': 'violations' } as CliArguments
 
 const context_empty = {

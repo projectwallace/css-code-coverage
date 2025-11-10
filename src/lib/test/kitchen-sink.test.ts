@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { calculate_coverage, parse_coverage, type Coverage, type CoverageResult } from '../index.js'
+import { calculate_coverage, parse_coverage, type Coverage } from '../index.js'
 import { generate_coverage } from './generate-coverage.js'
 import { format } from '@projectwallace/format-css'
 import * as fs from 'node:fs/promises'
