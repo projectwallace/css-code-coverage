@@ -299,8 +299,8 @@ test.describe('Wallace mega soverage suite', () => {
 			{ start_line: 198, end_line: 202 }, // @media print { .footer.svelte-jz8lnl
 			{ start_line: 275, end_line: 277 }, // .shortcut.svelte-1c8nzn6:hover
 			{ start_line: 296, end_line: 298 }, // .cmd-k.svelte-1ux7hi0:focus-visible
-			{ start_line: 1291, end_line: 1293 }, // .theme-popover-trigger.svelte-mls84d:focus-visible
-			{ start_line: 1318, end_line: 1324 }, // @supports not (right: anchor(end)) { .theme-popover.svelte-mls84d
+			{ start_line: 1286, end_line: 1288 }, // .theme-popover-trigger.svelte-mls84d:focus-visible
+			{ start_line: 1313, end_line: 1319 }, // @supports not (right: anchor(end)) { .theme-popover.svelte-mls84d
 		])
 	})
 })
