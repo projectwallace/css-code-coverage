@@ -260,33 +260,35 @@ test.describe('with --min-file-line-coverage', () => {
 			test('result snapshot', () => {
 				let snapshot = lines.join('\n')
 				expect(snapshot).toEqual(
-					`
-────────────────────────────────────────────────────────────
+					`────────────────────────────────────────────────────────────
 File: example.com
 Coverage: 42.11%, 8/19 lines covered
 Tip: cover 11 more lines to meet the file threshold of 100%
 ────────────────────────────────────────────────────────────
-  ▌  1 │ a {
-  ▌  2 │     color: red;
-  ▌  3 │ }
-     4 │
+▌    1 │ a {
+▌    2 │     color: red;
+▌    3 │ }
+     4 │ 
      5 │ a1 {
      6 │     color: blue;
 
      6 │     color: blue;
      7 │ }
-     8 │
-  ▌  9 │ b {
-  ▌ 10 │     color: red;
-  ▌ 11 │ }
-    12 │
+     8 │ 
+▌    9 │ b {
+▌   10 │     color: red;
+▌   11 │ }
+    12 │ 
     13 │ b1 {
     14 │     color: blue;
+
+    14 │     color: blue;
     15 │ }
-    16 │
-  ▌ 17 │ c {
-  ▌ 18 │     color: red;
-  ▌ 19 │ }`.trim(),
+    16 │ 
+▌   17 │ c {
+▌   18 │     color: red;
+▌   19 │ }
+`,
 				)
 			})
 		})
