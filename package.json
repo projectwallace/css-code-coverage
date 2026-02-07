@@ -28,7 +28,7 @@
 		"dist"
 	],
 	"bin": {
-		"css-coverage": "dist/cli.js"
+		"css-coverage": "dist/cli.mjs"
 	},
 	"main": "dist/index.js",
 	"exports": {
