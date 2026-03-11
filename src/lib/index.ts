@@ -75,34 +75,48 @@ function calculate_stylesheet_coverage({ text, url, chunks }: PrettifiedCoverage
 export function calculate_coverage(coverage: Coverage[]): CoverageResult {
 	let total_files_found = coverage.length
 
-	let filtered_coverage = coverage.reduce<Coverage[]>((acc, entry) => filter_coverage(acc, entry), [])
-	let deduplicated: Coverage[] = filtered_coverage.reduce<Coverage[]>((entries, entry) => deduplicate_entries(entries.concat(entry)), [])
+	let filtered_coverage = coverage.reduce<Coverage[]>(
+		(acc, entry) => filter_coverage(acc, entry),
+		[],
+	)
+	let deduplicated: Coverage[] = filtered_coverage.reduce<Coverage[]>(
+		(entries, entry) => deduplicate_entries(entries.concat(entry)),
+		[],
+	)
 	let extended: Coverage[] = deduplicated.map((coverage) => extend_ranges(coverage))
 	let chunkified: ChunkedCoverage[] = extended.map((sheet) => chunkify(sheet))
 	let prettified: PrettifiedCoverage[] = chunkified.map((sheet) => prettify(sheet))
-	let coverage_per_stylesheet = prettified.map((stylesheet) => calculate_stylesheet_coverage(stylesheet))
+	let coverage_per_stylesheet = prettified.map((stylesheet) =>
+		calculate_stylesheet_coverage(stylesheet),
+	)
 
 	// Calculate total coverage for all stylesheets combined
-	let { total_lines, total_covered_lines, total_uncovered_lines, total_bytes, total_used_bytes, total_unused_bytes } =
-		coverage_per_stylesheet.reduce(
-			(totals, sheet) => {
-				totals.total_lines += sheet.total_lines
-				totals.total_covered_lines += sheet.covered_lines
-				totals.total_uncovered_lines += sheet.uncovered_lines
-				totals.total_bytes += sheet.total_bytes
-				totals.total_used_bytes += sheet.covered_bytes
-				totals.total_unused_bytes += sheet.uncovered_bytes
-				return totals
-			},
-			{
-				total_lines: 0,
-				total_covered_lines: 0,
-				total_uncovered_lines: 0,
-				total_bytes: 0,
-				total_used_bytes: 0,
-				total_unused_bytes: 0,
-			},
-		)
+	let {
+		total_lines,
+		total_covered_lines,
+		total_uncovered_lines,
+		total_bytes,
+		total_used_bytes,
+		total_unused_bytes,
+	} = coverage_per_stylesheet.reduce(
+		(totals, sheet) => {
+			totals.total_lines += sheet.total_lines
+			totals.total_covered_lines += sheet.covered_lines
+			totals.total_uncovered_lines += sheet.uncovered_lines
+			totals.total_bytes += sheet.total_bytes
+			totals.total_used_bytes += sheet.covered_bytes
+			totals.total_unused_bytes += sheet.uncovered_bytes
+			return totals
+		},
+		{
+			total_lines: 0,
+			total_covered_lines: 0,
+			total_uncovered_lines: 0,
+			total_bytes: 0,
+			total_used_bytes: 0,
+			total_unused_bytes: 0,
+		},
+	)
 
 	return {
 		total_files_found,

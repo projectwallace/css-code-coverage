@@ -48,11 +48,15 @@ test.describe('--min-file-coverage', () => {
 	})
 
 	test('empty --min-file-coverage', () => {
-		expect.soft(() => validate_arguments(parse_arguments([...args, '--min-file-coverage']))).toThrowError()
+		expect
+			.soft(() => validate_arguments(parse_arguments([...args, '--min-file-coverage'])))
+			.toThrowError()
 	})
 
 	test('invalid --min-file-coverage=-1', () => {
-		expect(() => validate_arguments(parse_arguments([...args, '--min-file-coverage=-1']))).toThrowError()
+		expect(() =>
+			validate_arguments(parse_arguments([...args, '--min-file-coverage=-1'])),
+		).toThrowError()
 	})
 
 	test('valid --min-file-coverage=.8', () => {
@@ -93,15 +97,21 @@ test.describe('--show-uncovered', () => {
 
 	test('missing --show-uncovered', () => {
 		expect.soft(() => validate_arguments(parse_arguments([...args]))).not.toThrowError()
-		expect.soft(validate_arguments(parse_arguments([...args]))['show-uncovered']).toEqual('violations')
+		expect
+			.soft(validate_arguments(parse_arguments([...args]))['show-uncovered'])
+			.toEqual('violations')
 	})
 
 	test('empty --show-uncovered', () => {
-		expect.soft(() => validate_arguments(parse_arguments([...args, '--show-uncovered']))).toThrowError()
+		expect
+			.soft(() => validate_arguments(parse_arguments([...args, '--show-uncovered'])))
+			.toThrowError()
 	})
 
 	test('invalid --show-uncovered=test', () => {
-		expect(() => validate_arguments(parse_arguments([...args, '--show-uncovered=test']))).toThrowError()
+		expect(() =>
+			validate_arguments(parse_arguments([...args, '--show-uncovered=test'])),
+		).toThrowError()
 	})
 
 	test('valid --show-uncovered=none', () => {

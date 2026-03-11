@@ -15,7 +15,13 @@ const reporters = {
 
 let CoverageDirSchema = v.pipe(v.string(), v.nonEmpty())
 // Coerce args string to number and validate that it's between 0 and 1
-let RatioPercentageSchema = v.pipe(v.string(), v.transform(Number), v.number(), v.minValue(0), v.maxValue(1))
+let RatioPercentageSchema = v.pipe(
+	v.string(),
+	v.transform(Number),
+	v.number(),
+	v.minValue(0),
+	v.maxValue(1),
+)
 let ShowUncoveredSchema = v.pipe(v.string(), v.enum(show_uncovered_options))
 let ReporterSchema = v.pipe(v.string(), v.enum(reporters))
 

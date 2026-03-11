@@ -1,7 +1,11 @@
 // import from absolute package name instead of relative import (like ../lib/index.ts)
 // to prevent lib/index.js being bundled into cli.js, which would mean that indexjs
 // ends up in our /dist twice which is wasteful
-import { calculate_coverage, type Coverage, type CoverageResult } from '@projectwallace/css-code-coverage'
+import {
+	calculate_coverage,
+	type Coverage,
+	type CoverageResult,
+} from '@projectwallace/css-code-coverage'
 
 export type Report = {
 	context: {

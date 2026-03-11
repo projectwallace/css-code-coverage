@@ -26,7 +26,10 @@ function merge_ranges(ranges: Range[]): Range[] {
 }
 
 // 2. Merge ranges for a single stylesheet entry into an existing grouped sheet
-function merge_entry_ranges(sheet: { url: string; ranges: Range[] } | undefined, entry: Coverage): { url: string; ranges: Range[] } {
+function merge_entry_ranges(
+	sheet: { url: string; ranges: Range[] } | undefined,
+	entry: Coverage,
+): { url: string; ranges: Range[] } {
 	if (!sheet) {
 		return { url: entry.url, ranges: [...entry.ranges] }
 	}
