@@ -2,5 +2,5 @@
 	"useTabs": true,
 	"singleQuote": true,
 	"semi": false,
-	"ignorePatterns": []
+	"ignorePatterns": ["src/lib/test/fixtures/**"]
 }
