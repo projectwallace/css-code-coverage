@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { validate_arguments, parse_arguments } from './arguments.js'
+import { parse_arguments } from './arguments.js'
 import { program } from './program.js'
 import { read } from './file-reader.js'
 import { print as pretty } from './reporters/pretty.js'
@@ -18,7 +18,7 @@ async function cli(cli_args: string[]) {
 		return console.log(help())
 	}
 
-	let params = validate_arguments(parse_arguments(cli_args))
+	let params = parse_arguments(cli_args)
 	let coverage_data = await read(params['coverage-dir'])
 	let report = program(
 		{

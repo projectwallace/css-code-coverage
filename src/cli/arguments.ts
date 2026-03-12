@@ -1,104 +1,79 @@
 import { parseArgs } from 'node:util'
 import { resolve, sep } from 'node:path'
-import * as v from 'valibot'
 
-const show_uncovered_options = {
-	none: 'none',
-	all: 'all',
-	violations: 'violations',
-} as const
+const SHOW_UNCOVERED = ['none', 'all', 'violations'] as const
+type ShowUncovered = (typeof SHOW_UNCOVERED)[number]
 
-const reporters = {
-	pretty: 'pretty',
-	tap: 'tap',
-	json: 'json',
-} as const
-
-let CoverageDirSchema = v.pipe(
-	v.string(),
-	v.nonEmpty(),
-	v.transform((value) => resolve(value)),
-	v.check((value) => {
-		let cwd = process.cwd()
-		return value === cwd || value.startsWith(cwd + sep)
-	}, 'InvalidPath'),
-)
-// Coerce args string to number and validate that it's between 0 and 1
-let RatioPercentageSchema = v.pipe(
-	v.string(),
-	v.transform(Number),
-	v.number(),
-	v.minValue(0),
-	v.maxValue(1),
-)
-let ShowUncoveredSchema = v.pipe(v.string(), v.enum(show_uncovered_options))
-let ReporterSchema = v.pipe(v.string(), v.enum(reporters))
-
-let CliArgumentsSchema = v.object({
-	'coverage-dir': CoverageDirSchema,
-	'min-coverage': RatioPercentageSchema,
-	'min-file-coverage': v.optional(RatioPercentageSchema),
-	'show-uncovered': v.optional(ShowUncoveredSchema, show_uncovered_options.violations),
-	reporter: v.optional(ReporterSchema, reporters.pretty),
-})
+const REPORTERS = ['pretty', 'tap', 'json'] as const
+type Reporter = (typeof REPORTERS)[number]
 
 export type CliArguments = {
 	'coverage-dir': string
 	'min-coverage': number
-	'min-file-coverage'?: number
-	'show-uncovered': keyof typeof show_uncovered_options
-	reporter: keyof typeof reporters
+	'min-file-coverage': number
+	'show-uncovered': ShowUncovered
+	reporter: Reporter
 }
 
-type ArgumentIssue = { path?: string; message: string }
-
-class InvalidArgumentsError extends Error {
-	readonly issues: ArgumentIssue[]
-
-	constructor(issues: ArgumentIssue[]) {
-		super()
-		this.issues = issues
-	}
-}
-
-export function validate_arguments(args: ReturnType<typeof parse_arguments>): CliArguments {
-	let parse_result = v.safeParse(CliArgumentsSchema, args)
-
-	if (!parse_result.success) {
-		throw new InvalidArgumentsError(
-			parse_result.issues.map((issue) => ({
-				path: issue.path?.map((path) => path.key).join('.'),
-				message: issue.message,
-			})),
-		)
-	}
-
-	return parse_result.output
-}
-
-export function parse_arguments(args: string[]) {
+export function parse_arguments(args: string[]): CliArguments {
 	let { values } = parseArgs({
 		args,
 		options: {
-			'coverage-dir': {
-				type: 'string',
-			},
-			'min-coverage': {
-				type: 'string',
-			},
-			'min-file-coverage': {
-				type: 'string',
-				default: '0',
-			},
-			'show-uncovered': {
-				type: 'string',
-				default: 'violations',
-			},
-			reporter: {
-				type: 'string',
-				default: 'pretty',
-			},
+			'coverage-dir': { type: 'string' },
+			'min-coverage': { type: 'string' },
+			'min-file-coverage': { type: 'string', default: '0' },
+			'show-uncovered': { type: 'string', default: 'violations' },
+			reporter: { type: 'string', default: 'pretty' },
 		},
 	})
-	return values
+
+	let issues: string[] = []
+
+	let coverage_dir = values['coverage-dir']
+	if (!coverage_dir) {
+		issues.push('--coverage-dir is required')
+	} else {
+		let resolved = resolve(coverage_dir)
+		let cwd = process.cwd()
+		if (resolved !== cwd && !resolved.startsWith(cwd + sep)) {
+			issues.push('InvalidPath')
+		}
+	}
+
+	let min_coverage = Number(values['min-coverage'])
+	if (
+		values['min-coverage'] === undefined ||
+		isNaN(min_coverage) ||
+		min_coverage < 0 ||
+		min_coverage > 1
+	) {
+		issues.push('--min-coverage must be a number between 0 and 1')
+	}
+
+	let min_file_coverage = Number(values['min-file-coverage'])
+	if (isNaN(min_file_coverage) || min_file_coverage < 0 || min_file_coverage > 1) {
+		issues.push('--min-file-coverage must be a number between 0 and 1')
+	}
+
+	let show_uncovered = values['show-uncovered'] as ShowUncovered
+	if (!SHOW_UNCOVERED.includes(show_uncovered)) {
+		issues.push(`--show-uncovered must be one of: ${SHOW_UNCOVERED.join(', ')}`)
+	}
+
+	let reporter = values['reporter'] as Reporter
+	if (!REPORTERS.includes(reporter)) {
+		issues.push(`--reporter must be one of: ${REPORTERS.join(', ')}`)
+	}
+
+	if (issues.length > 0) {
+		throw new Error(issues.join('\n'))
+	}
+
+	return {
+		'coverage-dir': resolve(coverage_dir!),
+		'min-coverage': min_coverage,
+		'min-file-coverage': min_file_coverage,
+		'show-uncovered': show_uncovered,
+		reporter,
+	}
 }
