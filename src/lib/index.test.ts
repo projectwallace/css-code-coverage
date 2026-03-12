@@ -205,13 +205,11 @@ p {
 		])
 		expect(result.coverage_per_stylesheet.at(0)?.text).toEqual('h1 {\n\tcolor: blue;\n}')
 		expect(
-			result.coverage_per_stylesheet
-				.at(0)
-				?.chunks.map(({ start_line, end_line, is_covered }) => ({
-					start_line,
-					end_line,
-					is_covered,
-				})),
+			result.coverage_per_stylesheet.at(0)?.chunks.map(({ start_line, end_line, is_covered }) => ({
+				start_line,
+				end_line,
+				is_covered,
+			})),
 		).toEqual([
 			{
 				start_line: 1,
@@ -230,13 +228,11 @@ p {
 			},
 		])
 		expect(
-			result.coverage_per_stylesheet
-				.at(0)
-				?.chunks.map(({ start_line, end_line, is_covered }) => ({
-					start_line,
-					end_line,
-					is_covered,
-				})),
+			result.coverage_per_stylesheet.at(0)?.chunks.map(({ start_line, end_line, is_covered }) => ({
+				start_line,
+				end_line,
+				is_covered,
+			})),
 		).toEqual([
 			{
 				start_line: 1,
