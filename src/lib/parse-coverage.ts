@@ -1,29 +1,39 @@
-import * as v from 'valibot'
+export type Range = {
+	start: number
+	end: number
+}
 
-let RangeSchema = v.object({
-	start: v.number(),
-	end: v.number(),
-})
+export type Coverage = {
+	text: string
+	url: string
+	ranges: Range[]
+}
 
-export type Range = v.InferInput<typeof RangeSchema>
-
-let CoverageSchema = v.object({
-	text: v.string(),
-	url: v.string(),
-	ranges: v.array(RangeSchema),
-})
-
-export type Coverage = v.InferInput<typeof CoverageSchema>
-
-function is_valid_coverage(input: unknown): boolean {
-	let result = v.safeParse(v.array(CoverageSchema), input)
-	return result.success
+function is_valid_coverage(input: unknown): input is Coverage[] {
+	return (
+		Array.isArray(input) &&
+		input.every(
+			(item) =>
+				typeof item === 'object' &&
+				item !== null &&
+				typeof item.text === 'string' &&
+				typeof item.url === 'string' &&
+				Array.isArray(item.ranges) &&
+				item.ranges.every(
+					(r: unknown) =>
+						typeof r === 'object' &&
+						r !== null &&
+						typeof (r as Range).start === 'number' &&
+						typeof (r as Range).end === 'number',
+				),
+		)
+	)
 }
 
 export function parse_coverage(input: string) {
 	try {
-		let parse_result = JSON.parse(input)
-		return is_valid_coverage(parse_result) ? (parse_result as Coverage[]) : ([] as Coverage[])
+		let parsed: unknown = JSON.parse(input)
+		return is_valid_coverage(parsed) ? parsed : ([] as Coverage[])
 	} catch {
 		return [] as Coverage[]
 	}
