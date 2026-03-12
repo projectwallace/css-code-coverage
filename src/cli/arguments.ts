@@ -41,7 +41,12 @@ export function parse_arguments(args: string[]): CliArguments {
 	}
 
 	let min_coverage = Number(values['min-coverage'])
-	if (values['min-coverage'] === undefined || isNaN(min_coverage) || min_coverage < 0 || min_coverage > 1) {
+	if (
+		values['min-coverage'] === undefined ||
+		isNaN(min_coverage) ||
+		min_coverage < 0 ||
+		min_coverage > 1
+	) {
 		issues.push('--min-coverage must be a number between 0 and 1')
 	}
 
