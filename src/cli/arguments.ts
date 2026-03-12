@@ -1,4 +1,5 @@
 import { parseArgs } from 'node:util'
+import { resolve, sep } from 'node:path'
 import * as v from 'valibot'
 
 const show_uncovered_options = {
@@ -13,7 +14,15 @@ const reporters = {
 	json: 'json',
 } as const
 
-let CoverageDirSchema = v.pipe(v.string(), v.nonEmpty())
+let CoverageDirSchema = v.pipe(
+	v.string(),
+	v.nonEmpty(),
+	v.transform((value) => resolve(value)),
+	v.check((value) => {
+		let cwd = process.cwd()
+		return value === cwd || value.startsWith(cwd + sep)
+	}, 'InvalidPath'),
+)
 // Coerce args string to number and validate that it's between 0 and 1
 let RatioPercentageSchema = v.pipe(
 	v.string(),
