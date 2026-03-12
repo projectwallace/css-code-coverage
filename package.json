@@ -53,7 +53,7 @@
 		"oxfmt": "^0.38.0",
 		"oxlint": "^1.39.0",
 		"publint": "^0.3.16",
-		"tsdown": "^0.20.1",
+		"tsdown": "^0.21.2",
 		"typescript": "^5.9.3"
 	},
 	"engines": {
