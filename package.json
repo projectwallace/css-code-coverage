@@ -36,7 +36,7 @@
 		"test": "c8 --reporter=text --reporter=lcov playwright test",
 		"build": "tsdown",
 		"check": "tsc --noEmit",
-		"lint": "oxlint --config .oxlintrc.json && oxfmt --check",
+		"lint": "oxlint --config .oxlintrc.json; oxfmt --check",
 		"lint-package": "publint",
 		"knip": "knip"
 	},
