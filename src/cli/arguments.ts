@@ -55,11 +55,13 @@ export function parse_arguments(args: string[]): CliArguments {
 		issues.push('--min-file-coverage must be a number between 0 and 1')
 	}
 
-	if (!SHOW_UNCOVERED.includes(values['show-uncovered'] as ShowUncovered)) {
+	let show_uncovered = values['show-uncovered'] as ShowUncovered
+	if (!SHOW_UNCOVERED.includes(show_uncovered)) {
 		issues.push(`--show-uncovered must be one of: ${SHOW_UNCOVERED.join(', ')}`)
 	}
 
-	if (!REPORTERS.includes(values['reporter'] as Reporter)) {
+	let reporter = values['reporter'] as Reporter
+	if (!REPORTERS.includes(reporter)) {
 		issues.push(`--reporter must be one of: ${REPORTERS.join(', ')}`)
 	}
 
@@ -71,7 +73,7 @@ export function parse_arguments(args: string[]): CliArguments {
 		'coverage-dir': resolve(coverage_dir!),
 		'min-coverage': min_coverage,
 		'min-file-coverage': min_file_coverage,
-		'show-uncovered': values['show-uncovered'] as ShowUncovered,
-		reporter: values['reporter'] as Reporter,
+		'show-uncovered': show_uncovered,
+		reporter,
 	}
 }
