@@ -5,7 +5,9 @@ let parse: (html: string) => Element[]
 
 test.beforeAll(() => {
 	parse = function (html: string) {
-		return new DOMParser().parseFromString(`<html>${html}</html>`, 'text/html').querySelectorAll('style')
+		return new DOMParser()
+			.parseFromString(`<html>${html}</html>`, 'text/html')
+			.querySelectorAll('style')
 	}
 })
 
@@ -33,7 +35,9 @@ test('finds multiple <style> tags', () => {
 })
 
 test('finds style tags with attributes', () => {
-	expect(parse('<style data-attr data-testid="yup">.css{}</style>')).toEqual([{ textContent: '.css{}' }])
+	expect(parse('<style data-attr data-testid="yup">.css{}</style>')).toEqual([
+		{ textContent: '.css{}' },
+	])
 })
 
 test.describe('invalid tags', () => {

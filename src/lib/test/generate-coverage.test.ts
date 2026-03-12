@@ -101,6 +101,8 @@ test.describe('coverage quirks', () => {
 		expect.soft(sheet.text!.substring(12, 16)).toBe('all ')
 		expect.soft(sheet.text!.substring(23, 54)).toBe('h1 {\n\t\t\t\t\t\tcolor: green;\n\t\t\t\t\t}')
 		expect.soft(sheet.text!.substring(75, 91)).toBe('(display: grid) ')
-		expect.soft(sheet.text!.substring(98, 132)).toBe('h1 {\n\t\t\t\t\t\tfont-size: 24px;\n\t\t\t\t\t}')
+		expect
+			.soft(sheet.text!.substring(98, 132))
+			.toBe('h1 {\n\t\t\t\t\t\tfont-size: 24px;\n\t\t\t\t\t}')
 	})
 })

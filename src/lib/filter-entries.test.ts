@@ -21,7 +21,9 @@ test('keeps files with CSS extension', () => {
 			ranges: [{ start: 0, end: 13 }],
 		},
 	] satisfies Coverage[]
-	expect(entries.reduce<Coverage[]>((acc, entry) => filter_coverage(acc, entry), [])).toEqual(entries)
+	expect(entries.reduce<Coverage[]>((acc, entry) => filter_coverage(acc, entry), [])).toEqual(
+		entries,
+	)
 })
 
 test('keeps extension-less URL with HTML text', () => {
@@ -39,7 +41,9 @@ test('keeps extension-less URL with HTML text', () => {
 			ranges: [{ start: 0, end: 13 }], // ranges are remapped
 		},
 	] satisfies Coverage[]
-	expect(entries.reduce<Coverage[]>((acc, entry) => filter_coverage(acc, entry), [])).toEqual(expected)
+	expect(entries.reduce<Coverage[]>((acc, entry) => filter_coverage(acc, entry), [])).toEqual(
+		expected,
+	)
 })
 
 test('keeps extension-less URL with CSS text (running coverage in vite dev mode)', () => {
@@ -50,7 +54,9 @@ test('keeps extension-less URL with CSS text (running coverage in vite dev mode)
 			ranges: [{ start: 0, end: 13 }],
 		},
 	] satisfies Coverage[]
-	expect(entries.reduce<Coverage[]>((acc, entry) => filter_coverage(acc, entry), [])).toEqual(entries)
+	expect(entries.reduce<Coverage[]>((acc, entry) => filter_coverage(acc, entry), [])).toEqual(
+		entries,
+	)
 })
 
 test('filters out extension-less JS', () => {

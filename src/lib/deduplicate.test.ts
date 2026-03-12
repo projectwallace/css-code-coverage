@@ -33,7 +33,9 @@ test('merges two identical texts with different URLs and identical ranges', () =
 		},
 	]
 	let first = entries.at(0)!
-	expect(deduplicate_entries(entries)).toEqual([{ text: first.text, url: first.url, ranges: first.ranges }])
+	expect(deduplicate_entries(entries)).toEqual([
+		{ text: first.text, url: first.url, ranges: first.ranges },
+	])
 })
 
 test('merges different ranges on identical CSS, different URLs', () => {
@@ -50,7 +52,9 @@ test('merges different ranges on identical CSS, different URLs', () => {
 		},
 	]
 	let first = entries.at(0)!
-	expect(deduplicate_entries(entries)).toEqual([{ text: first.text, url: first.url, ranges: [{ start: 0, end: 9 }] }])
+	expect(deduplicate_entries(entries)).toEqual([
+		{ text: first.text, url: first.url, ranges: [{ start: 0, end: 9 }] },
+	])
 })
 
 test('merges different ranges on identical CSS, identical URLs', () => {
@@ -66,7 +70,9 @@ test('merges different ranges on identical CSS, identical URLs', () => {
 			url: 'example.com',
 		},
 	]
-	expect(deduplicate_entries(entries)).toEqual([{ text: entries[0]!.text, url: entries[0]!.url, ranges: [{ start: 0, end: 9 }] }])
+	expect(deduplicate_entries(entries)).toEqual([
+		{ text: entries[0]!.text, url: entries[0]!.url, ranges: [{ start: 0, end: 9 }] },
+	])
 })
 
 test('does not merge different CSS with different URLs and identical ranges', () => {

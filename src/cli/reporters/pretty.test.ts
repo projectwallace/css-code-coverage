@@ -193,7 +193,10 @@ test.describe('with --min-file-line-coverage', () => {
 			},
 		} satisfies Report
 		let result = print(report, show_none, dependencies)
-		expect(result).toEqual(['Success: total line coverage is 50.22%', 'Success: all files pass minimum line coverage of 50.00%'])
+		expect(result).toEqual([
+			'Success: total line coverage is 50.22%',
+			'Success: all files pass minimum line coverage of 50.00%',
+		])
 	})
 
 	test.describe('--min-line-coverage: success; --min-file-line-coverage: failure; --show: none', () => {
@@ -211,10 +214,14 @@ test.describe('with --min-file-line-coverage', () => {
 			expect(result[0]).toEqual('Success: total line coverage is 50.22%')
 		})
 		test('file-coverage: fail', () => {
-			expect(result[1]).toEqual('Failed: 1 file does not meet the minimum line coverage of 100% (minimum coverage was 50.00%)')
+			expect(result[1]).toEqual(
+				'Failed: 1 file does not meet the minimum line coverage of 100% (minimum coverage was 50.00%)',
+			)
 		})
 		test('shows hint to --show=violations', () => {
-			expect(result[2]).toEqual("  Hint: set --show-uncovered=violations to see which files didn't pass")
+			expect(result[2]).toEqual(
+				"  Hint: set --show-uncovered=violations to see which files didn't pass",
+			)
 		})
 		test('no files shown', () => {
 			expect(result).toHaveLength(3)
@@ -236,10 +243,14 @@ test.describe('with --min-file-line-coverage', () => {
 			expect(result[0]).toEqual('Success: total line coverage is 50.22%')
 		})
 		test('file-coverage: fail', () => {
-			expect(result[1]).toEqual('Failed: 1 file does not meet the minimum line coverage of 100% (minimum coverage was 50.00%)')
+			expect(result[1]).toEqual(
+				'Failed: 1 file does not meet the minimum line coverage of 100% (minimum coverage was 50.00%)',
+			)
 		})
 		test('does not show hint to --show=violations', () => {
-			expect(result[2]).not.toEqual("  Hint: set --show-uncovered=violations to see which files didn't pass")
+			expect(result[2]).not.toEqual(
+				"  Hint: set --show-uncovered=violations to see which files didn't pass",
+			)
 		})
 		test.describe('shows file details', () => {
 			let lines = result.slice(2)

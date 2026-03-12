@@ -98,13 +98,21 @@ test.describe('from <link rel="stylesheet">', () => {
 		expect.soft(sheet.uncovered_lines).toBe(8)
 		expect.soft(sheet.total_lines).toBe(23)
 		expect.soft(sheet.url).toEqual('http://localhost/style.css')
-		expect.soft(sheet.chunks.map(({ is_covered, start_line, end_line }) => ({ is_covered, start_line, end_line }))).toEqual([
-			{ is_covered: true, start_line: 1, end_line: 4 },
-			{ is_covered: false, start_line: 5, end_line: 8 },
-			{ is_covered: true, start_line: 9, end_line: 13 },
-			{ is_covered: false, start_line: 14, end_line: 17 },
-			{ is_covered: true, start_line: 18, end_line: 23 },
-		])
+		expect
+			.soft(
+				sheet.chunks.map(({ is_covered, start_line, end_line }) => ({
+					is_covered,
+					start_line,
+					end_line,
+				})),
+			)
+			.toEqual([
+				{ is_covered: true, start_line: 1, end_line: 4 },
+				{ is_covered: false, start_line: 5, end_line: 8 },
+				{ is_covered: true, start_line: 9, end_line: 13 },
+				{ is_covered: false, start_line: 14, end_line: 17 },
+				{ is_covered: true, start_line: 18, end_line: 23 },
+			])
 	})
 })
 
@@ -169,7 +177,12 @@ p {
 		let result = calculate_coverage(coverage)
 		let sheet = result.coverage_per_stylesheet.at(0)!
 		expect(
-			sheet.chunks.map(({ is_covered, start_line, end_line, total_lines }) => ({ is_covered, start_line, end_line, total_lines })),
+			sheet.chunks.map(({ is_covered, start_line, end_line, total_lines }) => ({
+				is_covered,
+				start_line,
+				end_line,
+				total_lines,
+			})),
 		).toEqual([
 			{ is_covered: true, start_line: 1, end_line: 5, total_lines: 5 },
 			{ is_covered: false, start_line: 6, end_line: 9, total_lines: 4 },
@@ -192,7 +205,11 @@ p {
 		])
 		expect(result.coverage_per_stylesheet.at(0)?.text).toEqual('h1 {\n\tcolor: blue;\n}')
 		expect(
-			result.coverage_per_stylesheet.at(0)?.chunks.map(({ start_line, end_line, is_covered }) => ({ start_line, end_line, is_covered })),
+			result.coverage_per_stylesheet.at(0)?.chunks.map(({ start_line, end_line, is_covered }) => ({
+				start_line,
+				end_line,
+				is_covered,
+			})),
 		).toEqual([
 			{
 				start_line: 1,
@@ -211,7 +228,11 @@ p {
 			},
 		])
 		expect(
-			result.coverage_per_stylesheet.at(0)?.chunks.map(({ start_line, end_line, is_covered }) => ({ start_line, end_line, is_covered })),
+			result.coverage_per_stylesheet.at(0)?.chunks.map(({ start_line, end_line, is_covered }) => ({
+				start_line,
+				end_line,
+				is_covered,
+			})),
 		).toEqual([
 			{
 				start_line: 1,

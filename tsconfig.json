@@ -12,10 +12,7 @@
 		// Type checking, not transpiling
 		"module": "ESNext",
 		"moduleResolution": "bundler",
-		"lib": [
-			"es2024",
-			"DOM"
-		],
+		"lib": ["es2024", "DOM"],
 		"declaration": true,
 		"rootDirs": ["src/lib", "src/cli"],
 		"outDir": "dist",
@@ -24,12 +21,6 @@
 			"@projectwallace/css-code-coverage": ["./src/lib/index.ts"]
 		}
 	},
-	"include": [
-		"src/lib/index.ts",
-		"src/cli/cli.ts",
-		"src/lib/*.d.ts"
-	],
-	"exclude": [
-		"node_modules",
-	]
+	"include": ["src/lib/index.ts", "src/cli/cli.ts", "src/lib/*.d.ts"],
+	"exclude": ["node_modules"]
 }

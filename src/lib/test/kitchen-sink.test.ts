@@ -75,7 +75,12 @@ test.describe('comment coverage', () => {
 		let result = calculate_coverage(coverage)
 		let sheet = result.coverage_per_stylesheet.at(0)!
 		expect(
-			sheet.chunks.map(({ is_covered, start_line, end_line, total_lines }) => ({ is_covered, start_line, end_line, total_lines })),
+			sheet.chunks.map(({ is_covered, start_line, end_line, total_lines }) => ({
+				is_covered,
+				start_line,
+				end_line,
+				total_lines,
+			})),
 		).toEqual([
 			{ is_covered: false, start_line: 1, end_line: 1, total_lines: 1 },
 			{ is_covered: true, start_line: 2, end_line: 5, total_lines: 4 },
@@ -93,7 +98,12 @@ test.describe('comment coverage', () => {
 		let result = calculate_coverage(coverage)
 		let sheet = result.coverage_per_stylesheet.at(0)!
 		expect(
-			sheet.chunks.map(({ is_covered, start_line, end_line, total_lines }) => ({ is_covered, start_line, end_line, total_lines })),
+			sheet.chunks.map(({ is_covered, start_line, end_line, total_lines }) => ({
+				is_covered,
+				start_line,
+				end_line,
+				total_lines,
+			})),
 		).toEqual([
 			{ is_covered: false, start_line: 1, end_line: 3, total_lines: 3 },
 			{ is_covered: true, start_line: 4, end_line: 7, total_lines: 4 },
@@ -109,7 +119,12 @@ test.describe('comment coverage', () => {
 		let result = calculate_coverage(coverage)
 		let sheet = result.coverage_per_stylesheet.at(0)!
 		expect(
-			sheet.chunks.map(({ is_covered, start_line, end_line, total_lines }) => ({ is_covered, start_line, end_line, total_lines })),
+			sheet.chunks.map(({ is_covered, start_line, end_line, total_lines }) => ({
+				is_covered,
+				start_line,
+				end_line,
+				total_lines,
+			})),
 		).toEqual([
 			{ is_covered: true, start_line: 1, end_line: 4, total_lines: 4 },
 			{ is_covered: false, start_line: 5, end_line: 5, total_lines: 1 },
@@ -127,7 +142,12 @@ test.describe('comment coverage', () => {
 		let result = calculate_coverage(coverage)
 		let sheet = result.coverage_per_stylesheet.at(0)!
 		expect(
-			sheet.chunks.map(({ is_covered, start_line, end_line, total_lines }) => ({ is_covered, start_line, end_line, total_lines })),
+			sheet.chunks.map(({ is_covered, start_line, end_line, total_lines }) => ({
+				is_covered,
+				start_line,
+				end_line,
+				total_lines,
+			})),
 		).toEqual([
 			{ is_covered: true, start_line: 1, end_line: 4, total_lines: 4 },
 			{ is_covered: false, start_line: 5, end_line: 7, total_lines: 3 },
@@ -164,7 +184,13 @@ test.describe('@rules', () => {
 		let result = calculate_coverage(coverage)
 		let sheet = result.coverage_per_stylesheet.at(0)!
 
-		expect(sheet.chunks.map(({ is_covered, start_line, total_lines }) => ({ is_covered, start_line, total_lines }))).toEqual([
+		expect(
+			sheet.chunks.map(({ is_covered, start_line, total_lines }) => ({
+				is_covered,
+				start_line,
+				total_lines,
+			})),
+		).toEqual([
 			{ is_covered: true, start_line: 1, total_lines: 6 },
 			{ is_covered: false, start_line: 7, total_lines: 3 },
 		])
@@ -187,7 +213,12 @@ test.describe('@rules', () => {
 		let sheet = result.coverage_per_stylesheet.at(0)!
 
 		expect(
-			sheet.chunks.map(({ is_covered, start_line, end_line, total_lines }) => ({ is_covered, start_line, end_line, total_lines })),
+			sheet.chunks.map(({ is_covered, start_line, end_line, total_lines }) => ({
+				is_covered,
+				start_line,
+				end_line,
+				total_lines,
+			})),
 		).toEqual([
 			{ is_covered: false, start_line: 1, end_line: 3, total_lines: 3 },
 			{ is_covered: true, start_line: 4, end_line: 10, total_lines: 7 },
@@ -215,7 +246,12 @@ test.describe('@rules', () => {
 		let sheet = result.coverage_per_stylesheet.at(0)!
 
 		expect(
-			sheet.chunks.map(({ is_covered, start_line, end_line, total_lines }) => ({ is_covered, start_line, end_line, total_lines })),
+			sheet.chunks.map(({ is_covered, start_line, end_line, total_lines }) => ({
+				is_covered,
+				start_line,
+				end_line,
+				total_lines,
+			})),
 		).toEqual([
 			{ is_covered: false, start_line: 1, end_line: 3, total_lines: 3 },
 			{ is_covered: true, start_line: 4, end_line: 9, total_lines: 6 },
@@ -256,10 +292,18 @@ test.describe('Wallace mega soverage suite', () => {
 		let sheet = result.coverage_per_stylesheet.find((s) => s.url.includes('Meter'))!
 		expect.soft(sheet.line_coverage_ratio).not.toBe(1)
 		expect.soft(sheet.total_lines).toBe(35)
-		expect.soft(sheet.chunks.map(({ is_covered, start_line, end_line }) => ({ is_covered, start_line, end_line }))).toEqual([
-			{ is_covered: true, start_line: 1, end_line: 22 },
-			{ is_covered: false, start_line: 23, end_line: 35 },
-		])
+		expect
+			.soft(
+				sheet.chunks.map(({ is_covered, start_line, end_line }) => ({
+					is_covered,
+					start_line,
+					end_line,
+				})),
+			)
+			.toEqual([
+				{ is_covered: true, start_line: 1, end_line: 22 },
+				{ is_covered: false, start_line: 23, end_line: 35 },
+			])
 	})
 
 	test('Container has partial coverage', () => {
@@ -268,11 +312,19 @@ test.describe('Wallace mega soverage suite', () => {
 		expect.soft(sheet.line_coverage_ratio).not.toBe(1)
 		expect.soft(sheet.total_lines).toBe(44)
 		expect.soft(sheet.uncovered_lines).toBe(3)
-		expect.soft(sheet.chunks.map(({ is_covered, start_line, end_line }) => ({ is_covered, start_line, end_line }))).toEqual([
-			{ is_covered: true, start_line: 1, end_line: 21 },
-			{ is_covered: false, start_line: 22, end_line: 24 },
-			{ is_covered: true, start_line: 25, end_line: 44 },
-		])
+		expect
+			.soft(
+				sheet.chunks.map(({ is_covered, start_line, end_line }) => ({
+					is_covered,
+					start_line,
+					end_line,
+				})),
+			)
+			.toEqual([
+				{ is_covered: true, start_line: 1, end_line: 21 },
+				{ is_covered: false, start_line: 22, end_line: 24 },
+				{ is_covered: true, start_line: 25, end_line: 44 },
+			])
 	})
 
 	test('Markdown has partial coverage', () => {
@@ -280,27 +332,39 @@ test.describe('Wallace mega soverage suite', () => {
 		let sheet = result.coverage_per_stylesheet.find((s) => s.url.includes('Markdown'))!
 		expect.soft(sheet.line_coverage_ratio).not.toBe(1)
 		expect.soft(sheet.total_lines).toBe(202)
-		expect.soft(sheet.chunks.filter((c) => !c.is_covered).map(({ start_line, end_line }) => ({ start_line, end_line }))).toEqual([
-			{ start_line: 26, end_line: 38 }, // .markdown h4
-			{ start_line: 154, end_line: 157 }, // .markdown img
-			{ start_line: 179, end_line: 197 }, // .markdown aside
-		])
+		expect
+			.soft(
+				sheet.chunks
+					.filter((c) => !c.is_covered)
+					.map(({ start_line, end_line }) => ({ start_line, end_line })),
+			)
+			.toEqual([
+				{ start_line: 26, end_line: 38 }, // .markdown h4
+				{ start_line: 154, end_line: 157 }, // .markdown img
+				{ start_line: 179, end_line: 197 }, // .markdown aside
+			])
 	})
 
 	// This was a notoriously difficult one to fix
 	test('main sheet has partial coverage', () => {
 		let result = calculate_coverage(coverage)
 		let sheet = result.coverage_per_stylesheet.find((s) => s.url.endsWith('0.RC2DzJv0.css'))!
-		expect.soft(sheet.chunks.filter((c) => !c.is_covered).map(({ start_line, end_line }) => ({ start_line, end_line }))).toEqual([
-			{ start_line: 77, end_line: 81 }, // @media print { .nav-list.svelte-1h32yp1
-			{ start_line: 127, end_line: 130 }, // .nav-popover-trigger.svelte-1h32yp1.invisible
-			{ start_line: 146, end_line: 152 }, // @supports not (right: anchor(end)) { .nav-popover
-			{ start_line: 171, end_line: 173 }, // .popover-item.svelte-1h32yp1[aria-current=\"page\"]:hover
-			{ start_line: 198, end_line: 202 }, // @media print { .footer.svelte-jz8lnl
-			{ start_line: 275, end_line: 277 }, // .shortcut.svelte-1c8nzn6:hover
-			{ start_line: 296, end_line: 298 }, // .cmd-k.svelte-1ux7hi0:focus-visible
-			{ start_line: 1286, end_line: 1288 }, // .theme-popover-trigger.svelte-mls84d:focus-visible
-			{ start_line: 1313, end_line: 1319 }, // @supports not (right: anchor(end)) { .theme-popover.svelte-mls84d
-		])
+		expect
+			.soft(
+				sheet.chunks
+					.filter((c) => !c.is_covered)
+					.map(({ start_line, end_line }) => ({ start_line, end_line })),
+			)
+			.toEqual([
+				{ start_line: 77, end_line: 81 }, // @media print { .nav-list.svelte-1h32yp1
+				{ start_line: 127, end_line: 130 }, // .nav-popover-trigger.svelte-1h32yp1.invisible
+				{ start_line: 146, end_line: 152 }, // @supports not (right: anchor(end)) { .nav-popover
+				{ start_line: 171, end_line: 173 }, // .popover-item.svelte-1h32yp1[aria-current=\"page\"]:hover
+				{ start_line: 198, end_line: 202 }, // @media print { .footer.svelte-jz8lnl
+				{ start_line: 275, end_line: 277 }, // .shortcut.svelte-1c8nzn6:hover
+				{ start_line: 296, end_line: 298 }, // .cmd-k.svelte-1ux7hi0:focus-visible
+				{ start_line: 1286, end_line: 1288 }, // .theme-popover-trigger.svelte-mls84d:focus-visible
+				{ start_line: 1313, end_line: 1319 }, // @supports not (right: anchor(end)) { .theme-popover.svelte-mls84d
+			])
 	})
 })

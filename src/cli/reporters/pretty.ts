@@ -42,12 +42,21 @@ function highlight(css: string, styleText: StyleTextFn): string {
 		let name = css.slice(0, space_pos)
 		let is_empty = css.endsWith('{}')
 		let prelude = css.slice(space_pos, is_empty ? -2 : -1)
-		return [styleText('blueBright', name), styleText('magentaBright', prelude), is_empty ? '{}' : '{'].join('')
+		return [
+			styleText('blueBright', name),
+			styleText('magentaBright', prelude),
+			is_empty ? '{}' : '{',
+		].join('')
 	}
 
 	// declaration
 	if (css.includes(':') && css.endsWith(';')) {
-		return [styleText('cyanBright', css.slice(0, css.indexOf(':'))), ':', css.slice(css.indexOf(':') + 1, css.length - 1), ';'].join('')
+		return [
+			styleText('cyanBright', css.slice(0, css.indexOf(':'))),
+			':',
+			css.slice(css.indexOf(':') + 1, css.length - 1),
+			';',
+		].join('')
 	}
 
 	// Empty rule
@@ -74,11 +83,17 @@ function highlight(css: string, styleText: StyleTextFn): string {
 	return [styleText('greenBright', css.slice(0, -1)), '{'].join('')
 }
 
-export function print_lines({ report, context }: Report, params: CliArguments, { styleText, print_width }: PrintLinesDependencies) {
+export function print_lines(
+	{ report, context }: Report,
+	params: CliArguments,
+	{ styleText, print_width }: PrintLinesDependencies,
+) {
 	let output: (string | undefined)[] = []
 
 	if (report.min_line_coverage.ok) {
-		output.push(`${styleText(['bold', 'green'], 'Success')}: total line coverage is ${percentage(report.min_line_coverage.actual)}`)
+		output.push(
+			`${styleText(['bold', 'green'], 'Success')}: total line coverage is ${percentage(report.min_line_coverage.actual)}`,
+		)
 	} else {
 		let { actual, expected } = report.min_line_coverage
 		output.push(
@@ -95,9 +110,13 @@ export function print_lines({ report, context }: Report, params: CliArguments, {
 	if (report.min_file_line_coverage.expected !== undefined) {
 		let { expected, actual, ok } = report.min_file_line_coverage
 		if (ok) {
-			output.push(`${styleText(['bold', 'green'], 'Success')}: all files pass minimum line coverage of ${percentage(expected)}`)
+			output.push(
+				`${styleText(['bold', 'green'], 'Success')}: all files pass minimum line coverage of ${percentage(expected)}`,
+			)
 		} else {
-			let num_files_failed = context.coverage.coverage_per_stylesheet.filter((sheet) => sheet.line_coverage_ratio < expected!).length
+			let num_files_failed = context.coverage.coverage_per_stylesheet.filter(
+				(sheet) => sheet.line_coverage_ratio < expected!,
+			).length
 			output.push(
 				`${styleText(['bold', 'red'], 'Failed')}: ${num_files_failed} ${
 					num_files_failed === 1 ? 'file does' : 'files do'
@@ -119,7 +138,9 @@ export function print_lines({ report, context }: Report, params: CliArguments, {
 		// Show empty line between report header and chunks output
 		output.push()
 
-		for (let sheet of context.coverage.coverage_per_stylesheet.sort((a, b) => a.line_coverage_ratio - b.line_coverage_ratio)) {
+		for (let sheet of context.coverage.coverage_per_stylesheet.sort(
+			(a, b) => a.line_coverage_ratio - b.line_coverage_ratio,
+		)) {
 			if (
 				(sheet.line_coverage_ratio !== 1 && params['show-uncovered'] === 'all') ||
 				(min_file_line_coverage !== undefined &&
@@ -130,9 +151,15 @@ export function print_lines({ report, context }: Report, params: CliArguments, {
 				output.push()
 				output.push(styleText('dim', '─'.repeat(print_width)))
 				output.push(`File: ${sheet.url}`)
-				output.push(`Coverage: ${percentage(sheet.line_coverage_ratio)}, ${sheet.covered_lines}/${sheet.total_lines} lines covered`)
+				output.push(
+					`Coverage: ${percentage(sheet.line_coverage_ratio)}, ${sheet.covered_lines}/${sheet.total_lines} lines covered`,
+				)
 
-				if (min_file_line_coverage && min_file_line_coverage !== 0 && sheet.line_coverage_ratio < min_file_line_coverage) {
+				if (
+					min_file_line_coverage &&
+					min_file_line_coverage !== 0 &&
+					sheet.line_coverage_ratio < min_file_line_coverage
+				) {
 					let lines_to_cover = min_file_line_coverage * sheet.total_lines - sheet.covered_lines
 					output.push(
 						`Tip: cover ${Math.ceil(lines_to_cover)} more ${
@@ -146,16 +173,38 @@ export function print_lines({ report, context }: Report, params: CliArguments, {
 
 				for (let chunk of sheet.chunks.filter((chunk) => !chunk.is_covered)) {
 					// Render N leading lines
-					for (let x = Math.max(chunk.start_line - NUM_LEADING_LINES, 1); x < chunk.start_line; x++) {
-						output.push([' ', styleText('dim', line_number(x)), styleText('dim', indent(lines[x - 1]))].join(''))
+					for (
+						let x = Math.max(chunk.start_line - NUM_LEADING_LINES, 1);
+						x < chunk.start_line;
+						x++
+					) {
+						output.push(
+							[' ', styleText('dim', line_number(x)), styleText('dim', indent(lines[x - 1]))].join(
+								'',
+							),
+						)
 					}
 					// Render the uncovered chunk
 					for (let i = chunk.start_line; i <= chunk.end_line; i++) {
-						output.push([styleText('red', '▌'), styleText('dim', line_number(i)), highlight(indent(lines[i - 1]), styleText)].join(''))
+						output.push(
+							[
+								styleText('red', '▌'),
+								styleText('dim', line_number(i)),
+								highlight(indent(lines[i - 1]), styleText),
+							].join(''),
+						)
 					}
 					// Render N trailing lines
-					for (let y = chunk.end_line + 1; y < Math.min(chunk.end_line + NUM_TRAILING_LINES + 1, lines.length); y++) {
-						output.push([' ', styleText('dim', line_number(y)), styleText('dim', indent(lines[y - 1]))].join(''))
+					for (
+						let y = chunk.end_line + 1;
+						y < Math.min(chunk.end_line + NUM_TRAILING_LINES + 1, lines.length);
+						y++
+					) {
+						output.push(
+							[' ', styleText('dim', line_number(y)), styleText('dim', indent(lines[y - 1]))].join(
+								'',
+							),
+						)
 					}
 					// Show empty line between blocks
 					output.push('')
@@ -170,7 +219,10 @@ export function print_lines({ report, context }: Report, params: CliArguments, {
 export function print(report: Report, params: CliArguments): void {
 	let logger = report.report.ok ? console.log : console.error
 
-	for (let line of print_lines(report, params, { styleText, print_width: process.stdout.columns })) {
+	for (let line of print_lines(report, params, {
+		styleText,
+		print_width: process.stdout.columns,
+	})) {
 		logger(line)
 	}
 }

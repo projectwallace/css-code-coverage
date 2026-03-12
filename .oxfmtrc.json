@@ -1,7 +1,6 @@
 {
 	"useTabs": true,
 	"singleQuote": true,
-	"trailingComma": "all",
 	"semi": false,
-	"printWidth": 140
+	"ignorePatterns": ["src/lib/test/fixtures/**"]
 }

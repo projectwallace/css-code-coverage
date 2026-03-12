@@ -9,7 +9,12 @@ import { print as json } from './reporters/json.js'
 import { help } from './help.js'
 
 async function cli(cli_args: string[]) {
-	if (!cli_args || cli_args.length === 0 || cli_args.includes('--help') || cli_args.includes('-h')) {
+	if (
+		!cli_args ||
+		cli_args.length === 0 ||
+		cli_args.includes('--help') ||
+		cli_args.includes('-h')
+	) {
 		return console.log(help())
 	}
 
