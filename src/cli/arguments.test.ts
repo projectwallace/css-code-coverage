@@ -19,11 +19,15 @@ test.describe('--coverage-dir', () => {
 	})
 
 	test('path traversal --coverage-dir=../../etc', () => {
-		expect(() => validate_arguments(parse_arguments([cov, '--coverage-dir=../../etc']))).toThrowError()
+		expect(() =>
+			validate_arguments(parse_arguments([cov, '--coverage-dir=../../etc'])),
+		).toThrowError()
 	})
 
 	test('path traversal --coverage-dir=../sibling', () => {
-		expect(() => validate_arguments(parse_arguments([cov, '--coverage-dir=../sibling']))).toThrowError()
+		expect(() =>
+			validate_arguments(parse_arguments([cov, '--coverage-dir=../sibling'])),
+		).toThrowError()
 	})
 })
 
