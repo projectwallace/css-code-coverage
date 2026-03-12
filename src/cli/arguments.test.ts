@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { resolve } from 'node:path'
 import { parse_arguments, validate_arguments } from './arguments'
 
 test.describe('--coverage-dir', () => {
@@ -12,9 +13,17 @@ test.describe('--coverage-dir', () => {
 		expect(() => validate_arguments(parse_arguments([cov, '--coverage-dir']))).toThrowError()
 	})
 
-	test('valid --coverage-dir=path/to/coverage', () => {
-		let result = validate_arguments(parse_arguments([cov, '--coverage-dir=/path/to/coverage']))
-		expect(result['coverage-dir']).toEqual('/path/to/coverage')
+	test('valid --coverage-dir=coverage', () => {
+		let result = validate_arguments(parse_arguments([cov, '--coverage-dir=coverage']))
+		expect(result['coverage-dir']).toEqual(resolve('coverage'))
+	})
+
+	test('path traversal --coverage-dir=../../etc', () => {
+		expect(() => validate_arguments(parse_arguments([cov, '--coverage-dir=../../etc']))).toThrowError()
+	})
+
+	test('path traversal --coverage-dir=../sibling', () => {
+		expect(() => validate_arguments(parse_arguments([cov, '--coverage-dir=../sibling']))).toThrowError()
 	})
 })
 
