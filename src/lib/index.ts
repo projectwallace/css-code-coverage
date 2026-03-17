@@ -79,10 +79,7 @@ export function calculate_coverage(coverage: Coverage[]): CoverageResult {
 		(acc, entry) => filter_coverage(acc, entry),
 		[],
 	)
-	let deduplicated: Coverage[] = filtered_coverage.reduce<Coverage[]>(
-		(entries, entry) => deduplicate_entries(entries.concat(entry)),
-		[],
-	)
+	let deduplicated: Coverage[] = deduplicate_entries(filtered_coverage)
 	let extended: Coverage[] = deduplicated.map((coverage) => extend_ranges(coverage))
 	let chunkified: ChunkedCoverage[] = extended.map((sheet) => chunkify(sheet))
 	let prettified: PrettifiedCoverage[] = chunkified.map((sheet) => prettify(sheet))
