@@ -57,6 +57,9 @@
 		"tsdown": "^0.21.2",
 		"typescript": "^5.9.3"
 	},
+	"overrides": {
+		"@projectwallace/css-parser": "$@projectwallace/css-parser"
+	},
 	"engines": {
 		"node": ">=20"
 	},
