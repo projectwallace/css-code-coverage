@@ -146,7 +146,7 @@ test('merges adjacent same-coverage chunks separated by whitespace-only gap', ()
 		//           ^12  ^14 — the \n\n gap is whitespace-only
 		ranges: [
 			{ start: 0, end: 12 },
-			{ start: 14, end: 26 },
+			{ start: 14, end: 27 },
 		],
 		url: 'https://example.com',
 	}
@@ -154,7 +154,7 @@ test('merges adjacent same-coverage chunks separated by whitespace-only gap', ()
 	delete coverage.ranges
 	expect(result).toEqual({
 		...coverage,
-		chunks: [{ start_offset: 0, end_offset: 26, is_covered: true }],
+		chunks: [{ start_offset: 0, end_offset: 27, is_covered: true }],
 	} satisfies ChunkedCoverage)
 })
 
