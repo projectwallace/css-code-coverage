@@ -21,3 +21,49 @@ test('simple range at end', () => {})
 test('atrule at start', () => {})
 test('atrule at middle', () => {})
 test('atrule at end', () => {})
+
+test('prettified.text is the formatted output, not the original', () => {
+	let original = 'a{color:red}'
+	let chunked = chunkify({
+		text: original,
+		ranges: [{ start: 0, end: original.length }],
+		url: 'https://example.com',
+	})
+	let result = prettify(chunked)
+
+	// The formatted output differs from the minified original
+	expect(result.text).not.toBe(original)
+	// It contains proper whitespace that was absent in the original
+	expect(result.text).toContain('color: red')
+})
+
+test('offsets in prettified result are based on formatted CSS length, not original byte positions', () => {
+	let original = 'a{color:red}'
+	let chunked = chunkify({
+		text: original,
+		ranges: [{ start: 0, end: original.length }],
+		url: 'https://example.com',
+	})
+	let result = prettify(chunked)
+	let chunk = result.chunks[0]
+
+	// The formatted CSS is longer than the original, so offsets must differ
+	expect(result.text.length).toBeGreaterThan(original.length)
+	expect(chunk.end_offset).toBeGreaterThan(original.length - 1)
+})
+
+test('offsets index into prettified.text and yield formatted CSS, not original CSS', () => {
+	let original = 'a{color:red}'
+	let chunked = chunkify({
+		text: original,
+		ranges: [{ start: 0, end: original.length }],
+		url: 'https://example.com',
+	})
+	let result = prettify(chunked)
+	let chunk = result.chunks[0]
+
+	// Substring with prettified offsets returns formatted CSS, not the original
+	let recovered = result.text.substring(chunk.start_offset, chunk.end_offset + 1)
+	expect(recovered).not.toBe(original)
+	expect(recovered).toContain('color: red')
+})
