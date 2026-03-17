@@ -17,7 +17,7 @@ export function prettify(stylesheet: ChunkedCoverage): PrettifiedCoverage {
 	let offset = 0
 
 	let pretty_chunks = stylesheet.chunks.map((chunk, index) => {
-		let chunk_css = stylesheet.text.substring(chunk.start_offset, chunk.end_offset - 1)
+		let chunk_css = stylesheet.text.substring(chunk.start_offset, chunk.end_offset)
 		let css = format(chunk_css).trim()
 
 		if (chunk.is_covered) {
