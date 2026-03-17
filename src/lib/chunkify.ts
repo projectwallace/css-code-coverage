@@ -78,7 +78,7 @@ export function chunkify(stylesheet: Coverage): ChunkedCoverage {
 	}
 
 	// fill up last chunk if necessary:
-	if (offset !== stylesheet.text.length - 1) {
+	if (offset < stylesheet.text.length) {
 		chunks.push({
 			start_offset: offset,
 			end_offset: stylesheet.text.length,
