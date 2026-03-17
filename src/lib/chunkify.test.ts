@@ -103,3 +103,36 @@ test('creates a single chunk when none is covered', () => {
 		],
 	} satisfies ChunkedCoverage)
 })
+
+test('includes a trailing uncovered chunk when the last byte is not covered', () => {
+	// text length = 4; range covers first 3 bytes, leaving the last byte uncovered
+	let coverage = {
+		text: 'abcd',
+		ranges: [{ start: 0, end: 3 }],
+		url: 'https://example.com',
+	}
+	let result = chunkify(coverage)
+	delete coverage.ranges
+	expect(result).toEqual({
+		...coverage,
+		chunks: [
+			{ start_offset: 0, end_offset: 3, is_covered: true },
+			{ start_offset: 3, end_offset: 4, is_covered: false },
+		],
+	} satisfies ChunkedCoverage)
+})
+
+test('does not emit a spurious empty chunk when the last byte is covered', () => {
+	// range covers the full text — no trailing chunk should appear
+	let coverage = {
+		text: 'abcd',
+		ranges: [{ start: 0, end: 4 }],
+		url: 'https://example.com',
+	}
+	let result = chunkify(coverage)
+	delete coverage.ranges
+	expect(result).toEqual({
+		...coverage,
+		chunks: [{ start_offset: 0, end_offset: 4, is_covered: true }],
+	} satisfies ChunkedCoverage)
+})
