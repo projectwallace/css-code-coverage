@@ -42,7 +42,7 @@
 	},
 	"dependencies": {
 		"@projectwallace/css-parser": "^0.13.8",
-		"@projectwallace/format-css": "^2.2.0"
+		"@projectwallace/format-css": "^2.2.6"
 	},
 	"devDependencies": {
 		"@codecov/vite-plugin": "^1.9.1",
