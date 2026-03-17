@@ -70,7 +70,7 @@ export function parse_arguments(args: string[]): CliArguments {
 	}
 
 	return {
-		'coverage-dir': resolve(coverage_dir),
+		'coverage-dir': resolve(coverage_dir!),
 		'min-coverage': min_coverage,
 		'min-file-coverage': min_file_coverage,
 		'show-uncovered': show_uncovered,
