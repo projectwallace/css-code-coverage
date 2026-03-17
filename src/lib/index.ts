@@ -3,7 +3,7 @@ import { prettify, type PrettifiedChunk, type PrettifiedCoverage } from './prett
 import { deduplicate_entries } from './decuplicate.js'
 import { filter_coverage } from './filter-entries.js'
 import { extend_ranges } from './extend-ranges.js'
-import { chunkify, type ChunkedCoverage } from './chunkify.js'
+import { chunkify, mark_comments_as_covered, type ChunkedCoverage } from './chunkify.js'
 
 export type CoverageData = {
 	uncovered_bytes: number
@@ -81,7 +81,9 @@ export function calculate_coverage(coverage: Coverage[]): CoverageResult {
 	)
 	let deduplicated: Coverage[] = deduplicate_entries(filtered_coverage)
 	let extended: Coverage[] = deduplicated.map((coverage) => extend_ranges(coverage))
-	let chunkified: ChunkedCoverage[] = extended.map((sheet) => chunkify(sheet))
+	let chunkified: ChunkedCoverage[] = extended.map((sheet) =>
+		mark_comments_as_covered(chunkify(sheet)),
+	)
 	let prettified: PrettifiedCoverage[] = chunkified.map((sheet) => prettify(sheet))
 	let coverage_per_stylesheet = prettified.map((stylesheet) =>
 		calculate_stylesheet_coverage(stylesheet),

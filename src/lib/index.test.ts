@@ -30,12 +30,12 @@ test.describe('from <style> tag', () => {
 		let result = calculate_coverage(coverage)
 		expect.soft(result.total_files_found).toBe(1)
 		expect.soft(result.total_bytes).toBe(76)
-		expect.soft(result.covered_bytes).toBe(39)
-		expect.soft(result.uncovered_bytes).toBe(37)
+		expect.soft(result.covered_bytes).toBe(57)
+		expect.soft(result.uncovered_bytes).toBe(19)
 		expect.soft(result.total_lines).toBe(12)
-		expect.soft(result.covered_lines).toBe(8)
-		expect.soft(result.uncovered_lines).toBe(4)
-		expect.soft(result.line_coverage_ratio).toBe(8 / 12)
+		expect.soft(result.covered_lines).toBe(9)
+		expect.soft(result.uncovered_lines).toBe(3)
+		expect.soft(result.line_coverage_ratio).toBe(9 / 12)
 		expect.soft(result.total_stylesheets).toBe(1)
 	})
 
@@ -44,9 +44,9 @@ test.describe('from <style> tag', () => {
 		let sheet = result.coverage_per_stylesheet.at(0)!
 		expect.soft(sheet.url).toBe('http://localhost/test.html')
 		expect.soft(sheet.total_lines).toBe(12)
-		expect.soft(sheet.covered_lines).toBe(8)
-		expect.soft(sheet.uncovered_lines).toBe(4)
-		expect.soft(sheet.line_coverage_ratio).toBe(8 / 12)
+		expect.soft(sheet.covered_lines).toBe(9)
+		expect.soft(sheet.uncovered_lines).toBe(3)
+		expect.soft(sheet.line_coverage_ratio).toBe(9 / 12)
 	})
 })
 
@@ -82,20 +82,20 @@ test.describe('from <link rel="stylesheet">', () => {
 		let result = calculate_coverage(coverage)
 		expect.soft(result.total_files_found).toBe(1)
 		expect.soft(result.total_bytes).toBe(170)
-		expect.soft(result.covered_bytes).toBe(96)
-		expect.soft(result.uncovered_bytes).toBe(74)
+		expect.soft(result.covered_bytes).toBe(132)
+		expect.soft(result.uncovered_bytes).toBe(38)
 		expect.soft(result.total_lines).toBe(23)
-		expect.soft(result.covered_lines).toBe(15)
-		expect.soft(result.uncovered_lines).toBe(8)
-		expect.soft(result.line_coverage_ratio).toBe(15 / 23)
+		expect.soft(result.covered_lines).toBe(17)
+		expect.soft(result.uncovered_lines).toBe(6)
+		expect.soft(result.line_coverage_ratio).toBe(17 / 23)
 		expect.soft(result.total_stylesheets).toBe(1)
 	})
 
 	test('calculates stats per stylesheet', () => {
 		let result = calculate_coverage(coverage)
 		let sheet = result.coverage_per_stylesheet.at(0)!
-		expect.soft(sheet.covered_lines).toBe(15)
-		expect.soft(sheet.uncovered_lines).toBe(8)
+		expect.soft(sheet.covered_lines).toBe(17)
+		expect.soft(sheet.uncovered_lines).toBe(6)
 		expect.soft(sheet.total_lines).toBe(23)
 		expect.soft(sheet.url).toEqual('http://localhost/style.css')
 		expect
@@ -108,10 +108,10 @@ test.describe('from <link rel="stylesheet">', () => {
 			)
 			.toEqual([
 				{ is_covered: true, start_line: 1, end_line: 4 },
-				{ is_covered: false, start_line: 5, end_line: 8 },
-				{ is_covered: true, start_line: 9, end_line: 13 },
-				{ is_covered: false, start_line: 14, end_line: 17 },
-				{ is_covered: true, start_line: 18, end_line: 23 },
+				{ is_covered: false, start_line: 5, end_line: 7 },
+				{ is_covered: true, start_line: 8, end_line: 13 },
+				{ is_covered: false, start_line: 14, end_line: 16 },
+				{ is_covered: true, start_line: 17, end_line: 23 },
 			])
 	})
 })
@@ -146,8 +146,8 @@ test.describe('from coverage data downloaded directly from the browser as JSON',
 
 	test('counts totals', () => {
 		let result = calculate_coverage(coverage)
-		expect.soft(result.covered_lines).toBe(11)
-		expect.soft(result.uncovered_lines).toBe(4)
+		expect.soft(result.covered_lines).toBe(12)
+		expect.soft(result.uncovered_lines).toBe(3)
 		expect.soft(result.total_lines).toBe(15)
 		expect.soft(result.total_stylesheets).toBe(1)
 	})
@@ -159,8 +159,8 @@ test.describe('from coverage data downloaded directly from the browser as JSON',
 	color: blue;
 	font-size: 24px;
 }
-
 /* not covered */
+
 p {
 	color: red;
 }
@@ -184,8 +184,8 @@ p {
 				total_lines,
 			})),
 		).toEqual([
-			{ is_covered: true, start_line: 1, end_line: 5, total_lines: 5 },
-			{ is_covered: false, start_line: 6, end_line: 9, total_lines: 4 },
+			{ is_covered: true, start_line: 1, end_line: 6, total_lines: 6 },
+			{ is_covered: false, start_line: 7, end_line: 9, total_lines: 3 },
 			{ is_covered: true, start_line: 10, end_line: 15, total_lines: 6 },
 		])
 	})
