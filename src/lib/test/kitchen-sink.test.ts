@@ -66,7 +66,7 @@ test.describe('comment coverage', () => {
 			</html>
 		`
 
-	test('leading line comment is marked as uncovered', async () => {
+	test('leading line comment is marked as covered', async () => {
 		let css = `
 			/* start comment */
 			h1 { color: blue; }
@@ -81,13 +81,10 @@ test.describe('comment coverage', () => {
 				end_line,
 				total_lines,
 			})),
-		).toEqual([
-			{ is_covered: false, start_line: 1, end_line: 1, total_lines: 1 },
-			{ is_covered: true, start_line: 2, end_line: 5, total_lines: 4 },
-		])
+		).toEqual([{ is_covered: true, start_line: 1, end_line: 4, total_lines: 4 }])
 	})
 
-	test('leading block comment is marked as uncovered', async () => {
+	test('leading block comment is marked as covered', async () => {
 		let css = `
 			/*
 			  start comment
@@ -104,13 +101,10 @@ test.describe('comment coverage', () => {
 				end_line,
 				total_lines,
 			})),
-		).toEqual([
-			{ is_covered: false, start_line: 1, end_line: 3, total_lines: 3 },
-			{ is_covered: true, start_line: 4, end_line: 7, total_lines: 4 },
-		])
+		).toEqual([{ is_covered: true, start_line: 1, end_line: 6, total_lines: 6 }])
 	})
 
-	test('trailing line comment is marked as uncovered', async () => {
+	test('trailing line comment is marked as covered', async () => {
 		let css = `
 			h1 { color: blue; }
 			/* start comment */
@@ -125,13 +119,10 @@ test.describe('comment coverage', () => {
 				end_line,
 				total_lines,
 			})),
-		).toEqual([
-			{ is_covered: true, start_line: 1, end_line: 4, total_lines: 4 },
-			{ is_covered: false, start_line: 5, end_line: 5, total_lines: 1 },
-		])
+		).toEqual([{ is_covered: true, start_line: 1, end_line: 4, total_lines: 4 }])
 	})
 
-	test('trailing block comment is marked as uncovered', async () => {
+	test('trailing block comment is marked as covered', async () => {
 		let css = `
 			h1 { color: blue; }
 			/*
@@ -148,10 +139,58 @@ test.describe('comment coverage', () => {
 				end_line,
 				total_lines,
 			})),
+		).toEqual([{ is_covered: true, start_line: 1, end_line: 6, total_lines: 6 }])
+	})
+
+	test('comment between covered and uncovered rule is marked as covered', async () => {
+		let css = `
+			h1 { color: blue; }
+			/* middle comment */
+			h2 { color: red; }
+		`
+		let coverage = (await generate_coverage(html, { link_css: css })) as Coverage[]
+		let result = calculate_coverage(coverage)
+		let sheet = result.coverage_per_stylesheet.at(0)!
+		expect(
+			sheet.chunks.map(({ is_covered, start_line, end_line, total_lines }) => ({
+				is_covered,
+				start_line,
+				end_line,
+				total_lines,
+			})),
 		).toEqual([
-			{ is_covered: true, start_line: 1, end_line: 4, total_lines: 4 },
-			{ is_covered: false, start_line: 5, end_line: 7, total_lines: 3 },
+			{ is_covered: true, start_line: 1, end_line: 5, total_lines: 5 },
+			{ is_covered: false, start_line: 6, end_line: 8, total_lines: 3 },
 		])
+	})
+
+	test('multiple adjacent comments are each marked as covered', async () => {
+		let css = `
+			/* first comment */
+			/* second comment */
+			h1 { color: blue; }
+		`
+		let coverage = (await generate_coverage(html, { link_css: css })) as Coverage[]
+		let result = calculate_coverage(coverage)
+		let sheet = result.coverage_per_stylesheet.at(0)!
+		expect(
+			sheet.chunks.map(({ is_covered, start_line, end_line, total_lines }) => ({
+				is_covered,
+				start_line,
+				end_line,
+				total_lines,
+			})),
+		).toEqual([{ is_covered: true, start_line: 1, end_line: 5, total_lines: 5 }])
+	})
+
+	test('stylesheet with only comments is fully covered', async () => {
+		let css = `
+			/* just a comment */
+		`
+		let coverage = (await generate_coverage(html, { link_css: css })) as Coverage[]
+		let result = calculate_coverage(coverage)
+		let sheet = result.coverage_per_stylesheet.at(0)!
+		expect(sheet.chunks.every(({ is_covered }) => is_covered)).toBe(true)
 	})
 })
 

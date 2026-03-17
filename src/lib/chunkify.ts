@@ -1,3 +1,4 @@
+import { tokenize } from '@projectwallace/css-parser/tokenizer'
 import type { Coverage } from './parse-coverage'
 
 type Chunk = {
@@ -49,6 +50,56 @@ function merge(stylesheet: ChunkedCoverage): ChunkedCoverage {
 		...stylesheet,
 		chunks: new_chunks,
 	}
+}
+
+export function mark_comments_as_covered(stylesheet: ChunkedCoverage): ChunkedCoverage {
+	let new_chunks: Chunk[] = []
+
+	for (let chunk of stylesheet.chunks) {
+		if (chunk.is_covered) {
+			new_chunks.push(chunk)
+			continue
+		}
+
+		let text = stylesheet.text.slice(chunk.start_offset, chunk.end_offset)
+		let comments: Array<{ start: number; end: number }> = []
+
+		for (const _ of tokenize(text, ({ start, end }) => comments.push({ start, end }))) {
+			// consume the generator to drive the on_comment callback
+		}
+
+		if (comments.length === 0) {
+			new_chunks.push(chunk)
+			continue
+		}
+
+		let last_end = 0
+		for (let comment of comments) {
+			if (comment.start > last_end) {
+				new_chunks.push({
+					start_offset: chunk.start_offset + last_end,
+					end_offset: chunk.start_offset + comment.start,
+					is_covered: false,
+				})
+			}
+			new_chunks.push({
+				start_offset: chunk.start_offset + comment.start,
+				end_offset: chunk.start_offset + comment.end,
+				is_covered: true,
+			})
+			last_end = comment.end
+		}
+
+		if (last_end < text.length) {
+			new_chunks.push({
+				start_offset: chunk.start_offset + last_end,
+				end_offset: chunk.end_offset,
+				is_covered: false,
+			})
+		}
+	}
+
+	return merge({ ...stylesheet, chunks: new_chunks })
 }
 
 export function chunkify(stylesheet: Coverage): ChunkedCoverage {
