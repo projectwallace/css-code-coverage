@@ -136,3 +136,40 @@ test('does not emit a spurious empty chunk when the last byte is covered', () =>
 		chunks: [{ start_offset: 0, end_offset: 4, is_covered: true }],
 	} satisfies ChunkedCoverage)
 })
+
+test('merges adjacent same-coverage chunks separated by whitespace-only gap', () => {
+	// The whitespace-only uncovered chunk between two covered chunks should be
+	// absorbed so the two covered chunks merge into one. This is handled by the
+	// early `continue` at the top of merge(), not the else-if branch.
+	let coverage = {
+		text: 'a{color:red}\n\nb{color:blue}',
+		//           ^12  ^14 — the \n\n gap is whitespace-only
+		ranges: [
+			{ start: 0, end: 12 },
+			{ start: 14, end: 26 },
+		],
+		url: 'https://example.com',
+	}
+	let result = chunkify(coverage)
+	delete coverage.ranges
+	expect(result).toEqual({
+		...coverage,
+		chunks: [{ start_offset: 0, end_offset: 26, is_covered: true }],
+	} satisfies ChunkedCoverage)
+})
+
+test('absorbs a zero-length covered chunk into the surrounding uncovered chunk', () => {
+	// A zero-length range (start === end) produces an empty chunk.
+	// The empty chunk should not appear in the output.
+	let coverage = {
+		text: 'a{color:red}',
+		ranges: [{ start: 5, end: 5 }],
+		url: 'https://example.com',
+	}
+	let result = chunkify(coverage)
+	delete coverage.ranges
+	expect(result).toEqual({
+		...coverage,
+		chunks: [{ start_offset: 0, end_offset: 12, is_covered: false }],
+	} satisfies ChunkedCoverage)
+})
