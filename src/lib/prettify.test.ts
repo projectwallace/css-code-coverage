@@ -7,7 +7,7 @@ test('includes the last character of each chunk', () => {
 	// With the off-by-one bug (end_offset - 1) it would be silently dropped.
 	let chunked = chunkify({
 		text: 'a{color:red}',
-		ranges: [{ start: 0, end: 12 }],
+		ranges: [{ start: 0, end: 12, count: 1 }],
 		url: 'https://example.com',
 	})
 	let result = prettify(chunked)
@@ -26,7 +26,7 @@ test('prettified.text is the formatted output, not the original', () => {
 	let original = 'a{color:red}'
 	let chunked = chunkify({
 		text: original,
-		ranges: [{ start: 0, end: original.length }],
+		ranges: [{ start: 0, end: original.length, count: 1 }],
 		url: 'https://example.com',
 	})
 	let result = prettify(chunked)
@@ -41,7 +41,7 @@ test('offsets in prettified result are based on formatted CSS length, not origin
 	let original = 'a{color:red}'
 	let chunked = chunkify({
 		text: original,
-		ranges: [{ start: 0, end: original.length }],
+		ranges: [{ start: 0, end: original.length, count: 1 }],
 		url: 'https://example.com',
 	})
 	let result = prettify(chunked)
@@ -56,7 +56,7 @@ test('offsets index into prettified.text and yield formatted CSS, not original C
 	let original = 'a{color:red}'
 	let chunked = chunkify({
 		text: original,
-		ranges: [{ start: 0, end: original.length }],
+		ranges: [{ start: 0, end: original.length, count: 1 }],
 		url: 'https://example.com',
 	})
 	let result = prettify(chunked)

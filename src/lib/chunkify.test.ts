@@ -5,8 +5,8 @@ test('creates chunks with outer chunks covered', () => {
 	let coverage = {
 		text: 'a { color: red; } b { color: green; } c { color: blue; }',
 		ranges: [
-			{ start: 0, end: 17 },
-			{ start: 38, end: 56 },
+			{ start: 0, end: 17, count: 1 },
+			{ start: 38, end: 56, count: 1 },
 		],
 		url: 'https://example.com',
 	}
@@ -19,16 +19,19 @@ test('creates chunks with outer chunks covered', () => {
 				start_offset: 0,
 				end_offset: 17,
 				is_covered: true,
+				coverage_count: 1,
 			},
 			{
 				start_offset: 17,
 				end_offset: 38,
 				is_covered: false,
+				coverage_count: 0,
 			},
 			{
 				start_offset: 38,
 				end_offset: 56,
 				is_covered: true,
+				coverage_count: 1,
 			},
 		],
 	} satisfies ChunkedCoverage)
@@ -37,7 +40,7 @@ test('creates chunks with outer chunks covered', () => {
 test('creates chunks with only middle chunk covered', () => {
 	let coverage = {
 		text: 'a { color: red; } b { color: green; } c { color: blue; }',
-		ranges: [{ start: 17, end: 38 }],
+		ranges: [{ start: 17, end: 38, count: 1 }],
 		url: 'https://example.com',
 	}
 	let result = chunkify(coverage)
@@ -49,16 +52,19 @@ test('creates chunks with only middle chunk covered', () => {
 				start_offset: 0,
 				end_offset: 17,
 				is_covered: false,
+				coverage_count: 0,
 			},
 			{
 				start_offset: 17,
 				end_offset: 38,
 				is_covered: true,
+				coverage_count: 1,
 			},
 			{
 				start_offset: 38,
 				end_offset: 56,
 				is_covered: false,
+				coverage_count: 0,
 			},
 		],
 	} satisfies ChunkedCoverage)
@@ -67,7 +73,7 @@ test('creates chunks with only middle chunk covered', () => {
 test('creates a single chunk when all is covered', () => {
 	let coverage = {
 		text: 'a { color: red; } b { color: green; } c { color: blue; }',
-		ranges: [{ start: 0, end: 56 }],
+		ranges: [{ start: 0, end: 56, count: 1 }],
 		url: 'https://example.com',
 	}
 	let result = chunkify(coverage)
@@ -79,6 +85,7 @@ test('creates a single chunk when all is covered', () => {
 				start_offset: 0,
 				end_offset: 56,
 				is_covered: true,
+				coverage_count: 1,
 			},
 		],
 	} satisfies ChunkedCoverage)
@@ -99,6 +106,7 @@ test('creates a single chunk when none is covered', () => {
 				start_offset: 0,
 				end_offset: 56,
 				is_covered: false,
+				coverage_count: 0,
 			},
 		],
 	} satisfies ChunkedCoverage)
@@ -108,7 +116,7 @@ test('includes a trailing uncovered chunk when the last byte is not covered', ()
 	// text length = 4; range covers first 3 bytes, leaving the last byte uncovered
 	let coverage = {
 		text: 'abcd',
-		ranges: [{ start: 0, end: 3 }],
+		ranges: [{ start: 0, end: 3, count: 1 }],
 		url: 'https://example.com',
 	}
 	let result = chunkify(coverage)
@@ -116,8 +124,8 @@ test('includes a trailing uncovered chunk when the last byte is not covered', ()
 	expect(result).toEqual({
 		...coverage,
 		chunks: [
-			{ start_offset: 0, end_offset: 3, is_covered: true },
-			{ start_offset: 3, end_offset: 4, is_covered: false },
+			{ start_offset: 0, end_offset: 3, is_covered: true, coverage_count: 1 },
+			{ start_offset: 3, end_offset: 4, is_covered: false, coverage_count: 0 },
 		],
 	} satisfies ChunkedCoverage)
 })
@@ -126,14 +134,14 @@ test('does not emit a spurious empty chunk when the last byte is covered', () =>
 	// range covers the full text — no trailing chunk should appear
 	let coverage = {
 		text: 'abcd',
-		ranges: [{ start: 0, end: 4 }],
+		ranges: [{ start: 0, end: 4, count: 1 }],
 		url: 'https://example.com',
 	}
 	let result = chunkify(coverage)
 	delete coverage.ranges
 	expect(result).toEqual({
 		...coverage,
-		chunks: [{ start_offset: 0, end_offset: 4, is_covered: true }],
+		chunks: [{ start_offset: 0, end_offset: 4, is_covered: true, coverage_count: 1 }],
 	} satisfies ChunkedCoverage)
 })
 
@@ -145,8 +153,8 @@ test('merges adjacent same-coverage chunks separated by whitespace-only gap', ()
 		text: 'a{color:red}\n\nb{color:blue}',
 		//           ^12  ^14 — the \n\n gap is whitespace-only
 		ranges: [
-			{ start: 0, end: 12 },
-			{ start: 14, end: 27 },
+			{ start: 0, end: 12, count: 1 },
+			{ start: 14, end: 27, count: 1 },
 		],
 		url: 'https://example.com',
 	}
@@ -154,7 +162,7 @@ test('merges adjacent same-coverage chunks separated by whitespace-only gap', ()
 	delete coverage.ranges
 	expect(result).toEqual({
 		...coverage,
-		chunks: [{ start_offset: 0, end_offset: 27, is_covered: true }],
+		chunks: [{ start_offset: 0, end_offset: 27, is_covered: true, coverage_count: 1 }],
 	} satisfies ChunkedCoverage)
 })
 
@@ -163,13 +171,30 @@ test('absorbs a zero-length covered chunk into the surrounding uncovered chunk',
 	// The empty chunk should not appear in the output.
 	let coverage = {
 		text: 'a{color:red}',
-		ranges: [{ start: 5, end: 5 }],
+		ranges: [{ start: 5, end: 5, count: 1 }],
 		url: 'https://example.com',
 	}
 	let result = chunkify(coverage)
 	delete coverage.ranges
 	expect(result).toEqual({
 		...coverage,
-		chunks: [{ start_offset: 0, end_offset: 12, is_covered: false }],
+		chunks: [{ start_offset: 0, end_offset: 12, is_covered: false, coverage_count: 0 }],
+	} satisfies ChunkedCoverage)
+})
+
+test('merges adjacent covered chunks with different coverage counts, keeping the max', () => {
+	let coverage = {
+		text: 'a{color:red}b{color:blue}',
+		ranges: [
+			{ start: 0, end: 12, count: 2 },
+			{ start: 12, end: 25, count: 1 },
+		],
+		url: 'https://example.com',
+	}
+	let result = chunkify(coverage)
+	delete coverage.ranges
+	expect(result).toEqual({
+		...coverage,
+		chunks: [{ start_offset: 0, end_offset: 25, is_covered: true, coverage_count: 2 }],
 	} satisfies ChunkedCoverage)
 })

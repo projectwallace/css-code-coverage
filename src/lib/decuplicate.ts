@@ -1,28 +1,48 @@
 import type { Coverage, Range } from './parse-coverage.js'
 
-// 1. Merge and concatenate ranges
-function merge_ranges(ranges: Range[]): Range[] {
+export type WeightedRange = Range & { count: number }
+export type WeightedCoverage = Omit<Coverage, 'ranges'> & { ranges: WeightedRange[] }
+
+// 1. Sweep-line merge: produces weighted ranges where count = number of input ranges covering each segment
+function merge_ranges_weighted(ranges: Range[]): WeightedRange[] {
 	if (ranges.length === 0) return []
 
-	// sort by start
-	ranges.sort((a, b) => a.start - b.start)
+	type Event = { pos: number; delta: number }
+	let events: Event[] = []
 
-	let merged: Range[] = [ranges[0]!]
+	for (let r of ranges) {
+		events.push({ pos: r.start, delta: +1 })
+		events.push({ pos: r.end, delta: -1 })
+	}
 
-	for (let r of ranges.slice(1)) {
-		let last = merged.at(-1)
+	// sort by position; closes (-1) before opens (+1) at the same position
+	events.sort((a, b) => a.pos - b.pos || a.delta - b.delta)
 
-		// merge overlapping or adjacent
-		if (last && r.start <= last.end + 1) {
-			if (r.end > last.end) {
-				last.end = r.end
-			}
+	let swept: WeightedRange[] = []
+	let depth = 0
+	let prev_pos: number | null = null
+
+	for (let event of events) {
+		if (prev_pos !== null && event.pos > prev_pos && depth > 0) {
+			swept.push({ start: prev_pos, end: event.pos, count: depth })
+		}
+		depth += event.delta
+		prev_pos = event.pos
+	}
+
+	// Merge adjacent segments (up to 1-byte gap) with the same count, preserving the
+	// original behaviour where ranges touching at r.start <= last.end + 1 were merged.
+	let result: WeightedRange[] = swept.length > 0 ? [{ ...swept[0]! }] : []
+	for (let r of swept.slice(1)) {
+		let last = result.at(-1)!
+		if (r.start <= last.end + 1 && r.count === last.count) {
+			if (r.end > last.end) last.end = r.end
 		} else {
-			merged.push({ start: r.start, end: r.end })
+			result.push({ ...r })
 		}
 	}
 
-	return merged
+	return result
 }
 
 // 2. Merge ranges for a single stylesheet entry into an existing grouped sheet
@@ -42,7 +62,7 @@ function merge_entry_ranges(
 }
 
 // 3. Main function orchestrating the grouping and range merging
-export function deduplicate_entries(entries: Coverage[]): Coverage[] {
+export function deduplicate_entries(entries: Coverage[]): WeightedCoverage[] {
 	let grouped = entries.reduce<Record<string, { url: string; ranges: Range[] }>>((acc, entry) => {
 		let key = entry.text
 		acc[key] = merge_entry_ranges(acc[key], entry)
@@ -52,6 +72,6 @@ export function deduplicate_entries(entries: Coverage[]): Coverage[] {
 	return Object.entries(grouped).map(([text, { url, ranges }]) => ({
 		text,
 		url,
-		ranges: merge_ranges(ranges),
+		ranges: merge_ranges_weighted(ranges),
 	}))
 }
