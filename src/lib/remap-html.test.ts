@@ -44,6 +44,20 @@ test('remaps a single style block', () => {
 	})
 })
 
+test('remaps correctly when two style blocks have identical content', () => {
+	let css = `h1 { color: red; }`
+	// Two style tags with identical CSS — indexOf always finds the first occurrence,
+	// so a range inside the second block falls outside [first_start, first_end] and gets dropped
+	let html = `<style>${css}</style><style>${css}</style>`
+	let second_start = html.lastIndexOf('<style>') + '<style>'.length
+	let range = { start: second_start, end: second_start + css.length }
+	let result = remap_html(html, [range])
+	expect(result).toEqual({
+		css: css + css,
+		ranges: [{ start: css.length, end: css.length * 2 }],
+	})
+})
+
 test('remaps multiple style blocks', () => {
 	let css_head = `h1 { color: red; }`
 	let css_body = `h2 { font-size: 24px; }`
