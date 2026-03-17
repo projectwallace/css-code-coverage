@@ -33,11 +33,8 @@ function merge(stylesheet: ChunkedCoverage): ChunkedCoverage {
 				previous_chunk = chunk
 				continue
 			}
-			// If the current chunk is only whitespace or empty, add it to the previous
-			else if (
-				WHITESPACE_ONLY_REGEX.test(stylesheet.text.slice(chunk.start_offset, chunk.end_offset)) ||
-				chunk.end_offset === chunk.start_offset
-			) {
+			// If the current chunk is empty (zero-length range), absorb it into the previous
+			else if (chunk.end_offset === chunk.start_offset) {
 				latest_chunk.end_offset = chunk.end_offset
 				// do not update previous_chunk
 				continue
