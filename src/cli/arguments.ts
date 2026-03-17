@@ -16,10 +16,10 @@ export type CliArguments = {
 }
 
 export function parse_arguments(args: string[]): CliArguments {
-	let { values } = parseArgs({
+	let { values, positionals } = parseArgs({
 		args,
+		allowPositionals: true,
 		options: {
-			'coverage-dir': { type: 'string' },
 			'min-coverage': { type: 'string' },
 			'min-file-coverage': { type: 'string', default: '0' },
 			'show-uncovered': { type: 'string', default: 'violations' },
@@ -29,9 +29,9 @@ export function parse_arguments(args: string[]): CliArguments {
 
 	let issues: string[] = []
 
-	let coverage_dir = values['coverage-dir']
+	let coverage_dir = positionals[0]
 	if (!coverage_dir) {
-		issues.push('--coverage-dir is required')
+		issues.push('<coverage-dir> is required')
 	} else {
 		let resolved = resolve(coverage_dir)
 		let cwd = process.cwd()
@@ -70,7 +70,7 @@ export function parse_arguments(args: string[]): CliArguments {
 	}
 
 	return {
-		'coverage-dir': resolve(coverage_dir!),
+		'coverage-dir': resolve(coverage_dir),
 		'min-coverage': min_coverage,
 		'min-file-coverage': min_file_coverage,
 		'show-uncovered': show_uncovered,
