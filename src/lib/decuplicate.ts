@@ -34,14 +34,8 @@ function merge_entry_ranges(
 		return { url: entry.url, ranges: [...entry.ranges] }
 	}
 
-	let seen = new Set(sheet.ranges.map((r) => `${r.start}:${r.end}`))
-
 	for (let range of entry.ranges) {
-		let id = `${range.start}:${range.end}`
-		if (!seen.has(id)) {
-			seen.add(id)
-			sheet.ranges.push({ ...range })
-		}
+		sheet.ranges.push({ ...range })
 	}
 
 	return sheet
