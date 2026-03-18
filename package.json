@@ -58,7 +58,8 @@
 		"typescript": "^5.9.3"
 	},
 	"overrides": {
-		"@projectwallace/css-parser": "$@projectwallace/css-parser"
+		"@projectwallace/css-parser": "$@projectwallace/css-parser",
+		"undici": "^6.24.1"
 	},
 	"engines": {
 		"node": ">=20"
