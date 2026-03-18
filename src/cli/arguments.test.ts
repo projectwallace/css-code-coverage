@@ -2,33 +2,29 @@ import { test, expect } from '@playwright/test'
 import { resolve } from 'node:path'
 import { parse_arguments } from './arguments'
 
-test.describe('--coverage-dir', () => {
+test.describe('<coverage-dir>', () => {
 	let cov = '--min-coverage=1'
 
-	test('missing --coverage-dir', () => {
+	test('missing coverage-dir', () => {
 		expect(() => parse_arguments([cov])).toThrowError()
 	})
 
-	test('empty --coverage-dir', () => {
-		expect(() => parse_arguments([cov, '--coverage-dir'])).toThrowError()
-	})
-
-	test('valid --coverage-dir=coverage', () => {
-		let result = parse_arguments([cov, '--coverage-dir=coverage'])
+	test('valid coverage-dir positional', () => {
+		let result = parse_arguments(['coverage', cov])
 		expect(result['coverage-dir']).toEqual(resolve('coverage'))
 	})
 
-	test('path traversal --coverage-dir=../../etc', () => {
-		expect(() => parse_arguments([cov, '--coverage-dir=../../etc'])).toThrowError()
+	test('path traversal ../../etc', () => {
+		expect(() => parse_arguments(['../../etc', cov])).toThrowError()
 	})
 
-	test('path traversal --coverage-dir=../sibling', () => {
-		expect(() => parse_arguments([cov, '--coverage-dir=../sibling'])).toThrowError()
+	test('path traversal ../sibling', () => {
+		expect(() => parse_arguments(['../sibling', cov])).toThrowError()
 	})
 })
 
 test.describe('--min-coverage', () => {
-	let dir = '--coverage-dir=coverage'
+	let dir = 'coverage'
 
 	test('missing --min-coverage', () => {
 		expect(() => parse_arguments([dir])).toThrowError()
@@ -49,7 +45,7 @@ test.describe('--min-coverage', () => {
 })
 
 test.describe('--min-file-coverage', () => {
-	let args = ['--coverage-dir=coverage', '--min-coverage=1']
+	let args = ['coverage', '--min-coverage=1']
 
 	test('missing --min-file-coverage defaults to 0', () => {
 		let result = parse_arguments([...args])
@@ -71,7 +67,7 @@ test.describe('--min-file-coverage', () => {
 })
 
 test.describe('--reporter', () => {
-	let args = ['--coverage-dir=coverage', '--min-coverage=1']
+	let args = ['coverage', '--min-coverage=1']
 
 	test('missing --reporter defaults to pretty', () => {
 		let result = parse_arguments([...args])
@@ -98,7 +94,7 @@ test.describe('--reporter', () => {
 })
 
 test.describe('--show-uncovered', () => {
-	let args = ['--coverage-dir=coverage', '--min-coverage=1']
+	let args = ['coverage', '--min-coverage=1']
 
 	test('missing --show-uncovered defaults to violations', () => {
 		let result = parse_arguments([...args])
