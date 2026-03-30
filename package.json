@@ -55,7 +55,7 @@
 		"oxlint": "^1.39.0",
 		"publint": "^0.3.16",
 		"tsdown": "^0.21.2",
-		"typescript": "^5.9.3"
+		"typescript": "^6.0.2"
 	},
 	"overrides": {
 		"@projectwallace/css-parser": "$@projectwallace/css-parser"
