@@ -41,8 +41,8 @@
 		"knip": "knip"
 	},
 	"dependencies": {
-		"@projectwallace/css-parser": "^0.13.8",
-		"@projectwallace/format-css": "^2.2.6"
+		"@projectwallace/css-parser": "~0.14.7",
+		"@projectwallace/format-css": "^3.0.2"
 	},
 	"devDependencies": {
 		"@codecov/vite-plugin": "^1.9.1",
