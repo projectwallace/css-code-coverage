@@ -14,8 +14,10 @@
 		"moduleResolution": "bundler",
 		"lib": ["es2024", "DOM"],
 		"declaration": true,
+		"rootDir": "src",
 		"rootDirs": ["src/lib", "src/cli"],
 		"outDir": "dist",
+		"types": ["node"],
 		"paths": {
 			// So we can import like an external in the CLI
 			"@projectwallace/css-code-coverage": ["./src/lib/index.ts"]

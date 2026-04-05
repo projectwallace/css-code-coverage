@@ -1,6 +1,7 @@
 {
+	"ignorePatterns": ["src/lib/test/fixtures/**"],
 	"useTabs": true,
 	"singleQuote": true,
 	"semi": false,
-	"ignorePatterns": ["src/lib/test/fixtures/**"]
+	"trailingComma": "all"
 }
