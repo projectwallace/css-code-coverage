@@ -6,6 +6,7 @@ export default defineConfig([
 		entry: 'src/lib/index.ts',
 		platform: 'browser',
 		format: 'esm',
+		publint: true,
 		plugins: [
 			codecovVitePlugin({
 				enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
@@ -20,9 +21,12 @@ export default defineConfig([
 		platform: 'node',
 		format: 'esm',
 		dts: false,
+		publint: true,
 		// The CLI references the Core via 'external' reference to prevent it
 		// from ending up as duplicate code in cli.js
-		external: ['@projectwallace/css-code-coverage'],
+		deps: {
+			neverBundle: ['@projectwallace/css-code-coverage'],
+		},
 		plugins: [
 			codecovVitePlugin({
 				enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
