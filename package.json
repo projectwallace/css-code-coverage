@@ -1,6 +1,6 @@
 {
 	"name": "@projectwallace/css-code-coverage",
-	"version": "0.10.1",
+	"version": "0.10.2",
 	"description": "Generate useful CSS Code Coverage report from browser-reported coverage",
 	"keywords": [
 		"code",
