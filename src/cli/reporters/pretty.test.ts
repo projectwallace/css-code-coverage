@@ -240,20 +240,20 @@ test.describe('with --min-file-line-coverage', () => {
 		let result = print(report, show_violations, dependencies)
 
 		test('coverage: pass', () => {
-			expect(result[0]).toEqual('Success: total line coverage is 50.22%')
+			expect(result.at(-2)).toEqual('Success: total line coverage is 50.22%')
 		})
 		test('file-coverage: fail', () => {
-			expect(result[1]).toEqual(
+			expect(result.at(-1)).toEqual(
 				'Failed: 1 file does not meet the minimum line coverage of 100% (minimum coverage was 50.00%)',
 			)
 		})
 		test('does not show hint to --show=violations', () => {
-			expect(result[2]).not.toEqual(
+			expect(result.at(-1)).not.toEqual(
 				"  Hint: set --show-uncovered=violations to see which files didn't pass",
 			)
 		})
 		test.describe('shows file details', () => {
-			let lines = result.slice(2)
+			let lines = result
 
 			test('shows header block', () => {
 				expect(lines[0]).toEqual('─'.repeat(60))
@@ -299,7 +299,9 @@ Tip: cover 11 more lines to meet the file threshold of 100%
 ▌   17 │ c {
 ▌   18 │     color: red;
 ▌   19 │ }
-`,
+
+Success: total line coverage is 50.22%
+Failed: 1 file does not meet the minimum line coverage of 100% (minimum coverage was 50.00%)`,
 				)
 			})
 		})
