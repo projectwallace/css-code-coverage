@@ -14,6 +14,10 @@ function percentage(ratio: number, decimals: number = 2): string {
 	return `${(ratio * 100).toFixed(ratio === 1 ? 0 : decimals)}%`
 }
 
+function number(num: number): string {
+	return new Intl.NumberFormat().format(num)
+}
+
 export type TextStyle =
 	| 'bold'
 	| 'red'
@@ -90,53 +94,12 @@ export function print_lines(
 ) {
 	let output: (string | undefined)[] = []
 
-	if (report.min_line_coverage.ok) {
-		output.push(
-			`${styleText(['bold', 'green'], 'Success')}: total line coverage is ${percentage(report.min_line_coverage.actual)}`,
-		)
-	} else {
-		let { actual, expected } = report.min_line_coverage
-		output.push(
-			`${styleText(['bold', 'red'], 'Failed')}: line coverage is ${percentage(actual)}% which is lower than the threshold of ${expected}`,
-		)
-		let lines_to_cover = expected * context.coverage.total_lines - context.coverage.covered_lines
-		output.push(
-			`Tip: cover ${Math.ceil(lines_to_cover)} more ${lines_to_cover === 1 ? 'line' : 'lines'} to meet the threshold of ${percentage(
-				expected,
-			)}`,
-		)
-	}
-
-	if (report.min_file_line_coverage.expected !== undefined) {
-		let { expected, actual, ok } = report.min_file_line_coverage
-		if (ok) {
-			output.push(
-				`${styleText(['bold', 'green'], 'Success')}: all files pass minimum line coverage of ${percentage(expected)}`,
-			)
-		} else {
-			let num_files_failed = context.coverage.coverage_per_stylesheet.filter(
-				(sheet) => sheet.line_coverage_ratio < expected!,
-			).length
-			output.push(
-				`${styleText(['bold', 'red'], 'Failed')}: ${num_files_failed} ${
-					num_files_failed === 1 ? 'file does' : 'files do'
-				} not meet the minimum line coverage of ${percentage(expected)} (minimum coverage was ${percentage(actual)})`,
-			)
-			if (params['show-uncovered'] === 'none') {
-				output.push(`  Hint: set --show-uncovered=violations to see which files didn't pass`)
-			}
-		}
-	}
-
 	// Show un-covered chunks
 	if (params['show-uncovered'] !== 'none') {
 		const NUM_LEADING_LINES = 3
 		const NUM_TRAILING_LINES = NUM_LEADING_LINES
 		print_width = print_width ?? 80
 		let min_file_line_coverage = report.min_file_line_coverage.expected
-
-		// Show empty line between report header and chunks output
-		output.push()
 
 		for (let sheet of context.coverage.coverage_per_stylesheet.sort(
 			(a, b) => a.line_coverage_ratio - b.line_coverage_ratio,
@@ -209,6 +172,51 @@ export function print_lines(
 					// Show empty line between blocks
 					output.push('')
 				}
+			}
+		}
+	}
+
+	// Show empty line between report summary and chunks output
+	output.push()
+
+	output.push(
+		`Finished in ${number(Math.round(context.duration))}ms on ${number(context.coverage.total_files_found)} JSON files containing ${number(context.coverage.total_stylesheets)} stylesheets with ${number(context.coverage.total_lines)} lines of CSS in total.`,
+	)
+
+	if (report.min_line_coverage.ok) {
+		output.push(
+			`${styleText(['bold', 'green'], 'Success')}: total line coverage is ${percentage(report.min_line_coverage.actual)}`,
+		)
+	} else {
+		let { actual, expected } = report.min_line_coverage
+		output.push(
+			`${styleText(['bold', 'red'], 'Failed')}: line coverage is ${percentage(actual)}% which is lower than the threshold of ${expected}`,
+		)
+		let lines_to_cover = expected * context.coverage.total_lines - context.coverage.covered_lines
+		output.push(
+			`Tip: cover ${number(Math.ceil(lines_to_cover))} more ${lines_to_cover === 1 ? 'line' : 'lines'} to meet the threshold of ${percentage(
+				expected,
+			)}`,
+		)
+	}
+
+	if (report.min_file_line_coverage.expected !== undefined) {
+		let { expected, actual, ok } = report.min_file_line_coverage
+		if (ok) {
+			output.push(
+				`${styleText(['bold', 'green'], 'Success')}: all files pass minimum line coverage of ${percentage(expected)}`,
+			)
+		} else {
+			let num_files_failed = context.coverage.coverage_per_stylesheet.filter(
+				(sheet) => sheet.line_coverage_ratio < expected,
+			).length
+			output.push(
+				`${styleText(['bold', 'red'], 'Failed')}: ${number(num_files_failed)} ${
+					num_files_failed === 1 ? 'file does' : 'files do'
+				} not meet the minimum line coverage of ${percentage(expected)} (minimum coverage was ${percentage(actual)})`,
+			)
+			if (params['show-uncovered'] === 'none') {
+				output.push(`  Hint: set --show-uncovered=violations to see which files didn't pass`)
 			}
 		}
 	}

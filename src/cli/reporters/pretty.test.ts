@@ -62,16 +62,24 @@ const show_violations = { 'show-uncovered': 'violations' } as CliArguments
 
 const context_empty = {
 	context: {
-		coverage: {} as CoverageResult,
+		coverage: {
+			total_files_found: 7,
+			total_stylesheets: 8,
+			total_lines: 9999,
+		} as CoverageResult,
+		duration: 2,
 	},
 }
 
 const context_with_failures = {
 	context: {
+		duration: 2,
 		coverage: {
 			line_coverage_ratio: 0.4022222,
 			covered_lines: 10,
 			total_lines: 11,
+			total_files_found: 7,
+			total_stylesheets: 9,
 			coverage_per_stylesheet: [
 				{
 					url: 'example.com',
@@ -157,7 +165,10 @@ test.describe('only --min-line-coverage', () => {
 			},
 		} satisfies Report
 		let result = print(report, show_none, dependencies)
-		expect(result).toEqual(['Success: total line coverage is 50.22%'])
+		expect(result).toEqual([
+			'Finished in 2ms on 7 JSON files containing 8 stylesheets with 9,999 lines of CSS in total.',
+			'Success: total line coverage is 50.22%',
+		])
 	})
 
 	test('failure', () => {
@@ -166,7 +177,10 @@ test.describe('only --min-line-coverage', () => {
 				coverage: {
 					total_lines: 10_000,
 					covered_lines: 5022,
+					total_files_found: 7,
+					total_stylesheets: 8,
 				} as CoverageResult,
+				duration: 2,
 			},
 			report: {
 				ok: false,
@@ -176,8 +190,9 @@ test.describe('only --min-line-coverage', () => {
 		} satisfies Report
 		let result = print(report, show_none, dependencies)
 		expect(result).toEqual([
+			'Finished in 2ms on 7 JSON files containing 8 stylesheets with 10,000 lines of CSS in total.',
 			'Failed: line coverage is 50.22%% which is lower than the threshold of 1',
-			'Tip: cover 4978 more lines to meet the threshold of 100%',
+			'Tip: cover 4,978 more lines to meet the threshold of 100%',
 		])
 	})
 })
@@ -194,6 +209,7 @@ test.describe('with --min-file-line-coverage', () => {
 		} satisfies Report
 		let result = print(report, show_none, dependencies)
 		expect(result).toEqual([
+			'Finished in 2ms on 7 JSON files containing 8 stylesheets with 9,999 lines of CSS in total.',
 			'Success: total line coverage is 50.22%',
 			'Success: all files pass minimum line coverage of 50.00%',
 		])
@@ -210,21 +226,26 @@ test.describe('with --min-file-line-coverage', () => {
 		} satisfies Report
 		let result = print(report, show_none, dependencies)
 
+		test('metadata', () => {
+			expect(result[0]).toEqual(
+				'Finished in 2ms on 7 JSON files containing 9 stylesheets with 11 lines of CSS in total.',
+			)
+		})
 		test('coverage: pass', () => {
-			expect(result[0]).toEqual('Success: total line coverage is 50.22%')
+			expect(result[1]).toEqual('Success: total line coverage is 50.22%')
 		})
 		test('file-coverage: fail', () => {
-			expect(result[1]).toEqual(
+			expect(result[2]).toEqual(
 				'Failed: 1 file does not meet the minimum line coverage of 100% (minimum coverage was 50.00%)',
 			)
 		})
 		test('shows hint to --show=violations', () => {
-			expect(result[2]).toEqual(
+			expect(result[3]).toEqual(
 				"  Hint: set --show-uncovered=violations to see which files didn't pass",
 			)
 		})
 		test('no files shown', () => {
-			expect(result).toHaveLength(3)
+			expect(result).toHaveLength(4)
 		})
 	})
 
@@ -240,20 +261,20 @@ test.describe('with --min-file-line-coverage', () => {
 		let result = print(report, show_violations, dependencies)
 
 		test('coverage: pass', () => {
-			expect(result[0]).toEqual('Success: total line coverage is 50.22%')
+			expect(result.at(-2)).toEqual('Success: total line coverage is 50.22%')
 		})
 		test('file-coverage: fail', () => {
-			expect(result[1]).toEqual(
+			expect(result.at(-1)).toEqual(
 				'Failed: 1 file does not meet the minimum line coverage of 100% (minimum coverage was 50.00%)',
 			)
 		})
 		test('does not show hint to --show=violations', () => {
-			expect(result[2]).not.toEqual(
+			expect(result.at(-1)).not.toEqual(
 				"  Hint: set --show-uncovered=violations to see which files didn't pass",
 			)
 		})
 		test.describe('shows file details', () => {
-			let lines = result.slice(2)
+			let lines = result
 
 			test('shows header block', () => {
 				expect(lines[0]).toEqual('─'.repeat(60))
@@ -299,7 +320,10 @@ Tip: cover 11 more lines to meet the file threshold of 100%
 ▌   17 │ c {
 ▌   18 │     color: red;
 ▌   19 │ }
-`,
+
+Finished in 2ms on 7 JSON files containing 9 stylesheets with 11 lines of CSS in total.
+Success: total line coverage is 50.22%
+Failed: 1 file does not meet the minimum line coverage of 100% (minimum coverage was 50.00%)`,
 				)
 			})
 		})

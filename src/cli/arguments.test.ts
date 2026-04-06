@@ -47,9 +47,9 @@ test.describe('--min-coverage', () => {
 test.describe('--min-file-coverage', () => {
 	let args = ['coverage', '--min-coverage=1']
 
-	test('missing --min-file-coverage defaults to 0', () => {
+	test('missing --min-file-coverage defaults to undefined', () => {
 		let result = parse_arguments([...args])
-		expect(result['min-file-coverage']).toEqual(0)
+		expect(result['min-file-coverage']).toBeUndefined()
 	})
 
 	test('empty --min-file-coverage', () => {
