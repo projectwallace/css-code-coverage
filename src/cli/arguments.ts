@@ -10,7 +10,7 @@ type Reporter = (typeof REPORTERS)[number]
 export type CliArguments = {
 	'coverage-dir': string
 	'min-coverage': number
-	'min-file-coverage': number
+	'min-file-coverage'?: number
 	'show-uncovered': ShowUncovered
 	reporter: Reporter
 }
@@ -21,7 +21,7 @@ export function parse_arguments(args: string[]): CliArguments {
 		allowPositionals: true,
 		options: {
 			'min-coverage': { type: 'string' },
-			'min-file-coverage': { type: 'string', default: '0' },
+			'min-file-coverage': { type: 'string' },
 			'show-uncovered': { type: 'string', default: 'violations' },
 			reporter: { type: 'string', default: 'pretty' },
 		},
@@ -50,9 +50,13 @@ export function parse_arguments(args: string[]): CliArguments {
 		issues.push('--min-coverage must be a number between 0 and 1')
 	}
 
-	let min_file_coverage = Number(values['min-file-coverage'])
-	if (isNaN(min_file_coverage) || min_file_coverage < 0 || min_file_coverage > 1) {
-		issues.push('--min-file-coverage must be a number between 0 and 1')
+	let min_file_coverage
+	if (values['min-file-coverage'] !== undefined) {
+		min_file_coverage = Number(values['min-file-coverage'])
+
+		if (isNaN(min_file_coverage) || min_file_coverage < 0 || min_file_coverage > 1) {
+			issues.push('--min-file-coverage must be a number between 0 and 1')
+		}
 	}
 
 	let show_uncovered = values['show-uncovered'] as ShowUncovered

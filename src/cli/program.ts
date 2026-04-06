@@ -10,6 +10,7 @@ import {
 export type Report = {
 	context: {
 		coverage: CoverageResult
+		duration: number
 	}
 	report: {
 		ok: boolean
@@ -54,9 +55,11 @@ export function program(
 	{
 		min_coverage,
 		min_file_coverage,
+		start_time = 0,
 	}: {
 		min_coverage: number
 		min_file_coverage?: number
+		start_time?: number
 	},
 	coverage_data: Coverage[],
 ) {
@@ -66,10 +69,12 @@ export function program(
 		Math.min(...coverage.coverage_per_stylesheet.map((sheet) => sheet.line_coverage_ratio)),
 		min_file_coverage,
 	)
+	let end_time = performance.now()
 
 	let result: Report = {
 		context: {
 			coverage,
+			duration: end_time - start_time,
 		},
 		report: {
 			ok: min_coverage_result.ok && min_file_coverage_result.ok,

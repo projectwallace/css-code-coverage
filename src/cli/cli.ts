@@ -9,6 +9,7 @@ import { print as json } from './reporters/json.js'
 import { help } from './help.js'
 
 async function cli(cli_args: string[]) {
+	let start_time = performance.now()
 	if (
 		!cli_args ||
 		cli_args.length === 0 ||
@@ -24,6 +25,7 @@ async function cli(cli_args: string[]) {
 		{
 			min_coverage: params['min-coverage'],
 			min_file_coverage: params['min-file-coverage'],
+			start_time,
 		},
 		coverage_data,
 	)

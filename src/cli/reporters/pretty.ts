@@ -14,6 +14,10 @@ function percentage(ratio: number, decimals: number = 2): string {
 	return `${(ratio * 100).toFixed(ratio === 1 ? 0 : decimals)}%`
 }
 
+function number(num: number): string {
+	return new Intl.NumberFormat().format(num)
+}
+
 export type TextStyle =
 	| 'bold'
 	| 'red'
@@ -97,9 +101,6 @@ export function print_lines(
 		print_width = print_width ?? 80
 		let min_file_line_coverage = report.min_file_line_coverage.expected
 
-		// Show empty line between report header and chunks output
-		output.push()
-
 		for (let sheet of context.coverage.coverage_per_stylesheet.sort(
 			(a, b) => a.line_coverage_ratio - b.line_coverage_ratio,
 		)) {
@@ -175,7 +176,13 @@ export function print_lines(
 		}
 	}
 
+	// Show empty line between report summary and chunks output
 	output.push()
+
+	output.push(
+		`Finished in ${number(Math.round(context.duration))}ms on ${number(context.coverage.total_files_found)} JSON files containing ${number(context.coverage.total_stylesheets)} stylesheets with ${number(context.coverage.total_lines)} lines of CSS in total.`,
+	)
+
 	if (report.min_line_coverage.ok) {
 		output.push(
 			`${styleText(['bold', 'green'], 'Success')}: total line coverage is ${percentage(report.min_line_coverage.actual)}`,
@@ -187,7 +194,7 @@ export function print_lines(
 		)
 		let lines_to_cover = expected * context.coverage.total_lines - context.coverage.covered_lines
 		output.push(
-			`Tip: cover ${Math.ceil(lines_to_cover)} more ${lines_to_cover === 1 ? 'line' : 'lines'} to meet the threshold of ${percentage(
+			`Tip: cover ${number(Math.ceil(lines_to_cover))} more ${lines_to_cover === 1 ? 'line' : 'lines'} to meet the threshold of ${percentage(
 				expected,
 			)}`,
 		)
@@ -201,10 +208,10 @@ export function print_lines(
 			)
 		} else {
 			let num_files_failed = context.coverage.coverage_per_stylesheet.filter(
-				(sheet) => sheet.line_coverage_ratio < expected!,
+				(sheet) => sheet.line_coverage_ratio < expected,
 			).length
 			output.push(
-				`${styleText(['bold', 'red'], 'Failed')}: ${num_files_failed} ${
+				`${styleText(['bold', 'red'], 'Failed')}: ${number(num_files_failed)} ${
 					num_files_failed === 1 ? 'file does' : 'files do'
 				} not meet the minimum line coverage of ${percentage(expected)} (minimum coverage was ${percentage(actual)})`,
 			)
