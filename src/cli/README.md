@@ -2,7 +2,10 @@
 
 ```
 USAGE
-  $ css-coverage --coverage-dir=<dir> --min-coverage=<number> [options]
+  css-coverage <coverage-dir> --min-coverage=<number> [options]
+
+ARGUMENTS
+  <coverage-dir>        Where your Coverage JSON files are
 
 OPTIONS
 Required:
