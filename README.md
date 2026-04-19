@@ -93,7 +93,7 @@ for (let file of files) {
 Use the CLI tool (`css-coverage`) to check if coverage meets minimum requirements, globally and/or per file.
 
 ```sh
-css-coverage --coverage-dir=<dir> --min-coverage=<number> [options]
+css-coverage <coverage-dir> --min-coverage=<number> [options]
 ```
 
 [CLI docs](src/cli/README.md)

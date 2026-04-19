@@ -3,10 +3,10 @@ import { styleText } from 'node:util'
 export function help() {
 	return `
 ${styleText(['bold'], 'USAGE')}
-  $ css-coverage <coverage-dir> --min-coverage=<number> [options]
+  css-coverage <coverage-dir> --min-coverage=<number> [options]
 
 ${styleText('bold', 'ARGUMENTS')}
-  <coverage-dir>        Where your Coverage JSON files are
+  <coverage-dir>        Where your coverage JSON files are
 
 ${styleText('bold', 'OPTIONS')}
 Required:
@@ -28,12 +28,12 @@ Optional:
 
 ${styleText('bold', 'EXAMPLES')}
   ${styleText('dim', '# analyze all .json files in ./coverage; require 80% overall coverage')}
-  $ css-coverage ./coverage --min-coverage=0.8
+  css-coverage ./coverage --min-coverage=0.8
 
   ${styleText('dim', '# Require 50% coverage per file')}
-  $ css-coverage ./coverage --min-coverage=0.8 --min-file-coverage=0.5
+  css-coverage ./coverage --min-coverage=0.8 --min-file-coverage=0.5
 
   ${styleText('dim', 'Report JSON')}
-  $ css-coverage ./coverage --min-coverage=0.8 --reporter=json
+  css-coverage ./coverage --min-coverage=0.8 --reporter=json
   `.trim()
 }
