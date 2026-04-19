@@ -28,11 +28,11 @@ Optional:
 
 EXAMPLES
   # analyze all .json files in ./coverage; require 80% overall coverage
-  $ css-coverage --coverage-dir=./coverage --min-coverage=0.8
+  css-coverage --coverage-dir=./coverage --min-coverage=0.8
 
   # Require 50% coverage per file
-  $ css-coverage --coverage-dir=./coverage --min-coverage=0.8 --min-file-coverage=0.5
+  css-coverage --coverage-dir=./coverage --min-coverage=0.8 --min-file-coverage=0.5
 
   Report JSON
-  $ css-coverage --coverage-dir=./coverage --min-coverage=0.8 --reporter=json
+  css-coverage --coverage-dir=./coverage --min-coverage=0.8 --reporter=json
 ```
