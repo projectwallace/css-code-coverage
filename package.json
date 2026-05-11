@@ -45,7 +45,7 @@
 		"@projectwallace/format-css": "^3.0.2"
 	},
 	"devDependencies": {
-		"@codecov/vite-plugin": "^1.9.1",
+		"@codecov/vite-plugin": "^2.0.1",
 		"@playwright/test": "^1.59.1",
 		"@projectwallace/preset-oxlint": "^0.0.7",
 		"@types/node": "^25.5.2",
