@@ -33,6 +33,10 @@
 		"types": "./dist/index.d.ts",
 		"default": "./dist/index.js"
 	},
+	"publishConfig": {
+		"access": "public",
+		"provenance": true
+	},
 	"scripts": {
 		"test": "c8 --reporter=text --reporter=lcov playwright test",
 		"build": "tsdown",
@@ -45,7 +49,7 @@
 		"@projectwallace/format-css": "^3.0.2"
 	},
 	"devDependencies": {
-		"@codecov/vite-plugin": "^1.9.1",
+		"@codecov/vite-plugin": "^2.0.1",
 		"@playwright/test": "^1.59.1",
 		"@projectwallace/preset-oxlint": "^0.0.7",
 		"@types/node": "^25.5.2",
@@ -53,14 +57,21 @@
 		"knip": "^6.3.0",
 		"oxfmt": "^0.45.0",
 		"oxlint": "^1.58.0",
-		"publint": "^0.3.18",
-		"tsdown": "^0.21.7",
+		"publint": "^0.3.20",
+		"tsdown": "^0.22.0",
 		"typescript": "^6.0.2"
 	},
 	"overrides": {
 		"@projectwallace/css-parser": "$@projectwallace/css-parser"
 	},
 	"engines": {
-		"node": ">=20"
+		"node": ">=20",
+		"pnpm": ">=10.0.0"
+	},
+	"packageManager": "pnpm@11.1.1",
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"esbuild"
+		]
 	}
 }
