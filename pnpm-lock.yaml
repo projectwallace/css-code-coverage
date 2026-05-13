@@ -41,10 +41,10 @@ importers:
         version: 1.60.0
       publint:
         specifier: ^0.3.20
-        version: 0.3.20
+        version: 0.3.21
       tsdown:
         specifier: ^0.22.0
-        version: 0.22.0(oxc-resolver@11.19.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))(publint@0.3.20)(typescript@6.0.3)
+        version: 0.22.0(oxc-resolver@11.19.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))(publint@0.3.21)(typescript@6.0.3)
       typescript:
         specifier: ^6.0.2
         version: 6.0.3
@@ -1453,8 +1453,8 @@ packages:
     resolution: {integrity: sha512-SoSL4+OSEtR99LHFZQiJLkT59C5B1amGO1NzTwj7TT1qCUgUO6hxOvzkOYxD+vMrXBM3XJIKzokoERdqQq/Zmg==}
     engines: {node: ^10 || ^12 || >=14}
 
-  publint@0.3.20:
-    resolution: {integrity: sha512-UWqFYP7VBVCe9l/leEEGJrDs6Am4K4KapLmLi5qbt+9fA+Ny38ghdW+bw1nYfVqCK8/3kgsxjjhFjTYqYYRpyw==}
+  publint@0.3.21:
+    resolution: {integrity: sha512-OqejcnMV6E9zel2oCrUOJEiiFkGiAAni0A6ibfQNh1k9Gu5z4F+Yso8lllam7AzmV6Do0vp7u3UpZNRBwuXaHQ==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -2799,7 +2799,7 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
-  publint@0.3.20:
+  publint@0.3.21:
     dependencies:
       '@publint/pack': 0.1.4
       package-manager-detector: 1.6.0
@@ -2939,7 +2939,7 @@ snapshots:
 
   tree-kill@1.2.2: {}
 
-  tsdown@0.22.0(oxc-resolver@11.19.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))(publint@0.3.20)(typescript@6.0.3):
+  tsdown@0.22.0(oxc-resolver@11.19.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))(publint@0.3.21)(typescript@6.0.3):
     dependencies:
       ansis: 4.2.0
       cac: 7.0.0
@@ -2957,7 +2957,7 @@ snapshots:
       tree-kill: 1.2.2
       unconfig-core: 7.5.0
     optionalDependencies:
-      publint: 0.3.20
+      publint: 0.3.21
       typescript: 6.0.3
     transitivePeerDependencies:
       - '@ts-macro/tsc'
