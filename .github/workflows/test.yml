@@ -23,7 +23,7 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
-      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm install --frozen-lockfile
       - name: Install Playwright Browsers
         run: pnpm exec playwright install chromium --only-shell
       - run: pnpm test -- --forbid-only
@@ -45,7 +45,7 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
-      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm install --frozen-lockfile
       - run: pnpm run check
 
   lint-code:
@@ -61,7 +61,7 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
-      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm install --frozen-lockfile
       - run: pnpm run lint
 
   declutter-code:
@@ -77,7 +77,7 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
-      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm install --frozen-lockfile
       - run: pnpm run knip
 
   bundle-analysis:
@@ -92,7 +92,7 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
-      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm install --frozen-lockfile
       - run: pnpm run build
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
@@ -109,5 +109,5 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
-      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm install --frozen-lockfile
       - run: pnpm audit --audit-level=high

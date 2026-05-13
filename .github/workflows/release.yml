@@ -18,7 +18,7 @@ jobs:
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org
-      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install chromium --only-shell
       - run: pnpm test -- --forbid-only
       - run: pnpm run build
