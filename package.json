@@ -45,13 +45,13 @@
 		"knip": "knip"
 	},
 	"dependencies": {
-		"@projectwallace/css-parser": "~0.14.8",
+		"@projectwallace/css-parser": "~0.15.0",
 		"@projectwallace/format-css": "^3.0.2"
 	},
 	"devDependencies": {
 		"@codecov/vite-plugin": "^2.0.1",
 		"@playwright/test": "^1.59.1",
-		"@projectwallace/preset-oxlint": "^0.0.7",
+		"@projectwallace/preset-oxlint": "^0.0.11",
 		"@types/node": "^25.5.2",
 		"c8": "^11.0.0",
 		"knip": "^6.3.0",
