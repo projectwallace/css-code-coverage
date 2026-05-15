@@ -76,8 +76,8 @@ export { expect }
 import { test, expect } from './fixtures.js'
 
 test('my test', async ({ page, cssCoverage }) => {
-  await page.goto('https://example.com')
-  // CSS coverage is collected and written to disk when the test finishes
+	await page.goto('https://example.com')
+	// CSS coverage is collected and written to disk when the test finishes
 })
 ```
 
@@ -102,9 +102,9 @@ test('second test', async ({ page }) => { ... })
 import { defineConfig } from '@playwright/test'
 
 export default defineConfig({
-  use: {
-    cssCoverageDir: 'css-coverage', // default
-  },
+	use: {
+		cssCoverageDir: 'css-coverage', // default
+	},
 })
 ```
 
