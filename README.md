@@ -56,26 +56,32 @@ import { calculate_coverage } from '@projectwallace/css-code-coverage'
 let report = calculcate_coverage(coverage)
 ```
 
-### Playwright fixture (automatic)
+### Playwright fixture
 
-Use the built-in Playwright fixture to automatically collect CSS coverage for every test and write results to disk.
+Use the built-in Playwright fixture to collect CSS coverage per test and write results to disk.
 
-**1. Create a fixtures file** (e.g. `tests/fixtures.ts`):
+**1. Extend your fixtures file** (e.g. `tests/fixtures.ts`):
 
 ```ts
-export { test, expect } from '@projectwallace/css-code-coverage/playwright'
+import { test as base, expect } from '@playwright/test'
+import { test as withCssCoverage } from '@projectwallace/css-code-coverage/playwright'
+
+export const test = base.extend(withCssCoverage)
+export { expect }
 ```
 
-**2. Import it in your tests** instead of `@playwright/test`:
+**2. Use `cssCoverage` in any test** where you want to collect coverage:
 
 ```ts
 import { test, expect } from './fixtures.js'
 
-test('my test', async ({ page }) => {
+test('my test', async ({ page, cssCoverage }) => {
   await page.goto('https://example.com')
-  // CSS coverage is collected automatically — no extra code needed
+  // CSS coverage is collected and written to disk when the test finishes
 })
 ```
+
+The fixture starts coverage when the test begins and stops it when the test ends. JSON files are written to the output directory and attached to the Playwright HTML report.
 
 **3. Configure the output directory** (optional) in `playwright.config.ts`:
 
@@ -84,12 +90,12 @@ import { defineConfig } from '@playwright/test'
 
 export default defineConfig({
   use: {
-    cssCoverageDir: 'css-coverage', // default value
+    cssCoverageDir: 'css-coverage', // default
   },
 })
 ```
 
-Coverage JSON files are written to the configured directory and attached to the Playwright HTML report. Pass the directory to the `css-coverage` CLI to analyze results:
+Pass the directory to the `css-coverage` CLI to analyze results:
 
 ```sh
 css-coverage --coverage-dir=./css-coverage --min-coverage=0.8

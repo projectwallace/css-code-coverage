@@ -41,8 +41,6 @@ export const test = base_test.extend<CssCoverageFixtures, CssCoverageOptions>({
 				contentType: 'application/json',
 			})
 		},
-		{ auto: true },
+		{},
 	],
 })
-
-export { expect } from '@playwright/test'
