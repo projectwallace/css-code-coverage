@@ -56,6 +56,45 @@ import { calculate_coverage } from '@projectwallace/css-code-coverage'
 let report = calculcate_coverage(coverage)
 ```
 
+### Playwright fixture (automatic)
+
+Use the built-in Playwright fixture to automatically collect CSS coverage for every test and write results to disk.
+
+**1. Create a fixtures file** (e.g. `tests/fixtures.ts`):
+
+```ts
+export { test, expect } from '@projectwallace/css-code-coverage/playwright'
+```
+
+**2. Import it in your tests** instead of `@playwright/test`:
+
+```ts
+import { test, expect } from './fixtures.js'
+
+test('my test', async ({ page }) => {
+  await page.goto('https://example.com')
+  // CSS coverage is collected automatically — no extra code needed
+})
+```
+
+**3. Configure the output directory** (optional) in `playwright.config.ts`:
+
+```ts
+import { defineConfig } from '@playwright/test'
+
+export default defineConfig({
+  use: {
+    cssCoverageDir: 'css-coverage', // default value
+  },
+})
+```
+
+Coverage JSON files are written to the configured directory and attached to the Playwright HTML report. Pass the directory to the `css-coverage` CLI to analyze results:
+
+```sh
+css-coverage --coverage-dir=./css-coverage --min-coverage=0.8
+```
+
 ### Browser devtools
 
 In Edge, Chrome or chromium you can manually collect coverage in the browser's DevTools. In all cases you'll generate coverage data manually and the browser will let you export the data to a JSON file. Note that this JSON contains both JS coverage as well as the CSS coverage. Learn how it works:

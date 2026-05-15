@@ -17,6 +17,24 @@ export default defineConfig([
 		],
 	},
 	{
+		entry: 'src/playwright/index.ts',
+		platform: 'node',
+		format: 'esm',
+		outDir: 'dist/playwright',
+		publint: true,
+		deps: {
+			neverBundle: ['@playwright/test'],
+		},
+		plugins: [
+			codecovVitePlugin({
+				enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
+				bundleName: 'playwright.js',
+				uploadToken: process.env.CODECOV_TOKEN,
+				telemetry: false,
+			}),
+		],
+	},
+	{
 		entry: 'src/cli/cli.ts',
 		platform: 'node',
 		format: 'esm',
