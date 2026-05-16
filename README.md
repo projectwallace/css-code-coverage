@@ -56,6 +56,72 @@ import { calculate_coverage } from '@projectwallace/css-code-coverage'
 let report = calculcate_coverage(coverage)
 ```
 
+### Auto-collect from Playwright tests
+
+Add a `cssCoverage` fixture to automatically collect and save CSS coverage for each test. Create a fixtures file (e.g. `tests/fixtures.ts`):
+
+```ts
+import { test as base, expect } from '@playwright/test'
+import * as fs from 'node:fs/promises'
+import * as path from 'node:path'
+
+export const test = base.extend({
+	cssCoverage: [
+		async ({ page }, use, testInfo) => {
+			// Start collecting CSS coverage before the test runs
+			await page.coverage.startCSSCoverage()
+
+			// Run the test
+			await use()
+
+			// Collect the coverage data after the test finishes
+			let coverage = await page.coverage.stopCSSCoverage()
+
+			// Build a unique, human-readable filename from the test's title path,
+			// replacing characters that are invalid or ambiguous in file names
+			let file_name =
+				testInfo.titlePath
+					.map((s) =>
+						s
+							.replaceAll(/\s+|\/|\./g, '-')
+							.replaceAll(/[^a-z0-9-_]/gi, '')
+							.toLowerCase(),
+					)
+					.join('-') + '.json'
+
+			// Write the coverage data to disk
+			let dir = path.join(process.cwd(), 'css-coverage')
+			await fs.mkdir(dir, { recursive: true })
+			let file_path = path.join(dir, file_name)
+			await fs.writeFile(file_path, JSON.stringify(coverage))
+
+			// Attach the file to the Playwright HTML report for easy inspection
+			await testInfo.attach('css-coverage', { path: file_path, contentType: 'application/json' })
+		},
+		// auto: true makes this fixture run for every test without needing
+		// to explicitly request it as a parameter
+		{ auto: true },
+	],
+})
+export { expect }
+```
+
+Import `test` from your fixtures file instead of `@playwright/test` and coverage is collected automatically for every test:
+
+```ts
+import { test, expect } from './fixtures.js'
+
+test('my test', async ({ page }) => {
+	await page.goto('https://example.com')
+})
+```
+
+Pass the output directory to the `css-coverage` CLI to analyze results:
+
+```sh
+css-coverage --coverage-dir=./css-coverage --min-coverage=0.8
+```
+
 ### Browser devtools
 
 In Edge, Chrome or chromium you can manually collect coverage in the browser's DevTools. In all cases you'll generate coverage data manually and the browser will let you export the data to a JSON file. Note that this JSON contains both JS coverage as well as the CSS coverage. Learn how it works:
