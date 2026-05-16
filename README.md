@@ -88,26 +88,20 @@ export const test = base.extend({
 			await fs.writeFile(file_path, JSON.stringify(coverage))
 			await testInfo.attach('css-coverage', { path: file_path, contentType: 'application/json' })
 		},
-		{},
+		{ auto: true },
 	],
 })
 export { expect }
 ```
 
-Use `cssCoverage` in any test where you want to collect coverage:
+Import `test` from your fixtures file instead of `@playwright/test` and coverage is collected automatically for every test:
 
 ```ts
 import { test, expect } from './fixtures.js'
 
-test('my test', async ({ page, cssCoverage }) => {
+test('my test', async ({ page }) => {
 	await page.goto('https://example.com')
 })
-```
-
-Or enable it for an entire file with a single line:
-
-```ts
-test.beforeEach(async ({ cssCoverage }) => {})
 ```
 
 Pass the output directory to the `css-coverage` CLI to analyze results:
