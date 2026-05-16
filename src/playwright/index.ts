@@ -11,7 +11,7 @@ type CssCoverageOptions = {
 }
 
 export const test = base_test.extend<CssCoverageFixtures, CssCoverageOptions>({
-	cssCoverageDir: ['css-coverage', { option: true, scope: 'worker' }],
+	cssCoverageDir: ['css-coverage', { option: true }],
 
 	cssCoverage: [
 		async ({ page, cssCoverageDir }, use, testInfo) => {

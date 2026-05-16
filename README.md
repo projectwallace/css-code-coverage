@@ -63,10 +63,10 @@ Use the built-in Playwright fixture to collect CSS coverage per test and write r
 **1. Extend your fixtures file** (e.g. `tests/fixtures.ts`):
 
 ```ts
-import { test as base, expect } from '@playwright/test'
+import { mergeTests, test as base, expect } from '@playwright/test'
 import { test as withCssCoverage } from '@projectwallace/css-code-coverage/playwright'
 
-export const test = base.extend(withCssCoverage)
+export const test = mergeTests(base, withCssCoverage)
 export { expect }
 ```
 
