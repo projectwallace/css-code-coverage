@@ -30,14 +30,8 @@
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"exports": {
-		".": {
-			"types": "./dist/index.d.ts",
-			"default": "./dist/index.js"
-		},
-		"./playwright": {
-			"types": "./dist/playwright/index.d.mts",
-			"default": "./dist/playwright/index.mjs"
-		}
+		"types": "./dist/index.d.ts",
+		"default": "./dist/index.js"
 	},
 	"publishConfig": {
 		"access": "public",

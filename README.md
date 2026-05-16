@@ -58,13 +58,12 @@ let report = calculcate_coverage(coverage)
 
 ### Playwright fixture
 
-Use `save_css_coverage` to collect and save CSS coverage from within a Playwright fixture.
-
-**1. Add a fixture** (e.g. `tests/fixtures.ts`):
+Add a `cssCoverage` fixture to automatically collect and save CSS coverage for each test. Create a fixtures file (e.g. `tests/fixtures.ts`):
 
 ```ts
 import { test as base, expect } from '@playwright/test'
-import { save_css_coverage } from '@projectwallace/css-code-coverage/playwright'
+import * as fs from 'node:fs/promises'
+import * as path from 'node:path'
 
 export const test = base.extend({
 	cssCoverage: [
@@ -72,10 +71,22 @@ export const test = base.extend({
 			await page.coverage.startCSSCoverage()
 			await use()
 			let coverage = await page.coverage.stopCSSCoverage()
-			await save_css_coverage(coverage, {
-				title_path: testInfo.titlePath,
-				attach: testInfo.attach.bind(testInfo),
-			})
+
+			let file_name =
+				testInfo.titlePath
+					.map((s) =>
+						s
+							.replaceAll(/\s+|\/|\./g, '-')
+							.replaceAll(/[^a-z0-9-_]/gi, '')
+							.toLowerCase(),
+					)
+					.join('-') + '.json'
+
+			let dir = path.join(process.cwd(), 'css-coverage')
+			await fs.mkdir(dir, { recursive: true })
+			let file_path = path.join(dir, file_name)
+			await fs.writeFile(file_path, JSON.stringify(coverage))
+			await testInfo.attach('css-coverage', { path: file_path, contentType: 'application/json' })
 		},
 		{},
 	],
@@ -83,42 +94,23 @@ export const test = base.extend({
 export { expect }
 ```
 
-**2. Use `cssCoverage` in any test** where you want to collect coverage:
+Use `cssCoverage` in any test where you want to collect coverage:
 
 ```ts
 import { test, expect } from './fixtures.js'
 
 test('my test', async ({ page, cssCoverage }) => {
 	await page.goto('https://example.com')
-	// CSS coverage is collected and written to disk when the test finishes
 })
 ```
 
-The fixture starts coverage when the test begins and stops it when the test ends. JSON files are written to the output directory and attached to the Playwright HTML report.
-
-**Enable for an entire test file** with a single line:
+Or enable it for an entire file with a single line:
 
 ```ts
-import { test, expect } from './fixtures.js'
-
 test.beforeEach(async ({ cssCoverage }) => {})
-
-test('first test', async ({ page }) => { ... })
-test('second test', async ({ page }) => { ... })
 ```
 
-**Configure the output directory** (optional) via the `dir` option:
-
-```ts
-await save_css_coverage(coverage, {
-	dir: 'css-coverage', // default
-	title_path: testInfo.titlePath,
-})
-```
-
-Or set it globally in `playwright.config.ts` by passing the configured path to `save_css_coverage` from a shared fixture.
-
-Pass the directory to the `css-coverage` CLI to analyze results:
+Pass the output directory to the `css-coverage` CLI to analyze results:
 
 ```sh
 css-coverage --coverage-dir=./css-coverage --min-coverage=0.8
