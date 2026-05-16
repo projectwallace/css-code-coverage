@@ -58,15 +58,28 @@ let report = calculcate_coverage(coverage)
 
 ### Playwright fixture
 
-Use the built-in Playwright fixture to collect CSS coverage per test and write results to disk.
+Use `save_css_coverage` to collect and save CSS coverage from within a Playwright fixture.
 
-**1. Extend your fixtures file** (e.g. `tests/fixtures.ts`):
+**1. Add a fixture** (e.g. `tests/fixtures.ts`):
 
 ```ts
-import { mergeTests, test as base, expect } from '@playwright/test'
-import { test as withCssCoverage } from '@projectwallace/css-code-coverage/playwright'
+import { test as base, expect } from '@playwright/test'
+import { save_css_coverage } from '@projectwallace/css-code-coverage/playwright'
 
-export const test = mergeTests(base, withCssCoverage)
+export const test = base.extend({
+	cssCoverage: [
+		async ({ page }, use, testInfo) => {
+			await page.coverage.startCSSCoverage()
+			await use()
+			let coverage = await page.coverage.stopCSSCoverage()
+			await save_css_coverage(coverage, {
+				title_path: testInfo.titlePath,
+				attach: testInfo.attach.bind(testInfo),
+			})
+		},
+		{},
+	],
+})
 export { expect }
 ```
 
@@ -94,17 +107,16 @@ test('first test', async ({ page }) => { ... })
 test('second test', async ({ page }) => { ... })
 ```
 
-**3. Configure the output directory** (optional) in `playwright.config.ts`:
+**Configure the output directory** (optional) via the `dir` option:
 
 ```ts
-import { defineConfig } from '@playwright/test'
-
-export default defineConfig({
-	use: {
-		cssCoverageDir: 'css-coverage', // default
-	},
+await save_css_coverage(coverage, {
+	dir: 'css-coverage', // default
+	title_path: testInfo.titlePath,
 })
 ```
+
+Or set it globally in `playwright.config.ts` by passing the configured path to `save_css_coverage` from a shared fixture.
 
 Pass the directory to the `css-coverage` CLI to analyze results:
 

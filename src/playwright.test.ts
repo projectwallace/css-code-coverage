@@ -1,106 +1,74 @@
-import { mergeTests, test as base, expect } from '@playwright/test'
-import { test as withCssCoverage, slugify } from './playwright/index.js'
+import { test, expect } from '@playwright/test'
+import { save_css_coverage, slugify } from './playwright/index.js'
+import type { Coverage } from './lib/parse-coverage.js'
 import * as fs from 'node:fs/promises'
 import * as os from 'node:os'
 import * as path from 'node:path'
 
-const test = mergeTests(base, withCssCoverage)
+const MOCK_COVERAGE: Coverage[] = [
+	{
+		url: 'http://example.com/style.css',
+		text: 'body { color: red }',
+		ranges: [{ start: 0, end: 19 }],
+	},
+]
 
-const TEST_CONTENT = '<style>body { margin: 0 }</style><body></body>'
-
-function expected_filename(title_path: string[]): string {
-	return title_path.map(slugify).join('-') + '.json'
-}
-
-test.describe('cssCoverageDir option', () => {
-	let custom_dir = path.join(os.tmpdir(), 'css-code-coverage-fixture-dir-test')
-	let filename = ''
-
-	test.use({ cssCoverageDir: custom_dir })
+test.describe('save_css_coverage', () => {
+	let dir = path.join(os.tmpdir(), 'css-code-coverage-save-test')
 
 	test.beforeAll(async () => {
-		await fs.rm(custom_dir, { recursive: true, force: true })
-	})
-
-	test('writes coverage to the configured directory', async ({ page, cssCoverage }, testInfo) => {
-		await page.setContent(TEST_CONTENT)
-		filename = expected_filename(testInfo.titlePath)
+		await fs.rm(dir, { recursive: true, force: true })
 	})
 
 	test.afterAll(async () => {
-		await expect(fs.access(path.join(custom_dir, filename))).resolves.toBeUndefined()
-		await fs.rm(custom_dir, { recursive: true, force: true })
-	})
-})
-
-test.describe('default cssCoverageDir', () => {
-	let default_dir = path.join(process.cwd(), 'css-coverage')
-	let filename = ''
-
-	test('defaults to css-coverage relative to cwd', async ({ page, cssCoverage }, testInfo) => {
-		await page.setContent(TEST_CONTENT)
-		filename = expected_filename(testInfo.titlePath)
+		await fs.rm(dir, { recursive: true, force: true })
 	})
 
-	test.afterAll(async () => {
-		await expect(fs.access(path.join(default_dir, filename))).resolves.toBeUndefined()
+	test('writes file to the configured directory', async () => {
+		let title_path = ['writes file to the configured directory']
+		await save_css_coverage(MOCK_COVERAGE, { dir, title_path })
+		await expect(
+			fs.access(path.join(dir, title_path.map(slugify).join('-') + '.json')),
+		).resolves.toBeUndefined()
+	})
+
+	test('defaults dir to css-coverage relative to cwd', async () => {
+		let default_dir = path.join(process.cwd(), 'css-coverage')
+		let title_path = ['defaults dir to css-coverage relative to cwd']
+		await save_css_coverage(MOCK_COVERAGE, { title_path })
+		await expect(
+			fs.access(path.join(default_dir, title_path.map(slugify).join('-') + '.json')),
+		).resolves.toBeUndefined()
 		await fs.rm(default_dir, { recursive: true, force: true })
 	})
-})
 
-test.describe('file naming', () => {
-	let dir = path.join(os.tmpdir(), 'css-code-coverage-fixture-naming-test')
-	let filename = ''
-
-	test.use({ cssCoverageDir: dir })
-
-	test.beforeAll(async () => {
-		await fs.rm(dir, { recursive: true, force: true })
-	})
-
-	test('derives filename from the test title path', async ({ page, cssCoverage }, testInfo) => {
-		await page.setContent(TEST_CONTENT)
-		filename = expected_filename(testInfo.titlePath)
-	})
-
-	test.afterAll(async () => {
+	test('derives filename from title_path', async () => {
+		let title_path = ['My Suite', 'my test/name.ts']
+		await save_css_coverage(MOCK_COVERAGE, { dir, title_path })
 		let files = await fs.readdir(dir)
-		expect(files).toContain(filename)
-		await fs.rm(dir, { recursive: true, force: true })
-	})
-})
-
-test.describe('file content', () => {
-	let dir = path.join(os.tmpdir(), 'css-code-coverage-fixture-content-test')
-
-	test.use({ cssCoverageDir: dir })
-
-	test.beforeAll(async () => {
-		await fs.rm(dir, { recursive: true, force: true })
+		expect(files).toContain('my-suite-my-test-name-ts.json')
 	})
 
-	test('writes valid JSON', async ({ page, cssCoverage }) => {
-		await page.setContent(TEST_CONTENT)
+	test('calls attach with correct arguments', async () => {
+		let attached: { name: string; path: string; contentType: string } | undefined
+		let title_path = ['calls attach with correct arguments']
+		await save_css_coverage(MOCK_COVERAGE, {
+			dir,
+			title_path,
+			attach: async (name, opts) => {
+				attached = { name, ...opts }
+			},
+		})
+		expect(attached?.name).toBe('css-coverage')
+		expect(attached?.contentType).toBe('application/json')
+		expect(attached?.path).toContain('.json')
 	})
 
-	test('content is an array of coverage entries', async ({ page, cssCoverage }) => {
-		await page.setContent('<style>h1 { color: red }</style><body><h1>hi</h1></body>')
-	})
-
-	test.afterAll(async () => {
-		let files = await fs.readdir(dir)
-		for (let file of files) {
-			let content = await fs.readFile(path.join(dir, file), 'utf-8')
-			let parsed = JSON.parse(content)
-			expect(Array.isArray(parsed)).toBe(true)
-			for (let entry of parsed) {
-				expect(entry).toMatchObject({
-					url: expect.any(String),
-					text: expect.any(String),
-					ranges: expect.any(Array),
-				})
-			}
-		}
-		await fs.rm(dir, { recursive: true, force: true })
+	test('file content matches the coverage input', async () => {
+		let title_path = ['file content matches the coverage input']
+		await save_css_coverage(MOCK_COVERAGE, { dir, title_path })
+		let file_path = path.join(dir, title_path.map(slugify).join('-') + '.json')
+		let content = JSON.parse(await fs.readFile(file_path, 'utf-8'))
+		expect(content).toEqual(MOCK_COVERAGE)
 	})
 })

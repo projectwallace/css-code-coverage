@@ -1,46 +1,32 @@
-import { test as base_test } from '@playwright/test'
 import * as fs from 'node:fs/promises'
 import * as path from 'node:path'
-
-type CssCoverageFixtures = {
-	cssCoverage: void
-}
-
-type CssCoverageOptions = {
-	cssCoverageDir: string
-}
+import type { Coverage } from '../lib/parse-coverage.js'
 
 // Needed because titlePath entries can contain '/' (creates subdirs), spaces,
 // dots, and other chars that are invalid or problematic in file names.
 export function slugify(s: string): string {
 	return s
 		.replaceAll(/\s+|\/|\./g, '-')
-		.replaceAll(/[^a-zA-Z0-9-_]/g, '')
+		.replaceAll(/[^a-z0-9-_]/gi, '')
 		.toLowerCase()
 }
 
-export const test = base_test.extend<CssCoverageFixtures, CssCoverageOptions>({
-	cssCoverageDir: ['css-coverage', { option: true }],
+export async function save_css_coverage(
+	coverage: Coverage[],
+	options: {
+		dir?: string
+		title_path: string[]
+		attach?: (name: string, options: { path: string; contentType: string }) => Promise<void>
+	},
+): Promise<void> {
+	let { dir = 'css-coverage', title_path, attach } = options
 
-	cssCoverage: [
-		async ({ page, cssCoverageDir }, use, testInfo) => {
-			await page.coverage.startCSSCoverage()
-			await use()
-			let coverage = await page.coverage.stopCSSCoverage()
+	let file_name = title_path.map(slugify).join('-') + '.json'
+	let resolved_dir = path.resolve(process.cwd(), dir)
+	await fs.mkdir(resolved_dir, { recursive: true })
+	let file_path = path.join(resolved_dir, file_name)
 
-			let file_name = testInfo.titlePath.map(slugify).join('-') + '.json'
+	await fs.writeFile(file_path, JSON.stringify(coverage))
 
-			let dir = path.resolve(process.cwd(), cssCoverageDir)
-			await fs.mkdir(dir, { recursive: true })
-			let file_path = path.join(dir, file_name)
-
-			await fs.writeFile(file_path, JSON.stringify(coverage))
-
-			await testInfo.attach('css-coverage', {
-				path: file_path,
-				contentType: 'application/json',
-			})
-		},
-		{},
-	],
-})
+	await attach?.('css-coverage', { path: file_path, contentType: 'application/json' })
+}
