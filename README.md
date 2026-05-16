@@ -68,10 +68,17 @@ import * as path from 'node:path'
 export const test = base.extend({
 	cssCoverage: [
 		async ({ page }, use, testInfo) => {
+			// Start collecting CSS coverage before the test runs
 			await page.coverage.startCSSCoverage()
+
+			// Run the test
 			await use()
+
+			// Collect the coverage data after the test finishes
 			let coverage = await page.coverage.stopCSSCoverage()
 
+			// Build a unique, human-readable filename from the test's title path,
+			// replacing characters that are invalid or ambiguous in file names
 			let file_name =
 				testInfo.titlePath
 					.map((s) =>
@@ -82,12 +89,17 @@ export const test = base.extend({
 					)
 					.join('-') + '.json'
 
+			// Write the coverage data to disk
 			let dir = path.join(process.cwd(), 'css-coverage')
 			await fs.mkdir(dir, { recursive: true })
 			let file_path = path.join(dir, file_name)
 			await fs.writeFile(file_path, JSON.stringify(coverage))
+
+			// Attach the file to the Playwright HTML report for easy inspection
 			await testInfo.attach('css-coverage', { path: file_path, contentType: 'application/json' })
 		},
+		// auto: true makes this fixture run for every test without needing
+		// to explicitly request it as a parameter
 		{ auto: true },
 	],
 })
