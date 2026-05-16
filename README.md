@@ -56,7 +56,7 @@ import { calculate_coverage } from '@projectwallace/css-code-coverage'
 let report = calculcate_coverage(coverage)
 ```
 
-### Playwright fixture
+### Auto-collect from Playwright tests
 
 Add a `cssCoverage` fixture to automatically collect and save CSS coverage for each test. Create a fixtures file (e.g. `tests/fixtures.ts`):
 
