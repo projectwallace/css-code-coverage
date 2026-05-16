@@ -83,14 +83,12 @@ test('my test', async ({ page, cssCoverage }) => {
 
 The fixture starts coverage when the test begins and stops it when the test ends. JSON files are written to the output directory and attached to the Playwright HTML report.
 
-**Enable for an entire test file** by requesting the fixture in `test.beforeEach`:
+**Enable for an entire test file** with a single line:
 
 ```ts
 import { test, expect } from './fixtures.js'
 
-test.beforeEach(async ({ cssCoverage }) => {
-  // every test in this file will now collect CSS coverage
-})
+test.beforeEach(async ({ cssCoverage }) => {})
 
 test('first test', async ({ page }) => { ... })
 test('second test', async ({ page }) => { ... })

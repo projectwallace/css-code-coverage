@@ -10,6 +10,15 @@ type CssCoverageOptions = {
 	cssCoverageDir: string
 }
 
+// Needed because titlePath entries can contain '/' (creates subdirs), spaces,
+// dots, and other chars that are invalid or problematic in file names.
+export function slugify(s: string): string {
+	return s
+		.replaceAll(/\s+|\/|\./g, '-')
+		.replaceAll(/[^a-zA-Z0-9-_]/g, '')
+		.toLowerCase()
+}
+
 export const test = base_test.extend<CssCoverageFixtures, CssCoverageOptions>({
 	cssCoverageDir: ['css-coverage', { option: true }],
 
@@ -19,13 +28,7 @@ export const test = base_test.extend<CssCoverageFixtures, CssCoverageOptions>({
 			await use()
 			let coverage = await page.coverage.stopCSSCoverage()
 
-			let parts = testInfo.titlePath.map((s) =>
-				s
-					.replaceAll(/\s+|\/|\./g, '-')
-					.replaceAll(/[^a-zA-Z0-9-_]/g, '')
-					.toLowerCase(),
-			)
-			let file_name = parts.join('-') + '.json'
+			let file_name = testInfo.titlePath.map(slugify).join('-') + '.json'
 
 			let dir = path.resolve(process.cwd(), cssCoverageDir)
 			await fs.mkdir(dir, { recursive: true })
