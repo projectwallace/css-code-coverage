@@ -9,11 +9,11 @@ importers:
   .:
     dependencies:
       '@projectwallace/css-parser':
-        specifier: ~0.15.0
-        version: 0.15.0
+        specifier: ~0.16.0
+        version: 0.16.0
       '@projectwallace/format-css':
-        specifier: ^3.0.2
-        version: 3.0.2
+        specifier: ^3.1.2
+        version: 3.1.2
     devDependencies:
       '@codecov/vite-plugin':
         specifier: ^2.0.1
@@ -23,7 +23,7 @@ importers:
         version: 1.60.0
       '@projectwallace/preset-oxlint':
         specifier: ^0.0.11
-        version: 0.0.11(oxlint@1.60.0)
+        version: 0.0.11(oxlint@1.64.0)
       '@types/node':
         specifier: ^25.5.2
         version: 25.5.2
@@ -845,15 +845,13 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
-  '@projectwallace/css-parser@0.14.10':
-    resolution: {integrity: sha512-zE9boYHnGLk+6nn2hTz+QQs67E+BVOkPqDmBry/sUVWho+g/ZICBuSRssvRsCa+5ZCPhL1SkeupDqM8BEi85hA==}
+  '@projectwallace/css-parser@0.16.0':
+    resolution: {integrity: sha512-4WJOIU/6Zbscp5snGGvqx2UobIgYOfBaZDGbx6Mj7b7PjcMz34fFufus7h3AbDFlS7nXEkHHlPDZJl/Qu5gumg==}
+    engines: {pnpm: '>=11.0.0'}
 
-  '@projectwallace/css-parser@0.15.0':
-    resolution: {integrity: sha512-93/+vgClR/Zb0m4cWQLGaNOLBzeLRPRXNSEaxW6ZAwEOnri48kcpiaB1uUBicLvt660DPvjNExFHINipdkOB1w==}
-
-  '@projectwallace/format-css@3.0.2':
-    resolution: {integrity: sha512-4O+AR30yOTewNOkdrnCfkiys7bWXYaZfwgdAJ+5CrMYCZTD18ip0QREokJfzppZRRcrRRmvIFXRPZBArxHBPuA==}
-    engines: {node: '>=20.12.0'}
+  '@projectwallace/format-css@3.1.2':
+    resolution: {integrity: sha512-qqONzYjIkBo3manondz8xwCvSJXeQ8W+oHfQufYuAnpaJZacBQPHEMKLlwpyY8U8sWS3igeGFWAjFtOR8ZVCJg==}
+    engines: {node: '>=20.12.0', pnpm: '>=11.0.0'}
     hasBin: true
 
   '@projectwallace/preset-oxlint@0.0.11':
@@ -2208,15 +2206,13 @@ snapshots:
     dependencies:
       playwright: 1.60.0
 
-  '@projectwallace/css-parser@0.14.10': {}
+  '@projectwallace/css-parser@0.16.0': {}
 
-  '@projectwallace/css-parser@0.15.0': {}
-
-  '@projectwallace/format-css@3.0.2':
+  '@projectwallace/format-css@3.1.2':
     dependencies:
-      '@projectwallace/css-parser': 0.14.10
+      '@projectwallace/css-parser': 0.16.0
 
-  '@projectwallace/preset-oxlint@0.0.11(oxlint@1.60.0)':
+  '@projectwallace/preset-oxlint@0.0.11(oxlint@1.64.0)':
     dependencies:
       oxlint: 1.64.0
 
