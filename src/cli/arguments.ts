@@ -30,14 +30,14 @@ export function parse_arguments(args: string[]): CliArguments {
 	let issues: string[] = []
 
 	let coverage_dir = positionals[0]
-	if (!coverage_dir) {
-		issues.push('<coverage-dir> is required')
-	} else {
+	if (coverage_dir) {
 		let resolved = resolve(coverage_dir)
 		let cwd = process.cwd()
 		if (resolved !== cwd && !resolved.startsWith(cwd + sep)) {
 			issues.push('InvalidPath')
 		}
+	} else {
+		issues.push('<coverage-dir> is required')
 	}
 
 	let min_coverage = Number(values['min-coverage'])

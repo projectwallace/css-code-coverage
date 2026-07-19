@@ -1,9 +1,11 @@
 {
 	"$schema": "./node_modules/oxlint/configuration_schema.json",
-	"extends": ["@projectwallace/preset-oxlint"],
+	"extends": ["./node_modules/@projectwallace/preset-oxlint/index.json"],
 	"env": {
 		"node": true,
 		"browser": true
 	},
-	"rules": {}
+	"rules": {
+		"no-console": "off"
+	}
 }
