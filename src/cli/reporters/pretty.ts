@@ -1,4 +1,4 @@
-// oxlint-disable max-depth
+// oxlint-disable max-depth unicorn/prefer-single-call
 import { styleText } from 'node:util'
 import type { Report } from '../program.js'
 import type { CliArguments } from '../arguments.js'

@@ -45,33 +45,27 @@
 		"knip": "knip"
 	},
 	"dependencies": {
-		"@projectwallace/css-parser": "~0.16.0",
-		"@projectwallace/format-css": "^3.1.2"
+		"@projectwallace/css-parser": "~0.17.0",
+		"@projectwallace/format-css": "^3.1.5"
 	},
 	"devDependencies": {
-		"@codecov/vite-plugin": "^2.0.1",
-		"@playwright/test": "^1.59.1",
+		"@playwright/test": "^1.61.1",
 		"@projectwallace/preset-oxlint": "^0.0.11",
-		"@types/node": "^26.1.0",
-		"c8": "^11.0.0",
-		"knip": "^6.3.0",
-		"oxfmt": "^0.57.0",
-		"oxlint": "^1.58.0",
-		"publint": "^0.3.20",
-		"tsdown": "^0.22.0",
-		"typescript": "^6.0.2"
+		"@types/node": "^26.1.1",
+		"c8": "^12.0.0",
+		"knip": "^6.27.0",
+		"oxfmt": "^0.59.0",
+		"oxlint": "^1.74.0",
+		"publint": "^0.3.21",
+		"tsdown": "^0.22.11",
+		"typescript": "^7.0.2"
 	},
 	"overrides": {
 		"@projectwallace/css-parser": "$@projectwallace/css-parser"
 	},
 	"engines": {
 		"node": ">=20",
-		"pnpm": ">=10.0.0"
+		"pnpm": ">=11.0.0"
 	},
-	"packageManager": "pnpm@11.1.1",
-	"pnpm": {
-		"onlyBuiltDependencies": [
-			"esbuild"
-		]
-	}
+	"packageManager": "pnpm@11.1.1"
 }
