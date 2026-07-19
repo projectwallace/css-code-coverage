@@ -9,11 +9,11 @@ importers:
   .:
     dependencies:
       '@projectwallace/css-parser':
-        specifier: ~0.16.0
-        version: 0.16.0
+        specifier: ~0.17.0
+        version: 0.17.0
       '@projectwallace/format-css':
         specifier: ^3.1.2
-        version: 3.1.2
+        version: 3.1.5
     devDependencies:
       '@codecov/vite-plugin':
         specifier: ^2.0.1
@@ -822,12 +822,16 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
-  '@projectwallace/css-parser@0.16.0':
-    resolution: {integrity: sha512-4WJOIU/6Zbscp5snGGvqx2UobIgYOfBaZDGbx6Mj7b7PjcMz34fFufus7h3AbDFlS7nXEkHHlPDZJl/Qu5gumg==}
+  '@projectwallace/css-parser@0.16.2':
+    resolution: {integrity: sha512-Z5cWNEI5alUAv9Fwm61/mkpNiepxRGUK04ndYyU02HhzITWQpFqxn+OwsHGz8PJ8iaQ4DfZzIA3bGBSgtQWIOg==}
     engines: {pnpm: '>=11.0.0'}
 
-  '@projectwallace/format-css@3.1.2':
-    resolution: {integrity: sha512-qqONzYjIkBo3manondz8xwCvSJXeQ8W+oHfQufYuAnpaJZacBQPHEMKLlwpyY8U8sWS3igeGFWAjFtOR8ZVCJg==}
+  '@projectwallace/css-parser@0.17.0':
+    resolution: {integrity: sha512-y+PHhq9YzC8M3Rndw3XX2tucnV8zEYDLyz/fEsRfd0VCSxol0bB6MU03vvXuICkW8+FLsME6Ff0TA0DVEUfg5A==}
+    engines: {pnpm: '>=11.0.0'}
+
+  '@projectwallace/format-css@3.1.5':
+    resolution: {integrity: sha512-n4AmKUQF7w60JSW3YmQSzCC2BbgOx5br590ijAHhvqweMCMdZ9YoVN0bgp5UD61Pme9EqQuP5BO98Vq7d15ryA==}
     engines: {node: '>=20.12.0', pnpm: '>=11.0.0'}
     hasBin: true
 
@@ -1327,8 +1331,8 @@ packages:
     resolution: {integrity: sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==}
     engines: {node: '>=4'}
 
-  nanoid@3.3.15:
-    resolution: {integrity: sha512-y7Wygv/7mEOvxTuEQDB8StXdMRBWf1kR/tlhAzBRUFkB2jfcLOAxO/SHmOO2zgz1pVgK29/kyupn059/bCHdjA==}
+  nanoid@3.3.16:
+    resolution: {integrity: sha512-bzlKTyNJ7+LdGIIwy8ijFpIqEQIvafahV7eYykJ8Cvh42EdJeODoJ6gUJXpQJvej1BddH8OqTXZNE/KfbWAu8Q==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
@@ -1402,6 +1406,10 @@ packages:
     resolution: {integrity: sha512-QP88BAKvMam/3NxH6vj2o21R6MjxZUAd6nlwAS/pnGvN9IVLocLHxGYIzFhg6fUQ+5th6P4dv4eW9jX3DSIj7A==}
     engines: {node: '>=12'}
 
+  picomatch@4.0.5:
+    resolution: {integrity: sha512-RvwwcruNjI1ncT5xRakeyS9Lf8lcItv34KD+aif+VH9kduAyfYBipGh12274xtenIPZ119/R9BdTBa8gAwSh0A==}
+    engines: {node: '>=12'}
+
   playwright-core@1.61.1:
     resolution: {integrity: sha512-h7Qlt6m4REp25qvIdvbDtVmD4LqVXfpRxhORv9L0jzETM05p4fuPJ3dKyuSXQxDSbXnmS79HAgi9589lGSpLkg==}
     engines: {node: '>=18'}
@@ -1412,8 +1420,8 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
-  postcss@8.5.16:
-    resolution: {integrity: sha512-vuwillviilfKZsg0VGj5R/YwwcHx4SLsIOI/7K6mQkWx+l5cUHTjj5g0AasTBcyXsbfTgrwsUNmVUb5xVwyPwg==}
+  postcss@8.5.19:
+    resolution: {integrity: sha512-Mz8SaolMd8nB+G13WkORcxQKHZ/NE4xXevtkJHVuG+guo9/wYKlIMTKAqGdEmYOXR2ijPjTYNHssizdaVSUNdQ==}
     engines: {node: ^10 || ^12 || >=14}
 
   publint@0.3.21:
@@ -2184,11 +2192,13 @@ snapshots:
     dependencies:
       playwright: 1.61.1
 
-  '@projectwallace/css-parser@0.16.0': {}
+  '@projectwallace/css-parser@0.16.2': {}
 
-  '@projectwallace/format-css@3.1.2':
+  '@projectwallace/css-parser@0.17.0': {}
+
+  '@projectwallace/format-css@3.1.5':
     dependencies:
-      '@projectwallace/css-parser': 0.16.0
+      '@projectwallace/css-parser': 0.16.2
 
   '@projectwallace/preset-oxlint@0.0.11(oxlint@1.72.0)':
     dependencies:
@@ -2467,6 +2477,10 @@ snapshots:
     optionalDependencies:
       picomatch: 4.0.4
 
+  fdir@6.5.0(picomatch@4.0.5):
+    optionalDependencies:
+      picomatch: 4.0.5
+
   find-up@5.0.0:
     dependencies:
       locate-path: 6.0.0
@@ -2568,7 +2582,7 @@ snapshots:
 
   mri@1.2.0: {}
 
-  nanoid@3.3.15: {}
+  nanoid@3.3.16: {}
 
   obug@2.1.3: {}
 
@@ -2690,6 +2704,8 @@ snapshots:
 
   picomatch@4.0.4: {}
 
+  picomatch@4.0.5: {}
+
   playwright-core@1.61.1: {}
 
   playwright@1.61.1:
@@ -2698,9 +2714,9 @@ snapshots:
     optionalDependencies:
       fsevents: 2.3.2
 
-  postcss@8.5.16:
+  postcss@8.5.19:
     dependencies:
-      nanoid: 3.3.15
+      nanoid: 3.3.16
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
@@ -2896,9 +2912,9 @@ snapshots:
   vite@6.4.1(@types/node@26.1.0)(jiti@2.7.0)(yaml@2.9.0):
     dependencies:
       esbuild: 0.25.12
-      fdir: 6.5.0(picomatch@4.0.4)
-      picomatch: 4.0.4
-      postcss: 8.5.16
+      fdir: 6.5.0(picomatch@4.0.5)
+      picomatch: 4.0.5
+      postcss: 8.5.19
       rollup: 4.62.2
       tinyglobby: 0.2.17
     optionalDependencies:
