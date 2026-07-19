@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@projectwallace/css-parser':
-        specifier: ~0.16.2
-        version: 0.16.2
+        specifier: ~0.17.0
+        version: 0.17.0
       '@projectwallace/format-css':
         specifier: ^3.1.5
         version: 3.1.5
@@ -578,12 +578,12 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
-  '@projectwallace/css-parser@0.16.0':
-    resolution: {integrity: sha512-4WJOIU/6Zbscp5snGGvqx2UobIgYOfBaZDGbx6Mj7b7PjcMz34fFufus7h3AbDFlS7nXEkHHlPDZJl/Qu5gumg==}
-    engines: {pnpm: '>=11.0.0'}
-
   '@projectwallace/css-parser@0.16.2':
     resolution: {integrity: sha512-Z5cWNEI5alUAv9Fwm61/mkpNiepxRGUK04ndYyU02HhzITWQpFqxn+OwsHGz8PJ8iaQ4DfZzIA3bGBSgtQWIOg==}
+    engines: {pnpm: '>=11.0.0'}
+
+  '@projectwallace/css-parser@0.17.0':
+    resolution: {integrity: sha512-y+PHhq9YzC8M3Rndw3XX2tucnV8zEYDLyz/fEsRfd0VCSxol0bB6MU03vvXuICkW8+FLsME6Ff0TA0DVEUfg5A==}
     engines: {pnpm: '>=11.0.0'}
 
   '@projectwallace/format-css@3.1.5':
@@ -1631,13 +1631,13 @@ snapshots:
     dependencies:
       playwright: 1.61.1
 
-  '@projectwallace/css-parser@0.16.0': {}
-
   '@projectwallace/css-parser@0.16.2': {}
+
+  '@projectwallace/css-parser@0.17.0': {}
 
   '@projectwallace/format-css@3.1.5':
     dependencies:
-      '@projectwallace/css-parser': 0.16.0
+      '@projectwallace/css-parser': 0.16.2
 
   '@projectwallace/preset-oxlint@0.0.11(oxlint@1.74.0)':
     dependencies:
