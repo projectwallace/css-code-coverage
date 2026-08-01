@@ -45,7 +45,7 @@
 		"knip": "knip"
 	},
 	"dependencies": {
-		"@projectwallace/css-parser": "~0.17.0",
+		"@projectwallace/css-parser": "~0.18.1",
 		"@projectwallace/format-css": "^3.1.5"
 	},
 	"devDependencies": {
