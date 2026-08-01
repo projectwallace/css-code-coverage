@@ -9,11 +9,11 @@ importers:
   .:
     dependencies:
       '@projectwallace/css-parser':
-        specifier: ~0.17.0
-        version: 0.17.0
+        specifier: ~0.18.1
+        version: 0.18.1
       '@projectwallace/format-css':
-        specifier: ^3.1.5
-        version: 3.1.5
+        specifier: ^3.1.6
+        version: 3.1.6
     devDependencies:
       '@playwright/test':
         specifier: ^1.61.1
@@ -578,16 +578,12 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
-  '@projectwallace/css-parser@0.16.2':
-    resolution: {integrity: sha512-Z5cWNEI5alUAv9Fwm61/mkpNiepxRGUK04ndYyU02HhzITWQpFqxn+OwsHGz8PJ8iaQ4DfZzIA3bGBSgtQWIOg==}
+  '@projectwallace/css-parser@0.18.1':
+    resolution: {integrity: sha512-XTeexH92z5NLWfNw031emlEdd7P3yxJPv9ac/ZN3tFxyPyz1l8vEdZ6afQsd+cpfclOMvFfWbDxhfZ7IRePoLg==}
     engines: {pnpm: '>=11.0.0'}
 
-  '@projectwallace/css-parser@0.17.0':
-    resolution: {integrity: sha512-y+PHhq9YzC8M3Rndw3XX2tucnV8zEYDLyz/fEsRfd0VCSxol0bB6MU03vvXuICkW8+FLsME6Ff0TA0DVEUfg5A==}
-    engines: {pnpm: '>=11.0.0'}
-
-  '@projectwallace/format-css@3.1.5':
-    resolution: {integrity: sha512-n4AmKUQF7w60JSW3YmQSzCC2BbgOx5br590ijAHhvqweMCMdZ9YoVN0bgp5UD61Pme9EqQuP5BO98Vq7d15ryA==}
+  '@projectwallace/format-css@3.1.6':
+    resolution: {integrity: sha512-+o6GyH++F0eKVOTCjo4mk6aSbBQTZNqw3alapbZJ8wfbOFKknjkQuQmx6oL7C82mGUHjI8KIfcgPimt3B18Clg==}
     engines: {node: '>=20.12.0', pnpm: '>=11.0.0'}
     hasBin: true
 
@@ -1751,13 +1747,11 @@ snapshots:
     dependencies:
       playwright: 1.61.1
 
-  '@projectwallace/css-parser@0.16.2': {}
+  '@projectwallace/css-parser@0.18.1': {}
 
-  '@projectwallace/css-parser@0.17.0': {}
-
-  '@projectwallace/format-css@3.1.5':
+  '@projectwallace/format-css@3.1.6':
     dependencies:
-      '@projectwallace/css-parser': 0.16.2
+      '@projectwallace/css-parser': 0.18.1
 
   '@projectwallace/preset-oxlint@0.0.11(oxlint@1.74.0)':
     dependencies:
