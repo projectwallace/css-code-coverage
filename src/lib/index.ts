@@ -14,6 +14,7 @@ export type CoverageData = {
 	total_lines: number
 	covered_lines: number
 	uncovered_lines: number
+	max_coverage_count: number
 }
 
 export type StylesheetCoverage = CoverageData & {
@@ -40,6 +41,7 @@ function calculate_stylesheet_coverage({ text, url, chunks }: PrettifiedCoverage
 	let total_lines = 0
 	let covered_lines = 0
 	let uncovered_lines = 0
+	let max_coverage_count = 0
 
 	for (let chunk of chunks) {
 		let lines = chunk.total_lines
@@ -51,6 +53,9 @@ function calculate_stylesheet_coverage({ text, url, chunks }: PrettifiedCoverage
 		if (chunk.is_covered) {
 			covered_lines += lines
 			covered_bytes += bytes
+			if (chunk.coverage_count > max_coverage_count) {
+				max_coverage_count = chunk.coverage_count
+			}
 		} else {
 			uncovered_lines += lines
 			uncovered_bytes += bytes
@@ -68,6 +73,7 @@ function calculate_stylesheet_coverage({ text, url, chunks }: PrettifiedCoverage
 		total_lines,
 		covered_lines,
 		uncovered_lines,
+		max_coverage_count,
 		chunks,
 	}
 }
@@ -79,8 +85,8 @@ export function calculate_coverage(coverage: Coverage[]): CoverageResult {
 		(acc, entry) => filter_coverage(acc, entry),
 		[],
 	)
-	let deduplicated: Coverage[] = deduplicate_entries(filtered_coverage)
-	let extended: Coverage[] = deduplicated.map((coverage) => extend_ranges(coverage))
+	let deduplicated = deduplicate_entries(filtered_coverage)
+	let extended = deduplicated.map((coverage) => extend_ranges(coverage))
 	let chunkified: ChunkedCoverage[] = extended.map((sheet) =>
 		mark_comments_as_covered(chunkify(sheet)),
 	)
@@ -97,6 +103,7 @@ export function calculate_coverage(coverage: Coverage[]): CoverageResult {
 		total_bytes,
 		total_used_bytes,
 		total_unused_bytes,
+		total_max_coverage_count,
 	} = coverage_per_stylesheet.reduce(
 		(totals, sheet) => {
 			totals.total_lines += sheet.total_lines
@@ -105,6 +112,9 @@ export function calculate_coverage(coverage: Coverage[]): CoverageResult {
 			totals.total_bytes += sheet.total_bytes
 			totals.total_used_bytes += sheet.covered_bytes
 			totals.total_unused_bytes += sheet.uncovered_bytes
+			if (sheet.max_coverage_count > totals.total_max_coverage_count) {
+				totals.total_max_coverage_count = sheet.max_coverage_count
+			}
 			return totals
 		},
 		{
@@ -114,6 +124,7 @@ export function calculate_coverage(coverage: Coverage[]): CoverageResult {
 			total_bytes: 0,
 			total_used_bytes: 0,
 			total_unused_bytes: 0,
+			total_max_coverage_count: 0,
 		},
 	)
 
@@ -127,6 +138,7 @@ export function calculate_coverage(coverage: Coverage[]): CoverageResult {
 		uncovered_lines: total_uncovered_lines,
 		byte_coverage_ratio: ratio(total_used_bytes, total_bytes),
 		line_coverage_ratio: ratio(total_covered_lines, total_lines),
+		max_coverage_count: total_max_coverage_count,
 		coverage_per_stylesheet,
 		total_stylesheets: coverage_per_stylesheet.length,
 	}

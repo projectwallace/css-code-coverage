@@ -1,13 +1,14 @@
 import { tokenize } from '@projectwallace/css-parser/tokenizer'
-import type { Coverage } from './parse-coverage'
+import type { WeightedCoverage } from './decuplicate.js'
 
 type Chunk = {
 	start_offset: number
 	end_offset: number
+	coverage_count: number
 	is_covered: boolean
 }
 
-export type ChunkedCoverage = Omit<Coverage, 'ranges'> & {
+export type ChunkedCoverage = Omit<WeightedCoverage, 'ranges'> & {
 	chunks: Chunk[]
 }
 
@@ -27,10 +28,14 @@ function merge(stylesheet: ChunkedCoverage): ChunkedCoverage {
 
 		let latest_chunk = new_chunks.at(-1)
 
-		// merge current and previous if they are both covered or uncovered
+		// merge current and previous if they have the same coverage status
 		if (i > 0 && previous_chunk && latest_chunk) {
 			if (previous_chunk.is_covered === chunk.is_covered) {
 				latest_chunk.end_offset = chunk.end_offset
+				// keep the highest count seen across merged covered chunks
+				if (chunk.coverage_count > latest_chunk.coverage_count) {
+					latest_chunk.coverage_count = chunk.coverage_count
+				}
 				previous_chunk = chunk
 				continue
 			}
@@ -80,12 +85,14 @@ export function mark_comments_as_covered(stylesheet: ChunkedCoverage): ChunkedCo
 					start_offset: chunk.start_offset + last_end,
 					end_offset: chunk.start_offset + comment.start,
 					is_covered: false,
+					coverage_count: 0,
 				})
 			}
 			new_chunks.push({
 				start_offset: chunk.start_offset + comment.start,
 				end_offset: chunk.start_offset + comment.end,
 				is_covered: true,
+				coverage_count: 1,
 			})
 			last_end = comment.end
 		}
@@ -95,6 +102,7 @@ export function mark_comments_as_covered(stylesheet: ChunkedCoverage): ChunkedCo
 				start_offset: chunk.start_offset + last_end,
 				end_offset: chunk.end_offset,
 				is_covered: false,
+				coverage_count: 0,
 			})
 		}
 	}
@@ -102,8 +110,8 @@ export function mark_comments_as_covered(stylesheet: ChunkedCoverage): ChunkedCo
 	return merge({ ...stylesheet, chunks: new_chunks })
 }
 
-export function chunkify(stylesheet: Coverage): ChunkedCoverage {
-	let chunks = []
+export function chunkify(stylesheet: WeightedCoverage): ChunkedCoverage {
+	let chunks: Chunk[] = []
 	let offset = 0
 
 	for (let range of stylesheet.ranges) {
@@ -113,6 +121,7 @@ export function chunkify(stylesheet: Coverage): ChunkedCoverage {
 				start_offset: offset,
 				end_offset: range.start,
 				is_covered: false,
+				coverage_count: 0,
 			})
 			offset = range.start
 		}
@@ -121,6 +130,7 @@ export function chunkify(stylesheet: Coverage): ChunkedCoverage {
 			start_offset: range.start,
 			end_offset: range.end,
 			is_covered: true,
+			coverage_count: range.count,
 		})
 		offset = range.end
 	}
@@ -131,6 +141,7 @@ export function chunkify(stylesheet: Coverage): ChunkedCoverage {
 			start_offset: offset,
 			end_offset: stylesheet.text.length,
 			is_covered: false,
+			coverage_count: 0,
 		})
 	}
 

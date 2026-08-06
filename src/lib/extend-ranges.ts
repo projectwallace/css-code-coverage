@@ -3,7 +3,7 @@ import type { Coverage } from './parse-coverage'
 const AT_SIGN = 64
 const LONGEST_ATRULE_NAME = '@-webkit-font-feature-values'.length
 
-export function extend_ranges(coverage: Coverage): Coverage {
+export function extend_ranges<T extends Coverage>(coverage: T): T {
 	let { ranges, url, text } = coverage
 	// Adjust ranges to include @-rule name (only preludes included)
 	// Cannot reliably include closing } because it may not be the end of the range
@@ -52,5 +52,5 @@ export function extend_ranges(coverage: Coverage): Coverage {
 		return range
 	})
 
-	return { text, ranges: new_ranges, url }
+	return { text, ranges: new_ranges, url } as T
 }
