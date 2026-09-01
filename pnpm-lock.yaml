@@ -10,10 +10,10 @@ importers:
     dependencies:
       '@projectwallace/css-parser':
         specifier: ~0.18.1
-        version: 0.18.1
+        version: 0.18.6
       '@projectwallace/format-css':
         specifier: ^3.1.6
-        version: 3.1.6
+        version: 3.2.0
     devDependencies:
       '@playwright/test':
         specifier: ^1.62.1
@@ -573,12 +573,12 @@ packages:
     engines: {node: '>=20'}
     hasBin: true
 
-  '@projectwallace/css-parser@0.18.1':
-    resolution: {integrity: sha512-XTeexH92z5NLWfNw031emlEdd7P3yxJPv9ac/ZN3tFxyPyz1l8vEdZ6afQsd+cpfclOMvFfWbDxhfZ7IRePoLg==}
+  '@projectwallace/css-parser@0.18.6':
+    resolution: {integrity: sha512-o/3Q5YHs28nq5APCR73w/nUC9hr67nU229cbo611T1U72QeCBti11xkLwk7aMmUTzpSKnqqZib1o4bq7QEgapw==}
     engines: {pnpm: '>=11.0.0'}
 
-  '@projectwallace/format-css@3.1.6':
-    resolution: {integrity: sha512-+o6GyH++F0eKVOTCjo4mk6aSbBQTZNqw3alapbZJ8wfbOFKknjkQuQmx6oL7C82mGUHjI8KIfcgPimt3B18Clg==}
+  '@projectwallace/format-css@3.2.0':
+    resolution: {integrity: sha512-iwPr7GtrHcgCFNF8ncsQ5qUk1zgnQ9UlTdt6w9QZwyWl1+7+r2MmgNLroBhDRpCkvEv2Tvy4Bkq+8lYnhhz9Ig==}
     engines: {node: '>=20.12.0', pnpm: '>=11.0.0'}
     hasBin: true
 
@@ -1700,11 +1700,11 @@ snapshots:
     dependencies:
       playwright: 1.62.1
 
-  '@projectwallace/css-parser@0.18.1': {}
+  '@projectwallace/css-parser@0.18.6': {}
 
-  '@projectwallace/format-css@3.1.6':
+  '@projectwallace/format-css@3.2.0':
     dependencies:
-      '@projectwallace/css-parser': 0.18.1
+      '@projectwallace/css-parser': 0.18.6
 
   '@projectwallace/preset-oxlint@0.0.11(oxlint@1.76.0)':
     dependencies:
