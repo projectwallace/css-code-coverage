@@ -23,6 +23,6 @@
 			"@projectwallace/css-code-coverage": ["./src/lib/index.ts"]
 		}
 	},
-	"include": ["src/lib/index.ts", "src/cli/cli.ts", "src/lib/*.d.ts"],
+	"include": ["src/lib/index.ts", "src/cli/cli.ts", "src/lib/*.d.ts", "src/lib/test/**/*.ts"],
 	"exclude": ["node_modules"]
 }
