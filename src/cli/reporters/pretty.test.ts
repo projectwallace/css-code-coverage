@@ -194,7 +194,7 @@ test.describe('only --min-line-coverage', () => {
 		let result = print(report, show_none, dependencies)
 		expect(result).toEqual([
 			'Finished in 2ms on 3 JSON files (7 coverage entries) containing 8 stylesheets with 10,000 lines of CSS in total.',
-			'Failed: line coverage is 50.22%% which is lower than the threshold of 1',
+			'Failed: line coverage is 50.22% which is lower than the threshold of 100%',
 			'Tip: cover 4,978 more lines to meet the threshold of 100%',
 		])
 	})
@@ -387,5 +387,120 @@ test.describe('uncovered chunk rendering', () => {
 			'▌   12 │ a12 {}',
 			'',
 		])
+	})
+})
+
+test.describe('regressions', () => {
+	function sheet(url: string, line_coverage_ratio: number) {
+		return { url, line_coverage_ratio, covered_lines: 1, total_lines: 1, text: 'a {}', chunks: [] }
+	}
+
+	test('uses singular "line" when exactly one more line needs to be covered (total)', () => {
+		let report = {
+			context: {
+				duration: 2,
+				coverage: {
+					total_lines: 10,
+					covered_lines: 4,
+					total_files_found: 1,
+					total_stylesheets: 1,
+				} as CoverageResult,
+			},
+			report: {
+				ok: false,
+				// 0.45 * 10 - 4 = 0.5 lines, rounds up to 1
+				min_line_coverage: { ok: false, expected: 0.45, actual: 0.4 },
+				...min_file_line_coverage_unset,
+			},
+		} satisfies Report
+		let result = print(report, show_none, dependencies)
+		expect(result).toContain('Tip: cover 1 more line to meet the threshold of 45.00%')
+	})
+
+	test('uses singular "line" when exactly one more line needs to be covered (per file)', () => {
+		let report = {
+			context: {
+				duration: 2,
+				coverage: {
+					total_lines: 10,
+					covered_lines: 4,
+					total_files_found: 1,
+					total_stylesheets: 1,
+					coverage_per_stylesheet: [
+						{
+							url: 'example.com',
+							line_coverage_ratio: 0.4,
+							covered_lines: 4,
+							total_lines: 10,
+							text: 'a {}',
+							chunks: [],
+						},
+					],
+				} as unknown as CoverageResult,
+			},
+			report: {
+				ok: false,
+				...min_line_coverage_success,
+				min_file_line_coverage: { ok: false, expected: 0.45, actual: 0.4 },
+			},
+		} satisfies Report
+		let result = print(report, show_violations, dependencies)
+		expect(result).toContain('Tip: cover 1 more line to meet the file threshold of 45.00%')
+	})
+
+	test('does not reorder the stylesheets in the coverage result', () => {
+		let coverage_per_stylesheet = [sheet('a.css', 0.9), sheet('b.css', 0.1)]
+		let report = {
+			context: {
+				duration: 2,
+				coverage: {
+					total_lines: 2,
+					covered_lines: 1,
+					total_files_found: 2,
+					total_stylesheets: 2,
+					coverage_per_stylesheet,
+				} as unknown as CoverageResult,
+			},
+			report: { ok: true, ...min_line_coverage_success, ...min_file_line_coverage_unset },
+		} satisfies Report
+		let result = print(report, { 'show-uncovered': 'all' } as CliArguments, dependencies)
+		// Output is sorted by coverage (lowest first)...
+		expect(result.indexOf('File: b.css')).toBeLessThan(result.indexOf('File: a.css'))
+		// ...but the input is left untouched
+		expect(coverage_per_stylesheet.map((s) => s.url)).toEqual(['a.css', 'b.css'])
+	})
+})
+
+test.describe('uncovered chunk rendering: edges', () => {
+	function render(
+		text: string,
+		chunks: { start_line: number; end_line: number; is_covered: boolean }[],
+	) {
+		let report = {
+			context: {
+				duration: 2,
+				coverage: {
+					total_files_found: 1,
+					total_stylesheets: 1,
+					total_lines: 1,
+					coverage_per_stylesheet: [{ url: 'example.com', line_coverage_ratio: 0.5, text, chunks }],
+				} as unknown as CoverageResult,
+			},
+			report: { ok: true, ...min_line_coverage_success, ...min_file_line_coverage_unset },
+		} satisfies Report
+		return print(report, { 'show-uncovered': 'all' } as CliArguments, dependencies)
+	}
+
+	test('includes the last line of the file as trailing context', () => {
+		let result = render('a {}\nb {}\nc {}', [
+			{ start_line: 1, end_line: 1, is_covered: false },
+			{ start_line: 2, end_line: 3, is_covered: true },
+		])
+		expect(result.slice(4, 7)).toEqual(['▌    1 │ a {}', '     2 │ b {}', '     3 │ c {}'])
+	})
+
+	test('does not mangle uncovered lines it cannot classify', () => {
+		let result = render('a {\n\tcolor: red\n}', [{ start_line: 1, end_line: 3, is_covered: false }])
+		expect(result).toContain('▌    2 │     color: red')
 	})
 })
