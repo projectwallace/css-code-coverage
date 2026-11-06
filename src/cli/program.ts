@@ -11,6 +11,8 @@ export type Report = {
 	context: {
 		coverage: CoverageResult
 		duration: number
+		/** Number of JSON files read from disk (each file may contain many coverage entries) */
+		json_files_found?: number
 	}
 	report: {
 		ok: boolean
@@ -56,10 +58,12 @@ export function program(
 		min_coverage,
 		min_file_coverage,
 		start_time = 0,
+		json_files_found,
 	}: {
 		min_coverage: number
 		min_file_coverage?: number
 		start_time?: number
+		json_files_found?: number
 	},
 	coverage_data: Coverage[],
 ) {
@@ -75,6 +79,7 @@ export function program(
 		context: {
 			coverage,
 			duration: end_time - start_time,
+			json_files_found,
 		},
 		report: {
 			ok: min_coverage_result.ok && min_file_coverage_result.ok,

@@ -43,14 +43,14 @@ function highlight(css: string, styleText: StyleTextFn): string {
 	if (css.trim().startsWith('@')) {
 		let at_pos = css.indexOf('@')
 		let space_pos = css.indexOf(' ', at_pos)
+		if (space_pos === -1) space_pos = css.length - 1
 		let name = css.slice(0, space_pos)
+		// Statement at-rule like `@layer a, b;` or `@import url(x.css);`
+		let is_statement = css.endsWith(';')
 		let is_empty = css.endsWith('{}')
-		let prelude = css.slice(space_pos, is_empty ? -2 : -1)
-		return [
-			styleText('blueBright', name),
-			styleText('magentaBright', prelude),
-			is_empty ? '{}' : '{',
-		].join('')
+		let end = is_statement ? ';' : is_empty ? '{}' : '{'
+		let prelude = css.slice(space_pos, -end.length)
+		return [styleText('blueBright', name), styleText('magentaBright', prelude), end].join('')
 	}
 
 	// declaration
@@ -133,14 +133,19 @@ export function print_lines(
 				output.push(styleText('dim', '─'.repeat(print_width)))
 
 				let lines = sheet.text.split('\n')
+				let uncovered_chunks = sheet.chunks.filter((chunk) => !chunk.is_covered)
+				// Keep track of the last printed line so context lines of chunks that are close
+				// together are not printed twice
+				let last_printed_line = 0
 
-				for (let chunk of sheet.chunks.filter((chunk) => !chunk.is_covered)) {
+				for (let [index, chunk] of uncovered_chunks.entries()) {
+					let first_line = Math.max(chunk.start_line - NUM_LEADING_LINES, 1, last_printed_line + 1)
+					// Show empty line between non-contiguous blocks
+					if (last_printed_line > 0 && first_line > last_printed_line + 1) {
+						output.push('')
+					}
 					// Render N leading lines
-					for (
-						let x = Math.max(chunk.start_line - NUM_LEADING_LINES, 1);
-						x < chunk.start_line;
-						x++
-					) {
+					for (let x = first_line; x < chunk.start_line; x++) {
 						output.push(
 							[' ', styleText('dim', line_number(x)), styleText('dim', indent(lines[x - 1]))].join(
 								'',
@@ -157,10 +162,17 @@ export function print_lines(
 							].join(''),
 						)
 					}
-					// Render N trailing lines
+					last_printed_line = chunk.end_line
+					// Render N trailing lines, but stop before the next uncovered chunk
+					let next_chunk = uncovered_chunks[index + 1]
 					for (
 						let y = chunk.end_line + 1;
-						y < Math.min(chunk.end_line + NUM_TRAILING_LINES + 1, lines.length);
+						y <
+						Math.min(
+							chunk.end_line + NUM_TRAILING_LINES + 1,
+							lines.length,
+							next_chunk?.start_line ?? Infinity,
+						);
 						y++
 					) {
 						output.push(
@@ -168,10 +180,10 @@ export function print_lines(
 								'',
 							),
 						)
+						last_printed_line = y
 					}
-					// Show empty line between blocks
-					output.push('')
 				}
+				output.push('')
 			}
 		}
 	}
@@ -179,8 +191,14 @@ export function print_lines(
 	// Show empty line between report summary and chunks output
 	output.push()
 
+	let entries = context.coverage.total_files_found
+	let entries_label = `${number(entries)} coverage ${entries === 1 ? 'entry' : 'entries'}`
+	let source =
+		context.json_files_found === undefined
+			? entries_label
+			: `${number(context.json_files_found)} JSON ${context.json_files_found === 1 ? 'file' : 'files'} (${entries_label})`
 	output.push(
-		`Finished in ${number(Math.round(context.duration))}ms on ${number(context.coverage.total_files_found)} JSON files containing ${number(context.coverage.total_stylesheets)} stylesheets with ${number(context.coverage.total_lines)} lines of CSS in total.`,
+		`Finished in ${number(Math.round(context.duration))}ms on ${source} containing ${number(context.coverage.total_stylesheets)} stylesheets with ${number(context.coverage.total_lines)} lines of CSS in total.`,
 	)
 
 	if (report.min_line_coverage.ok) {

@@ -20,12 +20,13 @@ async function cli(cli_args: string[]) {
 	}
 
 	let params = parse_arguments(cli_args)
-	let coverage_data = await read(params['coverage-dir'])
+	let { json_files_found, coverage: coverage_data } = await read(params['coverage-dir'])
 	let report = program(
 		{
 			min_coverage: params['min-coverage'],
 			min_file_coverage: params['min-file-coverage'],
 			start_time,
+			json_files_found,
 		},
 		coverage_data,
 	)

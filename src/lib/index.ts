@@ -23,6 +23,7 @@ export type StylesheetCoverage = CoverageData & {
 }
 
 export type CoverageResult = CoverageData & {
+	/** Number of coverage entries passed in (not the number of JSON files they came from) */
 	total_files_found: number
 	total_stylesheets: number
 	coverage_per_stylesheet: StylesheetCoverage[]
