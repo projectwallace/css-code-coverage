@@ -6,6 +6,7 @@ import {
 	type Coverage,
 	type CoverageResult,
 } from '@projectwallace/css-code-coverage'
+import type { CliArguments } from './arguments.js'
 
 export type Report = {
 	context: {
@@ -29,25 +30,23 @@ export type Report = {
 	}
 }
 
-function validate_min_line_coverage(actual: number, expected: number) {
-	return {
-		ok: actual >= expected,
-		actual,
-		expected,
+type Sheet = CoverageResult['coverage_per_stylesheet'][number]
+
+// Whether a reporter should list this sheet, based on --show-uncovered
+export function should_show(
+	sheet: Sheet,
+	show: CliArguments['show-uncovered'],
+	min_file_line_coverage = 0,
+): boolean {
+	if (show === 'all') {
+		return sheet.line_coverage_ratio < 1
 	}
+	return show === 'violations' && sheet.line_coverage_ratio < min_file_line_coverage
 }
 
-function validate_min_file_line_coverage(actual: number, expected: number | undefined) {
-	if (expected === undefined) {
-		return {
-			ok: true,
-			actual,
-			expected,
-		}
-	}
-
+function validate<T extends number | undefined>(actual: number, expected: T) {
 	return {
-		ok: actual >= expected,
+		ok: expected === undefined || actual >= expected,
 		actual,
 		expected,
 	}
@@ -68,8 +67,8 @@ export function program(
 	coverage_data: Coverage[],
 ) {
 	let coverage = calculate_coverage(coverage_data)
-	let min_coverage_result = validate_min_line_coverage(coverage.line_coverage_ratio, min_coverage)
-	let min_file_coverage_result = validate_min_file_line_coverage(
+	let min_coverage_result = validate(coverage.line_coverage_ratio, min_coverage)
+	let min_file_coverage_result = validate(
 		Math.min(...coverage.coverage_per_stylesheet.map((sheet) => sheet.line_coverage_ratio)),
 		min_file_coverage,
 	)

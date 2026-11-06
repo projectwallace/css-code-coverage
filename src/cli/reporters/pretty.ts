@@ -1,5 +1,5 @@
 import { styleText } from 'node:util'
-import type { Report } from '../program.js'
+import { should_show, type Report } from '../program.js'
 import type { CliArguments } from '../arguments.js'
 
 const NUM_CONTEXT_LINES = 3
@@ -22,6 +22,15 @@ function number(num: number): string {
 
 function plural(count: number, singular: string, plural: string): string {
 	return count === 1 ? singular : plural
+}
+
+function tip(
+	threshold: number,
+	{ total_lines, covered_lines }: { total_lines: number; covered_lines: number },
+	label: string,
+): string {
+	let lines_to_cover = Math.ceil(threshold * total_lines - covered_lines)
+	return `Tip: cover ${number(lines_to_cover)} more ${plural(lines_to_cover, 'line', 'lines')} to meet the ${label} of ${percentage(threshold)}`
 }
 
 export type TextStyle =
@@ -100,10 +109,7 @@ function print_sheet(
 	]
 
 	if (line_coverage_ratio < min_file_line_coverage) {
-		let lines_to_cover = Math.ceil(min_file_line_coverage * total_lines - covered_lines)
-		output.push(
-			`Tip: cover ${number(lines_to_cover)} more ${plural(lines_to_cover, 'line', 'lines')} to meet the file threshold of ${percentage(min_file_line_coverage)}`,
-		)
+		output.push(tip(min_file_line_coverage, sheet, 'file threshold'))
 	}
 	output.push(divider)
 
@@ -173,10 +179,7 @@ function print_summary(
 		failure(
 			`line coverage is ${percentage(actual)} which is lower than the threshold of ${percentage(expected)}`,
 		)
-		let lines_to_cover = Math.ceil(expected * coverage.total_lines - coverage.covered_lines)
-		output.push(
-			`Tip: cover ${number(lines_to_cover)} more ${plural(lines_to_cover, 'line', 'lines')} to meet the threshold of ${percentage(expected)}`,
-		)
+		output.push(tip(expected, coverage, 'threshold'))
 	}
 
 	let file_coverage = report.min_file_line_coverage
@@ -205,14 +208,14 @@ export function print_lines(
 	params: CliArguments,
 	{ styleText, print_width = 80 }: PrintLinesDependencies,
 ): string[] {
-	let show = params['show-uncovered']
 	let min_file_line_coverage = report.min_file_line_coverage.expected ?? 0
-	let should_show = (sheet: Sheet) =>
-		show === 'all'
-			? sheet.line_coverage_ratio !== 1
-			: show === 'violations' && sheet.line_coverage_ratio < min_file_line_coverage
-
-	let sheets = show === 'none' ? [] : context.coverage.coverage_per_stylesheet.filter(should_show)
+	let show = params['show-uncovered']
+	let sheets =
+		show === 'none'
+			? []
+			: context.coverage.coverage_per_stylesheet.filter((sheet) =>
+					should_show(sheet, show, min_file_line_coverage),
+				)
 
 	return [
 		...sheets

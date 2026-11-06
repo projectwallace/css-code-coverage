@@ -16,7 +16,7 @@ Optional:
   --min-file-coverage   Minimal coverage per file [0-1]
 
   --show-uncovered      Which files to show when not meeting 
-                        the --min-file-line-coverage threshold
+                        the --min-file-coverage threshold
                         • violations [default] ${styleText('dim', 'show under-threshold files')}
                         • all ${styleText('dim', 'show partially covered files')}
                         • none ${styleText('dim', 'do not show files')}

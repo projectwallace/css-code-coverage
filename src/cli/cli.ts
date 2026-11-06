@@ -10,12 +10,7 @@ import { help } from './help.js'
 
 async function cli(cli_args: string[]) {
 	let start_time = performance.now()
-	if (
-		!cli_args ||
-		cli_args.length === 0 ||
-		cli_args.includes('--help') ||
-		cli_args.includes('-h')
-	) {
+	if (cli_args.length === 0 || cli_args.includes('--help') || cli_args.includes('-h')) {
 		return console.log(help())
 	}
 
@@ -35,13 +30,8 @@ async function cli(cli_args: string[]) {
 		process.exitCode = 1
 	}
 
-	if (params.reporter === 'tap') {
-		return tap(report, params)
-	}
-	if (params.reporter === 'json') {
-		return json(report, params)
-	}
-	return pretty(report, params)
+	let reporters = { pretty, tap, json }
+	reporters[params.reporter](report, params)
 }
 
 try {
