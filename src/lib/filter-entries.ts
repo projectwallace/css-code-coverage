@@ -9,7 +9,8 @@ function is_html(text: string): boolean {
 // Matches: element selectors, class/id selectors, attribute selectors, @rules
 const SELECTOR_REGEX = /(@[a-z-]+|\[[^\]]+\]|[a-zA-Z_#.-][a-zA-Z0-9_-]*)\s*\{/
 // Check for CSS properties (property: value pattern)
-const DECLARATION_REGEX = /^\s*[a-zA-Z-]+\s*:\s*.+;?\s*$/m
+// Uses [ \t] instead of \s so the pattern can't span lines, which would make it quadratic
+const DECLARATION_REGEX = /^[ \t]*[a-zA-Z-]+[ \t]*:[ \t]*.+;?[ \t]*$/m
 
 function is_css_like(text: string): boolean {
 	return SELECTOR_REGEX.test(text) || DECLARATION_REGEX.test(text)

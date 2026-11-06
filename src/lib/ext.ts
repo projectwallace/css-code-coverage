@@ -1,9 +1,12 @@
 export function ext(url: string) {
+	let path: string
 	try {
-		let parsed_url = new URL(url)
-		return parsed_url.pathname.slice(parsed_url.pathname.lastIndexOf('.') + 1)
+		path = new URL(url).pathname
 	} catch {
-		let ext_index = url.lastIndexOf('.')
-		return url.slice(ext_index, url.indexOf('/', ext_index) + 1)
+		// Relative URL or plain path: strip query and hash manually
+		path = url.split(/[?#]/)[0]!
 	}
+	let file = path.slice(path.lastIndexOf('/') + 1)
+	let dot = file.lastIndexOf('.')
+	return dot === -1 ? '' : file.slice(dot + 1)
 }

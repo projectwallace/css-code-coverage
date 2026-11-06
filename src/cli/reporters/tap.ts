@@ -48,7 +48,6 @@ export function print_lines({ report, context }: Report): string[] {
 
 export function print(report: Report): void {
 	let logger = report.report.ok ? console.log : console.error
-	for (let line of print_lines(report)) {
-		logger(line)
-	}
+	// One write instead of one per line
+	logger(print_lines(report).join('\n'))
 }
