@@ -1,52 +1,26 @@
 import type { Range } from './parse-coverage.js'
-import { DOMParser as WallaceDOMParser } from './html-parser.js'
-
-function get_dom_parser(): DOMParser | WallaceDOMParser {
-	if (typeof window !== 'undefined' && 'DOMParser' in window) {
-		return new window.DOMParser()
-	}
-
-	return new WallaceDOMParser()
-}
+import { find_style_blocks } from './html-parser.js'
 
 export function remap_html(html: string, old_ranges: Range[]) {
-	let dom_parser = get_dom_parser()
-	let doc = dom_parser.parseFromString(html, 'text/html')
-	let combined_css = ''
-	let new_ranges = []
-	let current_offset = 0
-	let style_elements = doc.querySelectorAll('style')
-	let search_from = 0
+	let css = ''
+	let ranges: Range[] = []
 
-	for (let style_element of Array.from(style_elements)) {
-		let style_content = style_element.textContent
-		if (!style_content.trim()) continue
+	for (let [start, end] of find_style_blocks(html)) {
+		let content = html.slice(start, end)
+		if (!content.trim()) {
+			continue
+		}
 
-		// Append the style content directly to the combined CSS
-		combined_css += style_content
-
-		// Find the offsets of this style element's content in the original HTML,
-		// starting after the previous style block to avoid matching an earlier occurrence
-		let start_index = html.indexOf(style_content, search_from)
-		let end_index = start_index + style_content.length
-		search_from = end_index
-
-		// Iterate through ranges and adjust if they fall within the current style tag
+		// Move ranges that fall within this style block to their new position in the combined CSS
+		let shift = css.length - start
 		for (let range of old_ranges) {
-			if (range.start >= start_index && range.end <= end_index) {
-				new_ranges.push({
-					start: current_offset + (range.start - start_index),
-					end: current_offset + (range.end - start_index),
-				})
+			if (range.start >= start && range.end <= end) {
+				ranges.push({ start: range.start + shift, end: range.end + shift })
 			}
 		}
 
-		// Update the current offset for the next style tag
-		current_offset += style_content.length
+		css += content
 	}
 
-	return {
-		css: combined_css,
-		ranges: new_ranges,
-	}
+	return { css, ranges }
 }

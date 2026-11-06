@@ -13,53 +13,49 @@ export type PrettifiedCoverage = Omit<ChunkedCoverage, 'chunks'> & {
 }
 
 export function prettify(stylesheet: ChunkedCoverage): PrettifiedCoverage {
+	let { chunks } = stylesheet
+	let last_index = chunks.length - 1
 	let line = 1
 	let offset = 0
 
-	let pretty_chunks = stylesheet.chunks.map((chunk, index) => {
-		let chunk_css = stylesheet.text.substring(chunk.start_offset, chunk.end_offset)
-		let css = format(chunk_css).trim()
+	let pretty_chunks = chunks.map((chunk, index) => {
+		let css = format(stylesheet.text.substring(chunk.start_offset, chunk.end_offset)).trim()
 
 		if (chunk.is_covered) {
-			let is_last_chunk = index === stylesheet.chunks.length - 1
-			if (index === 0) {
-				// mark the line between this chunk and the next on as covered
-				css = css + (is_last_chunk ? '' : '\n')
-			} else if (index === stylesheet.chunks.length - 1) {
-				// mark the newline after the previous uncovered block as covered
+			// mark the newline after the previous uncovered block as covered
+			if (index > 0) {
 				css = '\n' + css
-			} else {
-				// mark the newline after the previous uncovered block as covered
-				// and mark the line between this chunk and the next on as covered
-				css = '\n' + css + '\n'
+			}
+			// mark the line between this chunk and the next one as covered
+			if (index < last_index) {
+				css += '\n'
 			}
 		}
 
-		let line_count = css.split('\n').length
-		let start_offset = offset
-		let end_offset = offset + css.length - 1
-		let start_line = line
-		let end_line = line + line_count
+		let total_lines = 1
+		for (let i = css.indexOf('\n'); i !== -1; i = css.indexOf('\n', i + 1)) {
+			total_lines++
+		}
 
-		line = end_line
-		offset = end_offset
+		let start_offset = offset
+		let start_line = line
+		offset += css.length - 1
+		line += total_lines
 
 		return {
-			...chunk,
+			is_covered: chunk.is_covered,
 			start_offset,
+			end_offset: offset,
 			start_line,
-			end_line: end_line - 1,
-			end_offset,
+			end_line: line - 1,
+			total_lines,
 			css,
-			total_lines: end_line - start_line,
 		}
 	})
 
-	let updated_stylesheet = {
-		...stylesheet,
-		chunks: pretty_chunks,
+	return {
+		url: stylesheet.url,
 		text: pretty_chunks.map(({ css }) => css).join('\n'),
+		chunks: pretty_chunks,
 	}
-
-	return updated_stylesheet
 }

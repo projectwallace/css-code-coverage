@@ -1,6 +1,6 @@
 import { readFile, stat, readdir } from 'node:fs/promises'
 import { join } from 'node:path'
-import { parse_coverage, type Coverage } from '../lib/parse-coverage.js'
+import { parse_coverage, type Coverage } from '@projectwallace/css-code-coverage'
 
 export async function read(
 	coverage_dir: string,

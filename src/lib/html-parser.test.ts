@@ -1,15 +1,10 @@
 import { test, expect } from '@playwright/test'
-import { DOMParser, type Element } from './html-parser'
+import { find_style_blocks } from './html-parser'
 
-let parse: (html: string) => Element[]
-
-test.beforeAll(() => {
-	parse = function (html: string) {
-		return new DOMParser()
-			.parseFromString(`<html>${html}</html>`, 'text/html')
-			.querySelectorAll('style')
-	}
-})
+function parse(html: string) {
+	let doc = `<html>${html}</html>`
+	return find_style_blocks(doc).map(([start, end]) => ({ textContent: doc.slice(start, end) }))
+}
 
 test('finds nothing if there is no <style> tag', () => {
 	expect(parse('<p>nope</p>')).toEqual([])
