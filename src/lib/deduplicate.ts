@@ -14,7 +14,10 @@ function merge_ranges(ranges: Range[]): Range[] {
 				last.end = range.end
 			}
 		} else {
-			last = { start: range.start, end: range.end }
+			last = {
+				start: range.start,
+				end: range.end,
+			}
 			merged.push(last)
 		}
 	}
@@ -33,7 +36,11 @@ export function deduplicate_entries(entries: Coverage[]): Coverage[] {
 				sheet.ranges.push(range)
 			}
 		} else {
-			grouped.set(entry.text, { text: entry.text, url: entry.url, ranges: entry.ranges.slice() })
+			grouped.set(entry.text, {
+				text: entry.text,
+				url: entry.url,
+				ranges: entry.ranges.slice(),
+			})
 		}
 	}
 

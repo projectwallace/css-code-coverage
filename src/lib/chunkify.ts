@@ -59,17 +59,29 @@ function push_uncovered(chunks: Chunk[], text: string, start: number, end: numbe
 		for (const _ of tokenize(css, (comment) => {
 			let comment_start = start + comment.start
 			if (comment_start > last_end) {
-				chunks.push({ start_offset: last_end, end_offset: comment_start, is_covered: false })
+				chunks.push({
+					start_offset: last_end,
+					end_offset: comment_start,
+					is_covered: false,
+				})
 			}
 			last_end = start + comment.end
-			chunks.push({ start_offset: comment_start, end_offset: last_end, is_covered: true })
+			chunks.push({
+				start_offset: comment_start,
+				end_offset: last_end,
+				is_covered: true,
+			})
 		})) {
 			// consume the generator to drive the on_comment callback
 		}
 	}
 
 	if (last_end < end) {
-		chunks.push({ start_offset: last_end, end_offset: end, is_covered: false })
+		chunks.push({
+			start_offset: last_end,
+			end_offset: end,
+			is_covered: false,
+		})
 	}
 }
 
@@ -81,7 +93,11 @@ export function chunkify({ url, text, ranges }: Coverage): ChunkedCoverage {
 		if (offset !== range.start) {
 			push_uncovered(chunks, text, offset, range.start)
 		}
-		chunks.push({ start_offset: range.start, end_offset: range.end, is_covered: true })
+		chunks.push({
+			start_offset: range.start,
+			end_offset: range.end,
+			is_covered: true,
+		})
 		offset = range.end
 	}
 
@@ -89,5 +105,9 @@ export function chunkify({ url, text, ranges }: Coverage): ChunkedCoverage {
 		push_uncovered(chunks, text, offset, text.length)
 	}
 
-	return { url, text, chunks: merge(text, chunks) }
+	return {
+		url,
+		text,
+		chunks: merge(text, chunks),
+	}
 }

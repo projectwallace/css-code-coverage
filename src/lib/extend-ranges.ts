@@ -2,11 +2,12 @@ import type { Coverage } from './parse-coverage'
 
 const AT_SIGN = 64
 const LONGEST_ATRULE_NAME = '@-webkit-font-feature-values'.length
+const WHITESPACE_REGEX = /\s/
 
 // Returns the char at the first non-whitespace position from `offset`, and that position
 function next_non_whitespace(text: string, offset: number): [string, number] {
 	let char = text.charAt(offset)
-	while (/\s/.test(char)) {
+	while (WHITESPACE_REGEX.test(char)) {
 		char = text.charAt(++offset)
 	}
 	return [char, offset]

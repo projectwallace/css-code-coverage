@@ -1,6 +1,6 @@
 import { type Coverage } from './parse-coverage.js'
 import { prettify, type PrettifiedChunk } from './prettify.js'
-import { deduplicate_entries } from './decuplicate.js'
+import { deduplicate_entries } from './deduplicate.js'
 import { filter_coverage } from './filter-entries.js'
 import { extend_ranges } from './extend-ranges.js'
 import { chunkify } from './chunkify.js'
