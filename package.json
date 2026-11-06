@@ -46,7 +46,7 @@
 		"precommit": "pnpm test && pnpm check && pnpm lint && pnpm knip"
 	},
 	"dependencies": {
-		"@projectwallace/css-parser": "~0.19.0",
+		"@projectwallace/css-parser": "catalog:",
 		"@projectwallace/format-css": "^3.2.2"
 	},
 	"devDependencies": {
@@ -60,9 +60,6 @@
 		"publint": "^0.3.25",
 		"tsdown": "^0.23.1",
 		"typescript": "^7.0.2"
-	},
-	"overrides": {
-		"@projectwallace/css-parser": "$@projectwallace/css-parser"
 	},
 	"engines": {
 		"node": ">=20",
