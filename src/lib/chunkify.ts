@@ -1,4 +1,5 @@
-import { tokenize } from '@projectwallace/css-parser/tokenizer'
+import { tokenize_cb } from '@projectwallace/css-parser/tokenizer'
+import { TOKEN_COMMENT } from '@projectwallace/css-parser/token-types'
 import type { Coverage } from './parse-coverage'
 
 type Chunk = {
@@ -59,17 +60,18 @@ function push_uncovered(chunks: Chunk[], text: string, start: number, end: numbe
 	let last_end = start
 
 	// Skip tokenizing when there cannot be any comment
-	if (css.includes('/*')) {
-		for (const _ of tokenize(css, (comment) => {
-			let comment_start = start + comment.start
+	if (css.indexOf('/*') !== -1) {
+		tokenize_cb(css, (token_type, token_start, token_end) => {
+			if (token_type !== TOKEN_COMMENT) {
+				return
+			}
+			let comment_start = start + token_start
 			if (comment_start > last_end) {
 				chunks.push(create_chunk(last_end, comment_start, false))
 			}
-			last_end = start + comment.end
+			last_end = start + token_end
 			chunks.push(create_chunk(comment_start, last_end, true))
-		})) {
-			// consume the generator to drive the on_comment callback
-		}
+		})
 	}
 
 	if (last_end < end) {
