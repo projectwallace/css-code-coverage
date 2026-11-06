@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 import { filter_coverage } from './filter-entries.js'
-import { Coverage } from './parse-coverage.js'
+import type { Coverage } from './parse-coverage.js'
 
 test('filters out JS files', () => {
 	let entries = [

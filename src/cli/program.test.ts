@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { program } from './program'
-import { Coverage } from '../lib'
+import type { Coverage } from '../lib'
 
 // Line coverage: 4 covered, 3 uncovered
 let coverage = [

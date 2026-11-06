@@ -9,22 +9,18 @@ export type Coverage = {
 	ranges: Range[]
 }
 
+// Optional chaining makes `null` and non-object items fail the typeof checks
 function is_valid_coverage(input: unknown): input is Coverage[] {
 	return (
 		Array.isArray(input) &&
 		input.every(
 			(item) =>
-				typeof item === 'object' &&
-				item !== null &&
-				typeof item.text === 'string' &&
+				typeof item?.text === 'string' &&
 				typeof item.url === 'string' &&
 				Array.isArray(item.ranges) &&
 				item.ranges.every(
-					(r: unknown) =>
-						typeof r === 'object' &&
-						r !== null &&
-						typeof (r as Range).start === 'number' &&
-						typeof (r as Range).end === 'number',
+					(range: Range | null) =>
+						typeof range?.start === 'number' && typeof range.end === 'number',
 				),
 		)
 	)
