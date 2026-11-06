@@ -15,6 +15,11 @@ export type CliArguments = {
 	reporter: Reporter
 }
 
+// Also false for NaN, e.g. a missing or non-numeric value
+function is_ratio(value: number): boolean {
+	return value >= 0 && value <= 1
+}
+
 export function parse_arguments(args: string[]): CliArguments {
 	let { values, positionals } = parseArgs({
 		args,
@@ -41,20 +46,14 @@ export function parse_arguments(args: string[]): CliArguments {
 	}
 
 	let min_coverage = Number(values['min-coverage'])
-	if (
-		values['min-coverage'] === undefined ||
-		isNaN(min_coverage) ||
-		min_coverage < 0 ||
-		min_coverage > 1
-	) {
+	if (!is_ratio(min_coverage)) {
 		issues.push('--min-coverage must be a number between 0 and 1')
 	}
 
 	let min_file_coverage
 	if (values['min-file-coverage'] !== undefined) {
 		min_file_coverage = Number(values['min-file-coverage'])
-
-		if (isNaN(min_file_coverage) || min_file_coverage < 0 || min_file_coverage > 1) {
+		if (!is_ratio(min_file_coverage)) {
 			issues.push('--min-file-coverage must be a number between 0 and 1')
 		}
 	}

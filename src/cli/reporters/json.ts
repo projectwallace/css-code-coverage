@@ -1,36 +1,20 @@
 import type { CliArguments } from '../arguments.js'
-import type { Report } from '../program.js'
+import { should_show, type Report } from '../program.js'
 
-function prepare({ report, context }: Report, params: CliArguments) {
-	context.coverage.coverage_per_stylesheet = context.coverage.coverage_per_stylesheet.filter(
-		(sheet) => {
-			// Include if the user wanted min-file-coverage and this file coverage is too low
-			if (
-				params['show-uncovered'] === 'violations' &&
-				report.min_file_line_coverage.expected !== undefined &&
-				sheet.line_coverage_ratio < report.min_file_line_coverage.expected
-			) {
-				return true
-			}
-
-			// Include if show=all and coverage isn't 100%
-			if (params['show-uncovered'] === 'all' && sheet.line_coverage_ratio < 1) {
-				return true
-			}
-
-			// Skip the sheet if show=none or coverage is higher than requested
-			return false
-		},
+export function print_lines({ report, context }: Report, params: CliArguments): string[] {
+	let coverage_per_stylesheet = context.coverage.coverage_per_stylesheet.filter((sheet) =>
+		should_show(sheet, params['show-uncovered'], report.min_file_line_coverage.expected),
 	)
-
-	return {
+	let output = {
 		report,
-		context,
+		context: { ...context, coverage: { ...context.coverage, coverage_per_stylesheet } },
 	}
+	return [JSON.stringify(output)]
 }
 
-export function print({ report, context }: Report, params: CliArguments): void {
-	let logger = report.ok ? console.log : console.error
-	let data = prepare({ context, report }, params)
-	logger(JSON.stringify(data))
+export function print(report: Report, params: CliArguments): void {
+	let logger = report.report.ok ? console.log : console.error
+	for (let line of print_lines(report, params)) {
+		logger(line)
+	}
 }
