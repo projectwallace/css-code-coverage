@@ -1,7 +1,9 @@
-// oxlint-disable max-depth unicorn/prefer-single-call
 import { styleText } from 'node:util'
 import type { Report } from '../program.js'
 import type { CliArguments } from '../arguments.js'
+
+const NUM_CONTEXT_LINES = 3
+const number_formatter = new Intl.NumberFormat()
 
 // Re-indent because tabs in the terminal tend to be bigger than usual
 function indent(line?: string): string {
@@ -15,7 +17,11 @@ function percentage(ratio: number, decimals: number = 2): string {
 }
 
 function number(num: number): string {
-	return new Intl.NumberFormat().format(num)
+	return number_formatter.format(num)
+}
+
+function plural(count: number, singular: string, plural: string): string {
+	return count === 1 ? singular : plural
 }
 
 export type TextStyle =
@@ -38,200 +44,152 @@ export type PrintLinesDependencies = {
 	print_width?: number
 }
 
+type Sheet = Report['context']['coverage']['coverage_per_stylesheet'][number]
+
 function highlight(css: string, styleText: StyleTextFn): string {
+	// Style everything except `suffix`, which is appended unstyled
+	let wrap = (style: TextStyle, suffix: string) =>
+		styleText(style, css.slice(0, -suffix.length)) + suffix
+
 	// atrule
 	if (css.trim().startsWith('@')) {
-		let at_pos = css.indexOf('@')
-		let space_pos = css.indexOf(' ', at_pos)
-		if (space_pos === -1) space_pos = css.length - 1
-		let name = css.slice(0, space_pos)
+		let space_pos = css.indexOf(' ', css.indexOf('@'))
+		if (space_pos === -1) {
+			space_pos = css.length - 1
+		}
 		// Statement at-rule like `@layer a, b;` or `@import url(x.css);`
-		let is_statement = css.endsWith(';')
-		let is_empty = css.endsWith('{}')
-		let end = is_statement ? ';' : is_empty ? '{}' : '{'
-		let prelude = css.slice(space_pos, -end.length)
-		return [styleText('blueBright', name), styleText('magentaBright', prelude), end].join('')
+		let end = css.endsWith(';') ? ';' : css.endsWith('{}') ? '{}' : '{'
+		return (
+			styleText('blueBright', css.slice(0, space_pos)) +
+			styleText('magentaBright', css.slice(space_pos, -end.length)) +
+			end
+		)
 	}
 
 	// declaration
 	if (css.includes(':') && css.endsWith(';')) {
-		return [
-			styleText('cyanBright', css.slice(0, css.indexOf(':'))),
-			':',
-			css.slice(css.indexOf(':') + 1, css.length - 1),
-			';',
-		].join('')
+		let colon = css.indexOf(':')
+		return styleText('cyanBright', css.slice(0, colon)) + css.slice(colon)
 	}
-
-	// Empty rule
+	// empty rule
 	if (css.endsWith('{}')) {
-		return [styleText('greenBright', css.slice(0, -2)), '{}'].join('')
+		return wrap('greenBright', '{}')
 	}
-
-	// Closing }
-	if (css.endsWith('}')) {
-		return css
-	}
-
-	// empty line
-	if (css.trim() === '') {
-		return css
-	}
-
 	// selector,
 	if (css.endsWith(',')) {
-		return [styleText('greenBright', css.slice(0, -1)), ','].join('')
+		return wrap('greenBright', ',')
 	}
-
 	// selector {
-	return [styleText('greenBright', css.slice(0, -1)), '{'].join('')
+	if (css.endsWith('{')) {
+		return wrap('greenBright', '{')
+	}
+	return css // closing }, empty line, or anything unrecognised
 }
 
-export function print_lines(
+function print_sheet(
+	sheet: Sheet,
+	min_file_line_coverage: number,
+	{ styleText, print_width }: Required<PrintLinesDependencies>,
+): string[] {
+	let divider = styleText('dim', '─'.repeat(print_width))
+	let { line_coverage_ratio, covered_lines, total_lines, url } = sheet
+	let output = [
+		divider,
+		`File: ${url}`,
+		`Coverage: ${percentage(line_coverage_ratio)}, ${covered_lines}/${total_lines} lines covered`,
+	]
+
+	if (line_coverage_ratio < min_file_line_coverage) {
+		let lines_to_cover = Math.ceil(min_file_line_coverage * total_lines - covered_lines)
+		output.push(
+			`Tip: cover ${number(lines_to_cover)} more ${plural(lines_to_cover, 'line', 'lines')} to meet the file threshold of ${percentage(min_file_line_coverage)}`,
+		)
+	}
+	output.push(divider)
+
+	let lines = sheet.text.split('\n')
+	let uncovered_chunks = sheet.chunks.filter((chunk) => !chunk.is_covered)
+	// Keep track of the last printed line so context lines of chunks that are close
+	// together are not printed twice
+	let last_printed_line = 0
+
+	for (let [index, chunk] of uncovered_chunks.entries()) {
+		let next_chunk = uncovered_chunks[index + 1]
+		let from = Math.max(chunk.start_line - NUM_CONTEXT_LINES, 1, last_printed_line + 1)
+		// Stop trailing context lines before the next uncovered chunk
+		let to = Math.min(
+			chunk.end_line + NUM_CONTEXT_LINES,
+			lines.length,
+			(next_chunk?.start_line ?? Infinity) - 1,
+		)
+
+		// Show empty line between non-contiguous blocks
+		if (last_printed_line > 0 && from > last_printed_line + 1) {
+			output.push('')
+		}
+
+		for (let n = from; n <= to; n++) {
+			let line = indent(lines[n - 1])
+			let is_uncovered = n >= chunk.start_line && n <= chunk.end_line
+			output.push(
+				is_uncovered
+					? styleText('red', '▌') + styleText('dim', line_number(n)) + highlight(line, styleText)
+					: ' ' + styleText('dim', line_number(n) + line),
+			)
+		}
+		last_printed_line = to
+	}
+
+	output.push('')
+	return output
+}
+
+function print_summary(
 	{ report, context }: Report,
 	params: CliArguments,
-	{ styleText, print_width }: PrintLinesDependencies,
-) {
-	let output: (string | undefined)[] = []
+	styleText: StyleTextFn,
+): string[] {
+	let output: string[] = []
+	let success = (message: string) =>
+		output.push(`${styleText(['bold', 'green'], 'Success')}: ${message}`)
+	let failure = (message: string) =>
+		output.push(`${styleText(['bold', 'red'], 'Failed')}: ${message}`)
+	let { coverage, json_files_found, duration } = context
 
-	// Show un-covered chunks
-	if (params['show-uncovered'] !== 'none') {
-		const NUM_LEADING_LINES = 3
-		const NUM_TRAILING_LINES = NUM_LEADING_LINES
-		print_width = print_width ?? 80
-		let min_file_line_coverage = report.min_file_line_coverage.expected
-
-		for (let sheet of context.coverage.coverage_per_stylesheet.sort(
-			(a, b) => a.line_coverage_ratio - b.line_coverage_ratio,
-		)) {
-			if (
-				(sheet.line_coverage_ratio !== 1 && params['show-uncovered'] === 'all') ||
-				(min_file_line_coverage !== undefined &&
-					min_file_line_coverage !== 0 &&
-					sheet.line_coverage_ratio < min_file_line_coverage &&
-					params['show-uncovered'] === 'violations')
-			) {
-				output.push()
-				output.push(styleText('dim', '─'.repeat(print_width)))
-				output.push(`File: ${sheet.url}`)
-				output.push(
-					`Coverage: ${percentage(sheet.line_coverage_ratio)}, ${sheet.covered_lines}/${sheet.total_lines} lines covered`,
-				)
-
-				if (
-					min_file_line_coverage &&
-					min_file_line_coverage !== 0 &&
-					sheet.line_coverage_ratio < min_file_line_coverage
-				) {
-					let lines_to_cover = min_file_line_coverage * sheet.total_lines - sheet.covered_lines
-					output.push(
-						`Tip: cover ${Math.ceil(lines_to_cover)} more ${
-							lines_to_cover === 1 ? 'line' : 'lines'
-						} to meet the file threshold of ${percentage(min_file_line_coverage)}`,
-					)
-				}
-				output.push(styleText('dim', '─'.repeat(print_width)))
-
-				let lines = sheet.text.split('\n')
-				let uncovered_chunks = sheet.chunks.filter((chunk) => !chunk.is_covered)
-				// Keep track of the last printed line so context lines of chunks that are close
-				// together are not printed twice
-				let last_printed_line = 0
-
-				for (let [index, chunk] of uncovered_chunks.entries()) {
-					let first_line = Math.max(chunk.start_line - NUM_LEADING_LINES, 1, last_printed_line + 1)
-					// Show empty line between non-contiguous blocks
-					if (last_printed_line > 0 && first_line > last_printed_line + 1) {
-						output.push('')
-					}
-					// Render N leading lines
-					for (let x = first_line; x < chunk.start_line; x++) {
-						output.push(
-							[' ', styleText('dim', line_number(x)), styleText('dim', indent(lines[x - 1]))].join(
-								'',
-							),
-						)
-					}
-					// Render the uncovered chunk
-					for (let i = chunk.start_line; i <= chunk.end_line; i++) {
-						output.push(
-							[
-								styleText('red', '▌'),
-								styleText('dim', line_number(i)),
-								highlight(indent(lines[i - 1]), styleText),
-							].join(''),
-						)
-					}
-					last_printed_line = chunk.end_line
-					// Render N trailing lines, but stop before the next uncovered chunk
-					let next_chunk = uncovered_chunks[index + 1]
-					for (
-						let y = chunk.end_line + 1;
-						y <
-						Math.min(
-							chunk.end_line + NUM_TRAILING_LINES + 1,
-							lines.length,
-							next_chunk?.start_line ?? Infinity,
-						);
-						y++
-					) {
-						output.push(
-							[' ', styleText('dim', line_number(y)), styleText('dim', indent(lines[y - 1]))].join(
-								'',
-							),
-						)
-						last_printed_line = y
-					}
-				}
-				output.push('')
-			}
-		}
-	}
-
-	// Show empty line between report summary and chunks output
-	output.push()
-
-	let entries = context.coverage.total_files_found
-	let entries_label = `${number(entries)} coverage ${entries === 1 ? 'entry' : 'entries'}`
+	let entries = coverage.total_files_found
+	let entries_label = `${number(entries)} coverage ${plural(entries, 'entry', 'entries')}`
 	let source =
-		context.json_files_found === undefined
+		json_files_found === undefined
 			? entries_label
-			: `${number(context.json_files_found)} JSON ${context.json_files_found === 1 ? 'file' : 'files'} (${entries_label})`
+			: `${number(json_files_found)} JSON ${plural(json_files_found, 'file', 'files')} (${entries_label})`
 	output.push(
-		`Finished in ${number(Math.round(context.duration))}ms on ${source} containing ${number(context.coverage.total_stylesheets)} stylesheets with ${number(context.coverage.total_lines)} lines of CSS in total.`,
+		`Finished in ${number(Math.round(duration))}ms on ${source} containing ${number(coverage.total_stylesheets)} stylesheets with ${number(coverage.total_lines)} lines of CSS in total.`,
 	)
 
-	if (report.min_line_coverage.ok) {
-		output.push(
-			`${styleText(['bold', 'green'], 'Success')}: total line coverage is ${percentage(report.min_line_coverage.actual)}`,
-		)
+	let { actual, expected, ok } = report.min_line_coverage
+	if (ok) {
+		success(`total line coverage is ${percentage(actual)}`)
 	} else {
-		let { actual, expected } = report.min_line_coverage
-		output.push(
-			`${styleText(['bold', 'red'], 'Failed')}: line coverage is ${percentage(actual)}% which is lower than the threshold of ${expected}`,
+		failure(
+			`line coverage is ${percentage(actual)} which is lower than the threshold of ${percentage(expected)}`,
 		)
-		let lines_to_cover = expected * context.coverage.total_lines - context.coverage.covered_lines
+		let lines_to_cover = Math.ceil(expected * coverage.total_lines - coverage.covered_lines)
 		output.push(
-			`Tip: cover ${number(Math.ceil(lines_to_cover))} more ${lines_to_cover === 1 ? 'line' : 'lines'} to meet the threshold of ${percentage(
-				expected,
-			)}`,
+			`Tip: cover ${number(lines_to_cover)} more ${plural(lines_to_cover, 'line', 'lines')} to meet the threshold of ${percentage(expected)}`,
 		)
 	}
 
-	if (report.min_file_line_coverage.expected !== undefined) {
-		let { expected, actual, ok } = report.min_file_line_coverage
-		if (ok) {
-			output.push(
-				`${styleText(['bold', 'green'], 'Success')}: all files pass minimum line coverage of ${percentage(expected)}`,
-			)
+	let file_coverage = report.min_file_line_coverage
+	if (file_coverage.expected !== undefined) {
+		let { expected, actual } = file_coverage
+		if (file_coverage.ok) {
+			success(`all files pass minimum line coverage of ${percentage(expected)}`)
 		} else {
-			let num_files_failed = context.coverage.coverage_per_stylesheet.filter(
+			let num_failed = coverage.coverage_per_stylesheet.filter(
 				(sheet) => sheet.line_coverage_ratio < expected,
 			).length
-			output.push(
-				`${styleText(['bold', 'red'], 'Failed')}: ${number(num_files_failed)} ${
-					num_files_failed === 1 ? 'file does' : 'files do'
-				} not meet the minimum line coverage of ${percentage(expected)} (minimum coverage was ${percentage(actual)})`,
+			failure(
+				`${number(num_failed)} ${plural(num_failed, 'file does', 'files do')} not meet the minimum line coverage of ${percentage(expected)} (minimum coverage was ${percentage(actual)})`,
 			)
 			if (params['show-uncovered'] === 'none') {
 				output.push(`  Hint: set --show-uncovered=violations to see which files didn't pass`)
@@ -240,6 +198,28 @@ export function print_lines(
 	}
 
 	return output
+}
+
+export function print_lines(
+	{ report, context }: Report,
+	params: CliArguments,
+	{ styleText, print_width = 80 }: PrintLinesDependencies,
+): string[] {
+	let show = params['show-uncovered']
+	let min_file_line_coverage = report.min_file_line_coverage.expected ?? 0
+	let should_show = (sheet: Sheet) =>
+		show === 'all'
+			? sheet.line_coverage_ratio !== 1
+			: show === 'violations' && sheet.line_coverage_ratio < min_file_line_coverage
+
+	let sheets = show === 'none' ? [] : context.coverage.coverage_per_stylesheet.filter(should_show)
+
+	return [
+		...sheets
+			.toSorted((a, b) => a.line_coverage_ratio - b.line_coverage_ratio)
+			.flatMap((sheet) => print_sheet(sheet, min_file_line_coverage, { styleText, print_width })),
+		...print_summary({ report, context }, params, styleText),
+	]
 }
 
 export function print(report: Report, params: CliArguments): void {
