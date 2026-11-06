@@ -13,6 +13,10 @@ export type ChunkedCoverage = Omit<Coverage, 'ranges'> & {
 
 const WHITESPACE_ONLY_REGEX = /^\s+$/
 
+function create_chunk(start_offset: number, end_offset: number, is_covered: boolean): Chunk {
+	return { start_offset, end_offset, is_covered }
+}
+
 function merge(text: string, chunks: Chunk[]): Chunk[] {
 	let merged: Chunk[] = []
 	let previous_chunk: Chunk | undefined
@@ -59,29 +63,17 @@ function push_uncovered(chunks: Chunk[], text: string, start: number, end: numbe
 		for (const _ of tokenize(css, (comment) => {
 			let comment_start = start + comment.start
 			if (comment_start > last_end) {
-				chunks.push({
-					start_offset: last_end,
-					end_offset: comment_start,
-					is_covered: false,
-				})
+				chunks.push(create_chunk(last_end, comment_start, false))
 			}
 			last_end = start + comment.end
-			chunks.push({
-				start_offset: comment_start,
-				end_offset: last_end,
-				is_covered: true,
-			})
+			chunks.push(create_chunk(comment_start, last_end, true))
 		})) {
 			// consume the generator to drive the on_comment callback
 		}
 	}
 
 	if (last_end < end) {
-		chunks.push({
-			start_offset: last_end,
-			end_offset: end,
-			is_covered: false,
-		})
+		chunks.push(create_chunk(last_end, end, false))
 	}
 }
 
@@ -93,11 +85,7 @@ export function chunkify({ url, text, ranges }: Coverage): ChunkedCoverage {
 		if (offset !== range.start) {
 			push_uncovered(chunks, text, offset, range.start)
 		}
-		chunks.push({
-			start_offset: range.start,
-			end_offset: range.end,
-			is_covered: true,
-		})
+		chunks.push(create_chunk(range.start, range.end, true))
 		offset = range.end
 	}
 

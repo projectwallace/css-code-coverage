@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test'
-import { print_lines as print, PrintLinesDependencies, TextStyle } from './pretty'
-import { Report } from '../program'
-import { CoverageResult } from '../../lib'
-import { CliArguments } from '../arguments'
+import { print_lines as print, type PrintLinesDependencies, type TextStyle } from './pretty'
+import type { Report } from '../program'
+import type { CoverageResult } from '../../lib'
+import type { CliArguments } from '../arguments'
 
 // test matrix
 // ------------------------------

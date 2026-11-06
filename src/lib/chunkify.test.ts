@@ -11,9 +11,9 @@ test('creates chunks with outer chunks covered', () => {
 		url: 'https://example.com',
 	}
 	let result = chunkify(coverage)
-	delete coverage.ranges
 	expect(result).toEqual({
-		...coverage,
+		url: coverage.url,
+		text: coverage.text,
 		chunks: [
 			{
 				start_offset: 0,
@@ -41,9 +41,9 @@ test('creates chunks with only middle chunk covered', () => {
 		url: 'https://example.com',
 	}
 	let result = chunkify(coverage)
-	delete coverage.ranges
 	expect(result).toEqual({
-		...coverage,
+		url: coverage.url,
+		text: coverage.text,
 		chunks: [
 			{
 				start_offset: 0,
@@ -71,9 +71,9 @@ test('creates a single chunk when all is covered', () => {
 		url: 'https://example.com',
 	}
 	let result = chunkify(coverage)
-	delete coverage.ranges
 	expect(result).toEqual({
-		...coverage,
+		url: coverage.url,
+		text: coverage.text,
 		chunks: [
 			{
 				start_offset: 0,
@@ -91,9 +91,9 @@ test('creates a single chunk when none is covered', () => {
 		url: 'https://example.com',
 	}
 	let result = chunkify(coverage)
-	delete coverage.ranges
 	expect(result).toEqual({
-		...coverage,
+		url: coverage.url,
+		text: coverage.text,
 		chunks: [
 			{
 				start_offset: 0,
@@ -112,9 +112,9 @@ test('includes a trailing uncovered chunk when the last byte is not covered', ()
 		url: 'https://example.com',
 	}
 	let result = chunkify(coverage)
-	delete coverage.ranges
 	expect(result).toEqual({
-		...coverage,
+		url: coverage.url,
+		text: coverage.text,
 		chunks: [
 			{ start_offset: 0, end_offset: 3, is_covered: true },
 			{ start_offset: 3, end_offset: 4, is_covered: false },
@@ -130,9 +130,9 @@ test('does not emit a spurious empty chunk when the last byte is covered', () =>
 		url: 'https://example.com',
 	}
 	let result = chunkify(coverage)
-	delete coverage.ranges
 	expect(result).toEqual({
-		...coverage,
+		url: coverage.url,
+		text: coverage.text,
 		chunks: [{ start_offset: 0, end_offset: 4, is_covered: true }],
 	} satisfies ChunkedCoverage)
 })
@@ -151,9 +151,9 @@ test('merges adjacent same-coverage chunks separated by whitespace-only gap', ()
 		url: 'https://example.com',
 	}
 	let result = chunkify(coverage)
-	delete coverage.ranges
 	expect(result).toEqual({
-		...coverage,
+		url: coverage.url,
+		text: coverage.text,
 		chunks: [{ start_offset: 0, end_offset: 27, is_covered: true }],
 	} satisfies ChunkedCoverage)
 })
@@ -167,9 +167,9 @@ test('absorbs a zero-length covered chunk into the surrounding uncovered chunk',
 		url: 'https://example.com',
 	}
 	let result = chunkify(coverage)
-	delete coverage.ranges
 	expect(result).toEqual({
-		...coverage,
+		url: coverage.url,
+		text: coverage.text,
 		chunks: [{ start_offset: 0, end_offset: 12, is_covered: false }],
 	} satisfies ChunkedCoverage)
 })

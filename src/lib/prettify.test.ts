@@ -11,7 +11,7 @@ test('includes the last character of each chunk', () => {
 		url: 'https://example.com',
 	})
 	let result = prettify(chunked)
-	expect(result.chunks[0].css.trimEnd()).toContain('}')
+	expect(result.chunks[0]!.css.trimEnd()).toContain('}')
 })
 
 test('simple range at start', () => {})
@@ -45,7 +45,7 @@ test('offsets in prettified result are based on formatted CSS length, not origin
 		url: 'https://example.com',
 	})
 	let result = prettify(chunked)
-	let chunk = result.chunks[0]
+	let chunk = result.chunks[0]!
 
 	// The formatted CSS is longer than the original, so offsets must differ
 	expect(result.text.length).toBeGreaterThan(original.length)
@@ -60,7 +60,7 @@ test('offsets index into prettified.text and yield formatted CSS, not original C
 		url: 'https://example.com',
 	})
 	let result = prettify(chunked)
-	let chunk = result.chunks[0]
+	let chunk = result.chunks[0]!
 
 	// Substring with prettified offsets returns formatted CSS, not the original
 	let recovered = result.text.substring(chunk.start_offset, chunk.end_offset + 1)

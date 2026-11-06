@@ -24,7 +24,7 @@ test.describe('leaves ranges intact when nothing to change', () => {
 		// Expect the incomplete coverage reported by the browser
 		expect(coverage.at(0)!.ranges).toEqual([{ start: 0, end: 17 }])
 
-		let result = extend_ranges(coverage[0])
+		let result = extend_ranges(coverage[0]!)
 		expect(result.ranges).toEqual([{ start: 0, end: 17 }])
 	})
 })
@@ -37,7 +37,7 @@ test.describe('@rules', () => {
 		// Expect the incomplete coverage reported by the browser
 		expect(coverage.at(0)!.ranges).toEqual([{ start: 7, end: 42 }]) // (min-width:100px){body{color:green}
 
-		let result = extend_ranges(coverage[0])
+		let result = extend_ranges(coverage[0]!)
 		expect(result.ranges).toEqual([{ start: 0, end: 43 }]) // @media (min-width:100px){body{color:green}}
 	})
 
@@ -49,7 +49,7 @@ test.describe('@rules', () => {
 			// Expect the incomplete coverage reported by the browser
 			expect(coverage.at(0)!.ranges).toEqual([{ start: 10, end: 45 }]) // (min-width:100px){body{color:green}
 
-			let result = extend_ranges(coverage[0])
+			let result = extend_ranges(coverage[0]!)
 			expect(result.ranges).toEqual([{ start: 3, end: 46 }]) // @media (min-width:100px){body{color:green}}
 		})
 
@@ -60,7 +60,7 @@ test.describe('@rules', () => {
 			// Expect the incomplete coverage reported by the browser
 			expect(coverage.at(0)!.ranges).toEqual([{ start: 7, end: 42 }]) // (min-width:100px){body{color:green}
 
-			let result = extend_ranges(coverage[0])
+			let result = extend_ranges(coverage[0]!)
 			expect(result.ranges).toEqual([{ start: 0, end: 43 }]) // @media (min-width:100px){body{color:green}}
 		})
 	})
@@ -80,7 +80,7 @@ test.describe('@rules', () => {
 				],
 			})
 
-			let result = extend_ranges(coverage[0])
+			let result = extend_ranges(coverage[0]!)
 			expect(result).toEqual({
 				url: 'http://localhost/style.css',
 				text: css,
@@ -105,7 +105,7 @@ test.describe('@rules', () => {
 				],
 			})
 
-			let result = extend_ranges(coverage[0])
+			let result = extend_ranges(coverage[0]!)
 			expect(result).toEqual({
 				url: 'http://localhost/style.css',
 				text: css,
