@@ -40,3 +40,9 @@ test.describe('--min-file-coverage', () => {
 		expect(result.report.ok).toBeFalsy()
 	})
 })
+
+test('passes the number of JSON files to the context', () => {
+	let result = program({ min_coverage: 0, json_files_found: 1 }, [...coverage, ...coverage])
+	expect.soft(result.context.json_files_found).toEqual(1)
+	expect.soft(result.context.coverage.total_files_found).toEqual(2)
+})

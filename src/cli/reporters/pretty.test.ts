@@ -68,12 +68,14 @@ const context_empty = {
 			total_lines: 9999,
 		} as CoverageResult,
 		duration: 2,
+		json_files_found: 3,
 	},
 }
 
 const context_with_failures = {
 	context: {
 		duration: 2,
+		json_files_found: 3,
 		coverage: {
 			line_coverage_ratio: 0.4022222,
 			covered_lines: 10,
@@ -166,7 +168,7 @@ test.describe('only --min-line-coverage', () => {
 		} satisfies Report
 		let result = print(report, show_none, dependencies)
 		expect(result).toEqual([
-			'Finished in 2ms on 7 JSON files containing 8 stylesheets with 9,999 lines of CSS in total.',
+			'Finished in 2ms on 3 JSON files (7 coverage entries) containing 8 stylesheets with 9,999 lines of CSS in total.',
 			'Success: total line coverage is 50.22%',
 		])
 	})
@@ -181,6 +183,7 @@ test.describe('only --min-line-coverage', () => {
 					total_stylesheets: 8,
 				} as CoverageResult,
 				duration: 2,
+				json_files_found: 3,
 			},
 			report: {
 				ok: false,
@@ -190,7 +193,7 @@ test.describe('only --min-line-coverage', () => {
 		} satisfies Report
 		let result = print(report, show_none, dependencies)
 		expect(result).toEqual([
-			'Finished in 2ms on 7 JSON files containing 8 stylesheets with 10,000 lines of CSS in total.',
+			'Finished in 2ms on 3 JSON files (7 coverage entries) containing 8 stylesheets with 10,000 lines of CSS in total.',
 			'Failed: line coverage is 50.22%% which is lower than the threshold of 1',
 			'Tip: cover 4,978 more lines to meet the threshold of 100%',
 		])
@@ -209,7 +212,7 @@ test.describe('with --min-file-line-coverage', () => {
 		} satisfies Report
 		let result = print(report, show_none, dependencies)
 		expect(result).toEqual([
-			'Finished in 2ms on 7 JSON files containing 8 stylesheets with 9,999 lines of CSS in total.',
+			'Finished in 2ms on 3 JSON files (7 coverage entries) containing 8 stylesheets with 9,999 lines of CSS in total.',
 			'Success: total line coverage is 50.22%',
 			'Success: all files pass minimum line coverage of 50.00%',
 		])
@@ -228,7 +231,7 @@ test.describe('with --min-file-line-coverage', () => {
 
 		test('metadata', () => {
 			expect(result[0]).toEqual(
-				'Finished in 2ms on 7 JSON files containing 9 stylesheets with 11 lines of CSS in total.',
+				'Finished in 2ms on 3 JSON files (7 coverage entries) containing 9 stylesheets with 11 lines of CSS in total.',
 			)
 		})
 		test('coverage: pass', () => {
@@ -303,8 +306,6 @@ Tip: cover 11 more lines to meet the file threshold of 100%
      4 │ 
      5 │ a1 {
      6 │     color: blue;
-
-     6 │     color: blue;
      7 │ }
      8 │ 
 ▌    9 │ b {
@@ -313,19 +314,78 @@ Tip: cover 11 more lines to meet the file threshold of 100%
     12 │ 
     13 │ b1 {
     14 │     color: blue;
-
-    14 │     color: blue;
     15 │ }
     16 │ 
 ▌   17 │ c {
 ▌   18 │     color: red;
 ▌   19 │ }
 
-Finished in 2ms on 7 JSON files containing 9 stylesheets with 11 lines of CSS in total.
+Finished in 2ms on 3 JSON files (7 coverage entries) containing 9 stylesheets with 11 lines of CSS in total.
 Success: total line coverage is 50.22%
 Failed: 1 file does not meet the minimum line coverage of 100% (minimum coverage was 50.00%)`,
 				)
 			})
 		})
+	})
+})
+
+test.describe('uncovered chunk rendering', () => {
+	function render(
+		text: string,
+		chunks: { start_line: number; end_line: number; is_covered: boolean }[],
+	) {
+		let report = {
+			context: {
+				duration: 2,
+				coverage: {
+					total_files_found: 1,
+					total_stylesheets: 1,
+					total_lines: 1,
+					coverage_per_stylesheet: [{ url: 'example.com', line_coverage_ratio: 0.5, text, chunks }],
+				} as unknown as CoverageResult,
+			},
+			report: {
+				ok: true,
+				...min_line_coverage_success,
+				...min_file_line_coverage_unset,
+			},
+		} satisfies Report
+		return print(report, { 'show-uncovered': 'all' } as CliArguments, dependencies)
+	}
+
+	test('shows coverage entries when number of JSON files is unknown', () => {
+		let result = render('a {}', [{ start_line: 1, end_line: 1, is_covered: true }])
+		expect(result).toContain(
+			'Finished in 2ms on 1 coverage entry containing 1 stylesheets with 1 lines of CSS in total.',
+		)
+	})
+
+	test('renders statement at-rules with their trailing semicolon', () => {
+		let result = render('@layer components;\n\na {}', [
+			{ start_line: 1, end_line: 1, is_covered: false },
+			{ start_line: 2, end_line: 3, is_covered: true },
+		])
+		expect(result).toContain('▌    1 │ @layer components;')
+	})
+
+	test('separates chunks that are far apart with an empty line', () => {
+		let text = Array.from({ length: 12 }, (_, i) => `a${i + 1} {}`).join('\n')
+		let result = render(text, [
+			{ start_line: 1, end_line: 1, is_covered: false },
+			{ start_line: 2, end_line: 11, is_covered: true },
+			{ start_line: 12, end_line: 12, is_covered: false },
+		])
+		expect(result.slice(4, 14)).toEqual([
+			'▌    1 │ a1 {}',
+			'     2 │ a2 {}',
+			'     3 │ a3 {}',
+			'     4 │ a4 {}',
+			'',
+			'     9 │ a9 {}',
+			'    10 │ a10 {}',
+			'    11 │ a11 {}',
+			'▌   12 │ a12 {}',
+			'',
+		])
 	})
 })
