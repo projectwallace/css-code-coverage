@@ -69,11 +69,29 @@ export function calculate_coverage(coverage: Coverage[]): CoverageResult {
 		return Object.assign({ url, text }, calculate_coverage_data(chunks), { chunks })
 	})
 
+	// Total coverage for all stylesheets combined
+	let covered_bytes = 0
+	let total_bytes = 0
+	let covered_lines = 0
+	let total_lines = 0
+	for (let sheet of coverage_per_stylesheet) {
+		covered_bytes += sheet.covered_bytes
+		total_bytes += sheet.total_bytes
+		covered_lines += sheet.covered_lines
+		total_lines += sheet.total_lines
+	}
+
 	return {
 		total_files_found: coverage.length,
 		total_stylesheets: coverage_per_stylesheet.length,
-		// Total coverage for all stylesheets combined
-		...calculate_coverage_data(coverage_per_stylesheet.flatMap((sheet) => sheet.chunks)),
+		uncovered_bytes: total_bytes - covered_bytes,
+		covered_bytes,
+		total_bytes,
+		line_coverage_ratio: ratio(covered_lines, total_lines),
+		byte_coverage_ratio: ratio(covered_bytes, total_bytes),
+		total_lines,
+		covered_lines,
+		uncovered_lines: total_lines - covered_lines,
 		coverage_per_stylesheet,
 	}
 }

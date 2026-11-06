@@ -20,8 +20,10 @@ export async function read(
 		}
 		json_files_found++
 		let contents = await readFile(join(coverage_dir, file_path), 'utf-8')
-		let parsed = parse_coverage(contents)
-		parsed_files.push(...parsed)
+		// Not push(...parsed): spreading large arrays overflows the call stack
+		for (let entry of parse_coverage(contents)) {
+			parsed_files.push(entry)
+		}
 	}
 	return { json_files_found, coverage: parsed_files }
 }

@@ -68,10 +68,12 @@ export function program(
 ) {
 	let coverage = calculate_coverage(coverage_data)
 	let min_coverage_result = validate(coverage.line_coverage_ratio, min_coverage)
-	let min_file_coverage_result = validate(
-		Math.min(...coverage.coverage_per_stylesheet.map((sheet) => sheet.line_coverage_ratio)),
-		min_file_coverage,
-	)
+	// Not Math.min(...array): spreading large arrays overflows the call stack
+	let min_file_ratio = Infinity
+	for (let sheet of coverage.coverage_per_stylesheet) {
+		min_file_ratio = Math.min(min_file_ratio, sheet.line_coverage_ratio)
+	}
+	let min_file_coverage_result = validate(min_file_ratio, min_file_coverage)
 	let end_time = performance.now()
 
 	let result: Report = {

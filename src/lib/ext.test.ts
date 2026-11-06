@@ -23,4 +23,13 @@ test('invalid cases', () => {
 	expect.soft(ext('https://example.com/style.css.map#hash')).toBe('map')
 	expect.soft(ext('https://example.com/some-/nested/path/style.css.map')).toBe('map')
 	expect.soft(ext('https://example.com/style.scss')).toBe('scss')
+	expect.soft(ext('https://example.com/')).toBe('')
+	expect.soft(ext('https://example.com/dir.v2/page')).toBe('')
+})
+
+test('relative urls', () => {
+	expect.soft(ext('style.css')).toBe('css')
+	expect.soft(ext('/assets/style.css')).toBe('css')
+	expect.soft(ext('/assets/style.css?v=1#hash')).toBe('css')
+	expect.soft(ext('/dir.v2/page')).toBe('')
 })

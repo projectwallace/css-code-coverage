@@ -228,10 +228,11 @@ export function print_lines(
 export function print(report: Report, params: CliArguments): void {
 	let logger = report.report.ok ? console.log : console.error
 
-	for (let line of print_lines(report, params, {
-		styleText,
-		print_width: process.stdout.columns,
-	})) {
-		logger(line)
-	}
+	// One write instead of one per line
+	logger(
+		print_lines(report, params, {
+			styleText,
+			print_width: process.stdout.columns,
+		}).join('\n'),
+	)
 }
