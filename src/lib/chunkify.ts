@@ -1,4 +1,4 @@
-import { tokenize_cb } from '@projectwallace/css-parser/tokenizer'
+import { tokenize } from '@projectwallace/css-parser/tokenizer'
 import { TOKEN_COMMENT } from '@projectwallace/css-parser/token-types'
 import type { Coverage } from './parse-coverage'
 
@@ -61,7 +61,7 @@ function push_uncovered(chunks: Chunk[], text: string, start: number, end: numbe
 
 	// Skip tokenizing when there cannot be any comment
 	if (css.indexOf('/*') !== -1) {
-		tokenize_cb(css, (token_type, token_start, token_end) => {
+		tokenize(css, (token_type, token_start, token_end) => {
 			if (token_type !== TOKEN_COMMENT) {
 				return
 			}

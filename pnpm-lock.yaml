@@ -5,15 +5,15 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  '@projectwallace/css-parser': ~0.19.4
+  '@projectwallace/css-parser': ~0.20.0
 
 importers:
 
   .:
     dependencies:
       '@projectwallace/css-parser':
-        specifier: ~0.19.4
-        version: 0.19.4
+        specifier: ~0.20.0
+        version: 0.20.0
       '@projectwallace/format-css':
         specifier: ^3.2.2
         version: 3.2.2
@@ -562,8 +562,8 @@ packages:
     engines: {node: '>=20'}
     hasBin: true
 
-  '@projectwallace/css-parser@0.19.4':
-    resolution: {integrity: sha512-Wow4VO1HWUNq5MLMDffTPapW7hu2wXHF8wdgOrcjk6zdU+VYDS/O4b967yiL/8ZjyCO5LWC2HPRYQeqguEP5pQ==}
+  '@projectwallace/css-parser@0.20.0':
+    resolution: {integrity: sha512-DACi18aYryfiiEs/orFYB+1aE9uPkq8DmwwOkrKZydbwqPnP0hUl+0xESnIfbld2p2zF23ufJNfBZyV3HQD0/g==}
     engines: {pnpm: '>=11.0.0'}
 
   '@projectwallace/format-css@3.2.2':
@@ -1330,18 +1330,22 @@ packages:
   yuku-ast@0.19.0:
     resolution: {integrity: sha512-PyCsiScaelhxBGzL8dyeJkLqvRZycoh78R31Vrt/WqYrm0hMFoKwIw/X7Dx5mBKLWAMlV9I9HEyBOHnj2gZVyw==}
     engines: {node: '>=14.18.0'}
+    deprecated: 'Yuku is now one package with one core. Use "yuku" instead: https://yuku.fyi/javascript/. Existing installs keep working but get no more fixes.'
 
   yuku-codegen@0.19.0:
     resolution: {integrity: sha512-uymAKHjDuaP4BEpkXC/BSLz4DUEF5oArZ5AuD3888nb2miChjWSgpPdojEJxm3pjpXkgUaCRJQyNAbnMN33wHg==}
     engines: {node: '>=14.18.0'}
+    deprecated: 'Yuku is now one package with one core. Use "yuku" instead: https://yuku.fyi/javascript/. Existing installs keep working but get no more fixes.'
 
   yuku-core@0.19.0:
     resolution: {integrity: sha512-kYK9e1XdfirNhkipzW0wmMcSWcVF/CWnuugodfVYRCUwvoBefweL9HzB96OiKEhsx78V5WbUxbJqlizMX869Qg==}
     engines: {node: '>=14.18.0'}
+    deprecated: 'Yuku is now one package with one core. Use "yuku" instead: https://yuku.fyi/javascript/. Existing installs keep working but get no more fixes.'
 
   yuku-parser@0.19.0:
     resolution: {integrity: sha512-XrBh9ZiQK5mJVRxZBAvD6LwRyAYrK3MFtH3+onyuxFL5hFD44EC3QOmIC1FjTj6H2MMwq46/NAI+NZxLZPZgxg==}
     engines: {node: '>=14.18.0'}
+    deprecated: 'Yuku is now one package with one core. Use "yuku" instead: https://yuku.fyi/javascript/. Existing installs keep working but get no more fixes.'
 
   zod@4.6.7:
     resolution: {integrity: sha512-g8W2D2kU6a8untc053fX1uVBKzM7yqAxW/3zwk83+6RyF2+SKOuV+c0wBDhUwzV1PaGapmZH+rmcUzPf+3CGwg==}
@@ -1622,11 +1626,11 @@ snapshots:
     dependencies:
       playwright: 1.64.1
 
-  '@projectwallace/css-parser@0.19.4': {}
+  '@projectwallace/css-parser@0.20.0': {}
 
   '@projectwallace/format-css@3.2.2':
     dependencies:
-      '@projectwallace/css-parser': 0.19.4
+      '@projectwallace/css-parser': 0.20.0
 
   '@projectwallace/preset-oxlint@0.0.11(oxlint@1.89.0)':
     dependencies:
