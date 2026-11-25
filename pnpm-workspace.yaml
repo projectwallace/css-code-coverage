@@ -14,7 +14,7 @@ minimumReleaseAgeExclude:
 trustPolicy: no-downgrade
 
 catalog:
-  '@projectwallace/css-parser': ~0.19.4
+  '@projectwallace/css-parser': ~0.20.0
 
 # Make sure transitive deps (like @projectwallace/format-css) use the same css-parser
 overrides:
